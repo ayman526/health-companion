@@ -1,6 +1,6 @@
 {
-  "name": "Health Companion",
-  "short_name": "Health",
+  "name": "Health Journal",
+  "short_name": "Health Journal",
   "description": "Your health history, organized and understood.",
   "start_url": "/",
   "scope": "/",

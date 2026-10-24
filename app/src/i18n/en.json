@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Health Companion"
+    "name": "Health Journal"
   },
   "nav": {
     "home": "Home",
@@ -188,7 +188,7 @@
     "consent": {
       "terms": {
         "title": "Terms of use",
-        "body": "Health Companion gives health information and organizes your records. It is not a doctor, pharmacist or emergency service."
+        "body": "Health Journal gives health information and organizes your records. It is not a doctor, pharmacist or emergency service."
       },
       "privacy": {
         "title": "Privacy policy",

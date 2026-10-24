@@ -69,7 +69,7 @@ export function PrivacyPage() {
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `health-companion-${new Date().toISOString().slice(0, 10)}.zip`
+      a.download = `health-journal-${new Date().toISOString().slice(0, 10)}.zip`
       a.click()
       setTimeout(() => URL.revokeObjectURL(url), 10_000)
     } catch {

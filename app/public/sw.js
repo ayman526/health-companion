@@ -11,7 +11,7 @@ self.addEventListener('push', (event) => {
     data = { body: event.data ? event.data.text() : '' }
   }
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Health Companion', {
+    self.registration.showNotification(data.title || 'Health Journal', {
       body: data.body || '',
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-192.png',

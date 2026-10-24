@@ -1,4 +1,4 @@
-# Phase 6: what's left before others use Health Companion
+# Phase 6: what's left before others use Health Journal
 
 Tick items off as you go. **A** must be done before anyone else uses the app. **B** before inviting beta users. **C** before going public.
 

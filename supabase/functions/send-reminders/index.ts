@@ -29,8 +29,8 @@ const channels = () => ({
 })
 
 const TEXT = {
-  en: { title: 'Health Companion', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.' },
-  ar: { title: 'رفيقك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.' },
+  en: { title: 'Health Journal', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.' },
+  ar: { title: 'سجلك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.' },
 }
 
 type Due = { kind: 'dose' | 'reminder'; item_id: string; profile_id: string; owner_id: string; due_at: string }

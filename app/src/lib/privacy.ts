@@ -62,7 +62,7 @@ export async function exportMyData(profileId: string, email: string | undefined,
   onProgress({ stage: 'zip', done: 0, total: 1 })
   const data = { exported_at: new Date().toISOString(), format_version: 1, account: { email: email ?? null }, tables }
   const readme = [
-    'Health Companion: your data',
+    'Health Journal: your data',
     '',
     'data.json  All your records, one list per table, exactly as stored.',
     'files/     The original documents and photos you uploaded.',

@@ -1,4 +1,4 @@
-# Health Companion AI — MVP Specification
+# Health Journal (formerly Health Companion AI) — MVP Specification
 
 Status: draft v1 · 2026-10-24 · Source of truth for business logic. The original mega prompt describes the product vision; where they differ, this file wins.
 
@@ -106,7 +106,7 @@ The rules live in versioned code (`app/src/domain/labs/catalog.ts`) with a sourc
 - Dose instances are generated server-side 48 h ahead. States: `pending → taken | skipped | snoozed → not_recorded` (after the window closes). Never auto-classified as "missed".
 - Optional `supply_quantity` / `supply_ends_on` for renewal reminders.
 - Schedules are stored as local wall time + IANA time zone (handles DST and travel).
-- **Delivery**: pg_cron every minute → `send-reminders` edge function → web push (VAPID), else email (Resend), else WhatsApp (Meta Cloud API, approved template). Message bodies contain no health details by default ("You have a reminder in Health Companion"). `reminder_deliveries` records `sent | failed`; we never claim "delivered" unless the channel confirms it.
+- **Delivery**: pg_cron every minute → `send-reminders` edge function → web push (VAPID), else email (Resend), else WhatsApp (Meta Cloud API, approved template). Message bodies contain no health details by default ("You have a reminder in Health Journal"). `reminder_deliveries` records `sent | failed`; we never claim "delivered" unless the channel confirms it.
 - Follow-ups extracted from documents are proposed reminders until the user confirms the date. AI-suggested intervals are labelled as suggestions, never as clinician orders. A newly confirmed report containing the requested test suggests completing the follow-up.
 
 ## 10. Privacy, security, consent
