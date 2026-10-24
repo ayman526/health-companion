@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Home, FolderHeart, MessageCircleHeart, Pill, CalendarClock, Languages, Bell, Settings, LockKeyhole } from 'lucide-react'
@@ -93,7 +94,10 @@ export function AppShell() {
         </header>
 
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-5 pb-28 md:px-8 md:pt-10 md:pb-10">
-          <Outlet />
+          {/* Navigation stays visible while a screen's code downloads. */}
+          <Suspense fallback={<p role="status" className="py-10 text-center text-sm text-muted">{t('auth.loading')}</p>}>
+            <Outlet />
+          </Suspense>
         </main>
 
         {/* Bottom navigation on mobile */}

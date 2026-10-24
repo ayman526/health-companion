@@ -1,43 +1,63 @@
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthProvider, useAuth } from './auth/AuthProvider'
 import { AppShell } from './components/AppShell'
 import { HomePage } from './pages/Home'
-import { RecordsPage } from './pages/Records'
-import { AdvisorPage } from './pages/Advisor'
-import { MedicationsPage } from './pages/Medications'
-import { TimelinePage } from './pages/Timeline'
 import { SignInPage } from './pages/SignIn'
-import { OnboardingPage } from './pages/Onboarding'
-import { ScanPage } from './pages/Scan'
-import { ReviewPage } from './pages/Review'
-import { ReportDetailPage } from './pages/ReportDetail'
-import { TestHistoryPage } from './pages/TestHistory'
-import { ComparePage } from './pages/Compare'
-import { InsightsPage } from './pages/Insights'
-import { MedicationFormPage } from './pages/MedicationForm'
-import { MedicationDetailPage } from './pages/MedicationDetail'
-import { DocumentReviewPage } from './pages/DocumentReview'
-import { RemindersPage } from './pages/Reminders'
-import { SettingsPage } from './pages/Settings'
-import { LifestylePage } from './pages/Lifestyle'
-import { MedicationEditPage } from './pages/MedicationEdit'
-import { ProfilePage } from './pages/Profile'
-import { PrivacyPage } from './pages/Privacy'
+
+// Home and sign-in load with the app; every other screen is downloaded the
+// first time it's opened, so the first load stays small on mobile data.
+const RecordsPage = lazy(() => import('./pages/Records').then((m) => ({ default: m.RecordsPage })))
+const AdvisorPage = lazy(() => import('./pages/Advisor').then((m) => ({ default: m.AdvisorPage })))
+const MedicationsPage = lazy(() => import('./pages/Medications').then((m) => ({ default: m.MedicationsPage })))
+const TimelinePage = lazy(() => import('./pages/Timeline').then((m) => ({ default: m.TimelinePage })))
+const OnboardingPage = lazy(() => import('./pages/Onboarding').then((m) => ({ default: m.OnboardingPage })))
+const ScanPage = lazy(() => import('./pages/Scan').then((m) => ({ default: m.ScanPage })))
+const ReviewPage = lazy(() => import('./pages/Review').then((m) => ({ default: m.ReviewPage })))
+const ReportDetailPage = lazy(() => import('./pages/ReportDetail').then((m) => ({ default: m.ReportDetailPage })))
+const TestHistoryPage = lazy(() => import('./pages/TestHistory').then((m) => ({ default: m.TestHistoryPage })))
+const ComparePage = lazy(() => import('./pages/Compare').then((m) => ({ default: m.ComparePage })))
+const InsightsPage = lazy(() => import('./pages/Insights').then((m) => ({ default: m.InsightsPage })))
+const MedicationFormPage = lazy(() => import('./pages/MedicationForm').then((m) => ({ default: m.MedicationFormPage })))
+const MedicationDetailPage = lazy(() => import('./pages/MedicationDetail').then((m) => ({ default: m.MedicationDetailPage })))
+const DocumentReviewPage = lazy(() => import('./pages/DocumentReview').then((m) => ({ default: m.DocumentReviewPage })))
+const RemindersPage = lazy(() => import('./pages/Reminders').then((m) => ({ default: m.RemindersPage })))
+const SettingsPage = lazy(() => import('./pages/Settings').then((m) => ({ default: m.SettingsPage })))
+const LifestylePage = lazy(() => import('./pages/Lifestyle').then((m) => ({ default: m.LifestylePage })))
+const MedicationEditPage = lazy(() => import('./pages/MedicationEdit').then((m) => ({ default: m.MedicationEditPage })))
+const ProfilePage = lazy(() => import('./pages/Profile').then((m) => ({ default: m.ProfilePage })))
+const PrivacyPage = lazy(() => import('./pages/Privacy').then((m) => ({ default: m.PrivacyPage })))
+
+// Screens people usually open next, fetched quietly once the app is idle.
+const prefetchLikelyPages = () => {
+  void import('./pages/Records')
+  void import('./pages/Medications')
+  void import('./pages/Advisor')
+}
+
+function Loading() {
+  const { t } = useTranslation()
+  return (
+    <div role="status" className="grid min-h-dvh place-items-center text-muted">
+      {t('auth.loading')}
+    </div>
+  )
+}
 
 function Gate() {
-  const { t } = useTranslation()
   const { loading, session, profile } = useAuth()
+  const ready = !!profile?.onboarding_completed_at
 
-  if (loading) {
-    return (
-      <div role="status" className="grid min-h-dvh place-items-center text-muted">
-        {t('auth.loading')}
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (!ready) return
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500))
+    idle(prefetchLikelyPages)
+  }, [ready])
+
+  if (loading) return <Loading />
   if (!session) return <SignInPage />
-  if (!profile?.onboarding_completed_at) return <OnboardingPage />
+  if (!ready) return <Suspense fallback={<Loading />}><OnboardingPage /></Suspense>
 
   return (
     <Routes>

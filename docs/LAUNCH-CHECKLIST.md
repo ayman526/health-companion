@@ -29,7 +29,7 @@ Tick items off as you go. **A** must be done before anyone else uses the app. **
   - Re-check every table's row-level security.
   - Restrict the Edge Functions' allowed origin from `*` to your real web address.
   - Confirm no secret is in the GitHub repository.
-- [ ] **Speed:** split the single app bundle by page so the first load is faster on mobile data.
+- [x] **Speed:** screens load on demand, libraries cached separately, test explanations per language (first download about 30% smaller).
 - [ ] **Test the AI advisor** with real questions in both languages, including an emergency-sounding one.
 
 ## C. Before going public

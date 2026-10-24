@@ -1,11 +1,17 @@
-import { TEST_INFO_AR } from './ar'
-import { TEST_INFO_EN } from './en'
 import type { TestInfo } from './types'
 
 export type { TestInfo }
 
-export function getTestInfo(code: string, lang: string): TestInfo | undefined {
-  return (lang === 'ar' ? TEST_INFO_AR : TEST_INFO_EN)[code]
+type InfoTable = Record<string, TestInfo>
+const loaded: Partial<Record<'en' | 'ar', Promise<InfoTable>>> = {}
+
+/** Test explanations for one language, downloaded only when first needed. */
+export function loadTestInfo(lang: string): Promise<InfoTable> {
+  const key = lang === 'ar' ? 'ar' : 'en'
+  loaded[key] ??= key === 'ar'
+    ? import('./ar').then((m) => m.TEST_INFO_AR)
+    : import('./en').then((m) => m.TEST_INFO_EN)
+  return loaded[key]
 }
 
 /**

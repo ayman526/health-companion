@@ -93,3 +93,15 @@ async function syncNames(
 export const saveConditions = (profileId: string, names: string[]) => syncNames('medical_conditions', 'name', profileId, names, false)
 export const saveFamilyHistory = (profileId: string, names: string[]) => syncNames('medical_conditions', 'name', profileId, names, true)
 export const saveAllergies = (profileId: string, names: string[]) => syncNames('allergies', 'substance', profileId, names)
+
+/** How much of the optional profile is filled in (0–1), for the Home prompt. */
+export function profileCompleteness(p: {
+  date_of_birth: string | null; sex: string | null; height_cm: number | null; weight_kg: number | null
+  smoking_status: string | null; health_goals: string[] | null; no_known_conditions: boolean; no_known_allergies: boolean
+}, lists: { conditions: string[]; allergies: string[] }) {
+  const parts = [
+    !!p.date_of_birth, !!p.sex, !!p.height_cm && !!p.weight_kg, !!p.smoking_status, (p.health_goals ?? []).length > 0,
+    p.no_known_conditions || lists.conditions.length > 0, p.no_known_allergies || lists.allergies.length > 0,
+  ]
+  return parts.filter(Boolean).length / parts.length
+}

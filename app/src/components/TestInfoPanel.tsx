@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, ExternalLink } from 'lucide-react'
 import type { LabTest } from '../domain/labs/catalog'
 import type { MeasurementStatus } from '../domain/labs/rules'
-import { getTestInfo, medlinePlusUrl } from '../content/testInfo'
+import { loadTestInfo, medlinePlusUrl, type TestInfo } from '../content/testInfo'
 
 /**
  * "What this means": general education for a test, focused on the user's own
@@ -10,7 +11,12 @@ import { getTestInfo, medlinePlusUrl } from '../content/testInfo'
  */
 export function TestInfoPanel({ test, status, positive }: { test: LabTest; status: MeasurementStatus | null; positive?: boolean }) {
   const { t, i18n } = useTranslation()
-  const info = getTestInfo(test.code, i18n.language)
+  const [info, setInfo] = useState<TestInfo | undefined>()
+  useEffect(() => {
+    let current = true
+    void loadTestInfo(i18n.language).then((table) => current && setInfo(table[test.code]))
+    return () => { current = false }
+  }, [test.code, i18n.language])
   if (!info) return null
 
   const isHigh = status === 'high' || (status === 'urgent' && !!info.high)
