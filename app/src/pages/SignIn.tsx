@@ -80,7 +80,7 @@ export function SignInPage() {
             </button>
             {state.kind === 'error' && (
               <p role="alert" className="text-sm text-status-urgent">
-                {t('auth.error')} ({state.message})
+                {/rate limit/i.test(state.message) ? t('auth.rateLimited') : `${t('auth.error')} (${state.message})`}
               </p>
             )}
           </form>

@@ -174,7 +174,8 @@
       "encrypted": "Encrypted",
       "delete": "Delete anytime"
     },
-    "howWeProtect": "How we protect your records"
+    "howWeProtect": "How we protect your records",
+    "rateLimited": "Too many sign-in emails were sent in the last hour. Please try again later."
   },
   "onboarding": {
     "step": "Step {{n}} of {{total}}",
