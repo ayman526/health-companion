@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Calm, trustworthy palette. Status colors are muted on purpose:
+   "outside range" is amber, not red. Red is reserved for urgent. */
+@theme {
+  --font-sans: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
+
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+
+  --color-surface: #ffffff;
+  --color-canvas: #f6f8f8;
+  --color-ink: #0f1f1e;
+  --color-muted: #5b6b6a;
+  --color-line: #e3e9e8;
+
+  --color-status-ok: #15803d;
+  --color-status-ok-bg: #ecfdf3;
+  --color-status-watch: #b45309;
+  --color-status-watch-bg: #fffbeb;
+  --color-status-urgent: #b91c1c;
+  --color-status-urgent-bg: #fef2f2;
+  --color-status-info: #1d4ed8;
+  --color-status-info-bg: #eff6ff;
+}
+
+html[lang="ar"] {
+  --font-sans: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep medical values (numbers, units) left-to-right inside Arabic text. */
+.ltr-value {
+  direction: ltr;
+  unicode-bidi: isolate;
+}

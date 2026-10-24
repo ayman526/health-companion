@@ -1,0 +1,1047 @@
+{
+  "app": {
+    "name": "Health Companion"
+  },
+  "nav": {
+    "home": "Home",
+    "records": "Records",
+    "advisor": "Advisor",
+    "medications": "Medications",
+    "timeline": "Timeline"
+  },
+  "actions": {
+    "scan": "Scan a report",
+    "ask": "Ask your advisor",
+    "addMedication": "Add a medication",
+    "switchLanguage": "العربية"
+  },
+  "home": {
+    "greeting": "Good to see you",
+    "subtitle": "Here is where your health stands.",
+    "attention": "Needs your attention",
+    "changed": "What has changed",
+    "today": "Today",
+    "emptyAttention": "Nothing needs your attention right now.",
+    "emptyChanged": "Changes between your reports will appear here once you have two reports with the same tests.",
+    "emptyToday": "No medications or reminders scheduled for today.",
+    "reviewsPending_one": "1 report is waiting for your review",
+    "reviewsPending_other": "{{count}} reports are waiting for your review",
+    "greetingName": "Good to see you, {{name}}",
+    "allInsights_one": "See 1 insight",
+    "allInsights_other": "See all {{count}} insights"
+  },
+  "records": {
+    "title": "Health records",
+    "empty": "Your records will appear here. Start by scanning a lab report, prescription, or doctor's report.",
+    "labReport": "Lab report",
+    "needsReview": "Needs review",
+    "document": "Document",
+    "labReports": "Lab reports",
+    "docStatus": {
+      "uploaded": "Uploaded",
+      "processing": "Reading…",
+      "failed": "Couldn't be read",
+      "needs_review": "Saved"
+    },
+    "resultsToReview_one": "1 result to check",
+    "resultsToReview_other": "{{count}} results to check",
+    "resultCount_one": "1 result",
+    "resultCount_other": "{{count}} results",
+    "tests": "Your tests"
+  },
+  "advisor": {
+    "title": "AI health advisor",
+    "empty": "Ask about your results, changes over time or your medicines. Answers use only your confirmed records and say when something is missing.",
+    "disclaimer": "Health information, not medical care. The advisor isn't a doctor. In an emergency, call your local emergency number.",
+    "subtitle": "Answers based on your own confirmed records, with links to the reports behind them.",
+    "newConversation": "New conversation",
+    "history": "Earlier conversations",
+    "untitled": "Conversation",
+    "suggestions": {
+      "cholesterol": "How has my cholesterol changed since my first report?",
+      "liver": "Compare my latest liver results with the previous report.",
+      "doctor": "What should I discuss with my doctor at my next visit?",
+      "summary": "Summarize my health progress over the last six months.",
+      "arabic": "Explain my latest report in simple Arabic.",
+      "followUps": "What follow-up tests have I been advised to do?"
+    },
+    "thinking": "Reading your records…",
+    "errors": {
+      "ai_unavailable": "The advisor isn't available right now. Please try again in a moment.",
+      "ai_busy": "The advisor is busy. Please try again in a minute.",
+      "ai_refused": "The advisor couldn't answer this question. Try rephrasing it, or ask your doctor.",
+      "answer_too_long": "That question needs a very long answer. Try asking about one test or topic at a time.",
+      "invalid_ai_output": "The answer didn't come through properly. Please try again.",
+      "ai_not_configured": "The advisor isn't set up yet.",
+      "consent_required": "AI answers aren't allowed for your account. You can turn them on in Settings.",
+      "quota_exceeded": "You've reached this month's limit of 300 questions.",
+      "no_profile": "Your profile couldn't be found. Try signing out and in again.",
+      "conversation_not_found": "This conversation couldn't be found. Start a new one.",
+      "bad_request": "That message couldn't be sent. Try a shorter question.",
+      "no_backend": "The app isn't connected to its server."
+    },
+    "recordsStillAvailable": "Your records, charts and reminders are still available as usual.",
+    "placeholder": "Ask about your health records…",
+    "send": "Send",
+    "needsConsent": "The advisor uses AI to read your records. Turn on AI reading in",
+    "sections": {
+      "changes": "What changed",
+      "explanation": "In plain words",
+      "uncertainties": "What we don't know",
+      "nextSteps": "Next steps",
+      "warningSigns": "Get urgent care if"
+    },
+    "seeDoctor": {
+      "not_needed": "No doctor visit needed for this",
+      "routine": "Discuss at your next doctor visit",
+      "soon": "See your doctor soon",
+      "urgent": "Get medical care today"
+    },
+    "unverifiedNumbers": "Some numbers in this answer couldn't be matched to your records. Check them against your reports.",
+    "blockedNote": "Part of this answer was replaced because it suggested a medicine change or a diagnosis. Those decisions belong to your doctor.",
+    "proposedFacts": "You mentioned something that isn't in your record yet:",
+    "factKinds": {
+      "medication": "Medicine",
+      "condition": "Condition",
+      "allergy": "Allergy",
+      "symptom": "Symptom",
+      "lifestyle": "Life change"
+    },
+    "addToRecord": "Add to my record",
+    "thanks": "Thanks for the feedback.",
+    "helpful": "Helpful",
+    "notHelpful": "Not helpful",
+    "reportInaccurate": "Inaccurate",
+    "reportUnsafe": "Unsafe",
+    "feedbackPrompt": "What was wrong? (optional)",
+    "emergency": {
+      "title": "This may be an emergency",
+      "body": "If you or someone with you has these symptoms now, call emergency services or go to the nearest emergency department. Don't wait for an answer here.",
+      "crisisBody": "If you're thinking about ending your life or hurting yourself, please reach out now. You don't have to go through this alone.",
+      "call": "Call {{number}}",
+      "crisisCall": "Crisis line {{number}}"
+    }
+  },
+  "medications": {
+    "title": "Medications",
+    "empty": "Add your medicines manually or from a prescription to track doses and get reminders."
+  },
+  "timeline": {
+    "title": "Health timeline",
+    "empty": "Reports, medication changes, appointments and follow-ups will appear here in order.",
+    "filter": "Show",
+    "filters": {
+      "all": "All",
+      "labs": "Lab reports",
+      "meds": "Medications",
+      "care": "Follow-ups",
+      "lifestyle": "Life changes"
+    },
+    "types": {
+      "lab_report": "Lab report · {{title}}",
+      "medication_started": "Started {{title}}",
+      "medication_changed": "Dose changed · {{title}}",
+      "medication_stopped": "Stopped {{title}}",
+      "reminder_completed": "Done · {{title}}",
+      "follow_up": "Follow-up · {{title}}",
+      "appointment": "Appointment · {{title}}",
+      "diagnosis": "Diagnosis · {{title}}",
+      "insight": "{{title}}",
+      "document": "Document · {{title}}",
+      "symptom": "Symptom · {{title}}",
+      "lifestyle": "{{title}}"
+    }
+  },
+  "setup": {
+    "notConnected": "Coming soon",
+    "backendPending": "Your records, medications and reminders are ready. The AI advisor is coming next."
+  },
+  "auth": {
+    "tagline": "Your health history, organized and understood.",
+    "email": "Email address",
+    "sendLink": "Email me a sign-in link",
+    "sending": "Sending…",
+    "checkEmail": "Check your email",
+    "sentTo": "We sent a sign-in link to",
+    "useDifferentEmail": "Use a different email",
+    "error": "We couldn't send the link. Please try again.",
+    "notConfigured": "Sign-in isn't available yet: the app isn't connected to its secure backend.",
+    "privacyNote": "Your health records are private to your account. We never sell your data or use it for advertising.",
+    "signOut": "Sign out",
+    "loading": "Loading…",
+    "trust": {
+      "noPassword": "No passwords",
+      "encrypted": "Encrypted",
+      "delete": "Delete anytime"
+    },
+    "howWeProtect": "How we protect your records"
+  },
+  "onboarding": {
+    "step": "Step {{n}} of {{total}}",
+    "optional": "(optional)",
+    "continue": "Continue",
+    "back": "Back",
+    "finish": "Start using the app",
+    "saving": "Saving…",
+    "consentTitle": "Your privacy",
+    "consentIntro": "Please review how we handle your health information.",
+    "consent": {
+      "terms": {
+        "title": "Terms of use",
+        "body": "Health Companion gives health information and organizes your records. It is not a doctor, pharmacist or emergency service."
+      },
+      "privacy": {
+        "title": "Privacy policy",
+        "body": "Your data is private to your account, encrypted in transit and at rest, and stored by Supabase in Frankfurt, Germany. You can export or delete it at any time."
+      },
+      "health_data_processing": {
+        "title": "Storing your health information",
+        "body": "We store the health records, documents and medications you add so the app can track them over time."
+      },
+      "ai_processing": {
+        "title": "AI reading and explanations",
+        "body": "Lets the app send your documents and relevant records to Anthropic (Claude) to read reports and answer your questions. Anthropic does not use this data to train models. Without it, you can still enter results manually."
+      }
+    },
+    "adultConfirm": "I confirm I am 18 or older",
+    "legalDraftNote": "Beta: the full terms and privacy policy are being finalized and you will be asked to review them before public launch.",
+    "profileTitle": "About you",
+    "profileIntro": "All optional — it helps us tailor ranges and suggestions.",
+    "name": "What should we call you?",
+    "dob": "Date of birth",
+    "dobWhy": "Some results are interpreted differently by age.",
+    "mustBeAdult": "You must be 18 or older to use the app.",
+    "country": "Country",
+    "countries": {
+      "EG": "Egypt",
+      "US": "United States"
+    },
+    "timeZone": "Time zone for reminders",
+    "skip": "Skip",
+    "languageTitle": "Language",
+    "recommended": "Recommended",
+    "agreeAll": "Agree to all and continue (recommended)",
+    "chooseIndividually": "Choose individually",
+    "withoutAi": "Without AI reading, scanning reports and prescriptions won't work. You can turn it on later in Settings.",
+    "requiredConsents": "Terms, privacy and health data storage are needed to use the app.",
+    "mustConfirmAdult": "You must be 18 or older to use the app.",
+    "pregnancyTitle": "Pregnancy",
+    "pregnancyIntro": "Some lab ranges and medicine notes differ during pregnancy or breastfeeding. Optional.",
+    "healthTitle": "Health background",
+    "healthIntro": "Choose any that apply. Optional.",
+    "familyTitle": "Family history",
+    "familyIntro": "Conditions in parents, brothers or sisters. This changes which checkups we suggest. Optional.",
+    "goalsTitle": "Your goals",
+    "goalsIntro": "What would you like help with? Optional.",
+    "doctorTitle": "Your doctor",
+    "doctorIntro": "Your main doctor's name, to prepare summaries for visits. Optional.",
+    "doctorPlaceholder": "Doctor's name",
+    "alertsTitle": "Reminders",
+    "alertsIntro": "Turn on notifications so we can remind you to take your medicines.",
+    "startTitle": "You're all set",
+    "startIntro": "What would you like to do first?",
+    "startScanReport": "Scan a lab report",
+    "startScanReportHint": "Photo or PDF of your test results",
+    "startAddMedicine": "Add a medicine",
+    "startAddMedicineHint": "Set reminders for a medicine you take",
+    "startScanPrescription": "Scan a prescription",
+    "startScanPrescriptionHint": "We'll read the medicines for you",
+    "startLater": "I'll explore first",
+    "summary": {
+      "lock": {
+        "title": "Private to you",
+        "body": "Only you can see your records. We never sell them or use them for ads."
+      },
+      "place": {
+        "title": "Stored in Germany",
+        "body": "Encrypted in transit and at rest, in Frankfurt (EU)."
+      },
+      "ai": {
+        "title": "AI reading is essential",
+        "body": "It's how the app reads your reports and prescriptions. Anthropic (Claude) doesn't use your data for training."
+      }
+    },
+    "readFull": "Read the details",
+    "chooseTitle": "Choose what you agree to",
+    "required": "Required"
+  },
+  "scan": {
+    "title": "Scan a report",
+    "subtitle": "Take a photo of a lab report or upload a PDF. You'll check everything before it's saved.",
+    "allowAi": "Allow AI reading",
+    "takePhoto": "Take a photo",
+    "chooseFile": "Upload image or PDF",
+    "limits": "JPEG, PNG, WebP or PDF · up to 20 MB and 20 pages",
+    "uploading": "Uploading securely…",
+    "reading": "Reading your report…",
+    "readingHint": "This usually takes under a minute. You can leave this screen; the report will wait for you in Records.",
+    "savedOther": "Your document is saved. Reviewing prescriptions and doctor reports comes in a later update.",
+    "goToRecords": "Go to Records",
+    "duplicate": "You've already uploaded this exact file.",
+    "retry": "Try again",
+    "enterManually": "Enter results manually",
+    "enterManuallyHint": "Type values from a paper report. No AI is used.",
+    "uploadError": "The upload didn't complete. Check your connection and try again.",
+    "invalid": {
+      "type": "This file type isn't supported. Use a JPEG, PNG, WebP image or a PDF.",
+      "size": "This file is larger than 20 MB.",
+      "empty": "This file is empty."
+    },
+    "start": {
+      "consent_required": "AI reading isn't allowed for your account. Allow it above, or enter results manually.",
+      "quota_exceeded": "You've reached this month's limit of 30 scanned documents. You can still enter results manually.",
+      "ai_not_configured": "Report reading isn't set up yet. Your file is saved; try again later or enter results manually.",
+      "error": "We couldn't start reading this report. Your file is saved; try again."
+    },
+    "failure": {
+      "ai_unavailable": "The reading service is unavailable right now. Your file is saved; try again.",
+      "timeout": "Reading is taking longer than expected. Check Records in a few minutes.",
+      "ai_refused": "This document couldn't be read automatically. Enter the results manually.",
+      "document_too_long": "This document is too long to read in one go. Try uploading fewer pages.",
+      "invalid_ai_output": "The reading result was incomplete. Try again.",
+      "save_failed": "We read the report but couldn't save the draft. Try again.",
+      "file_missing": "The uploaded file couldn't be found. Upload it again.",
+      "too_many_pages": "This PDF has more than 20 pages. Upload only the pages with results.",
+      "unreadable": "We couldn't read this document. Try a clearer, well-lit photo.",
+      "ai_busy": "The reading service is busy. Try again in a minute.",
+      "ai_not_configured": "Report reading isn't set up yet. Try again later.",
+      "ai_rejected_file": "This file couldn't be processed. Try a different photo or PDF.",
+      "image_too_large": "This photo is too large to read. Try a photo with a lower resolution, or a PDF."
+    }
+  },
+  "review": {
+    "title": "Check your results",
+    "subtitle": "Results that were read clearly are listed at the bottom. Only the ones below need your check.",
+    "original": "Original document",
+    "openOriginal": "Open original document",
+    "duplicate": "A confirmed report from the same date has almost identical results. If this is the same report, discard this copy.",
+    "labName": "Laboratory",
+    "collectedAt": "Sample collection date",
+    "reportedAt": "Report date",
+    "dateFallback": "Only a report date was found, so it is used as the collection date. I've checked this date.",
+    "dateUncertain": "The day and month order on this report may be ambiguous. I've checked this date.",
+    "reportedName": "Test name (as printed)",
+    "matchedTest": "Matched test",
+    "notMatched": "Not matched",
+    "comparator": "Sign",
+    "value": "Value",
+    "unit": "Unit",
+    "textResult": "Non-numeric result: {{text}}",
+    "refLow": "Range low",
+    "refHigh": "Range high",
+    "flags": {
+      "none": "None",
+      "low": "Low",
+      "high": "High",
+      "abnormal": "Abnormal",
+      "critical_low": "Critical low",
+      "critical_high": "Critical high",
+      "critical": "Critical"
+    },
+    "rangeAsPrinted": "Range as printed",
+    "unitNotComparable": "This unit can't be converted to {{unit}}, so this result won't be compared with your other results for this test.",
+    "unmatchedHint": "Not in the app's list. It will still be tracked by its printed name and unit. Pick the test if you know it; the app will remember it next time.",
+    "checkedAgainstDoc": "I've checked the highlighted fields against the document",
+    "removeRow": "Remove this result",
+    "addRow": "Add a result",
+    "problems": {
+      "date": "Add the sample collection date.",
+      "dateCheck": "Confirm the collection date.",
+      "noRows": "Add at least one result.",
+      "name": "Every result needs a test name.",
+      "value": "Every result needs a value.",
+      "number": "Some values aren't valid numbers.",
+      "unchecked": "Check the highlighted fields and tick the box under each one."
+    },
+    "saveError": "Saving didn't work. Nothing was changed; try again.",
+    "discardConfirm": "Discard this report? Its draft results won't be saved.",
+    "notFound": "This report isn't available for review.",
+    "discard": "Discard",
+    "confirm": "Confirm and save",
+    "checkFields": "Please check: {{fields}}",
+    "fieldNames": {
+      "reported_name": "test name",
+      "value_numeric": "value",
+      "unit": "unit",
+      "ref_low": "range low",
+      "ref_high": "range high",
+      "lab_flag": "lab flag"
+    },
+    "matchSource": {
+      "learned": "remembered from your earlier reports",
+      "catalog": "recognized",
+      "ai_suggested": "suggested by AI",
+      "manual": "chosen by you"
+    },
+    "labMarked": "Lab marked: {{flag}}",
+    "aiMatchUnit": "Looks like {{test}}, but the unit doesn't fit that test. Pick the test if you're sure.",
+    "collapse": "Done",
+    "edit": "Edit this result",
+    "needsCheck_one": "1 result needs your check",
+    "needsCheck_other": "{{count}} results need your check",
+    "readClearly_one": "1 result read clearly",
+    "readClearly_other": "{{count}} results read clearly"
+  },
+  "report": {
+    "collectedOn": "Sample collected {{date}}",
+    "sourceNote": "Values come from your confirmed report. Status labels compare each value with the range printed by the lab; they are not a diagnosis.",
+    "asPrinted": "As printed",
+    "range": "Lab range",
+    "vsPrevious": "vs {{date}}:",
+    "notComparable": "Not compared: the unit or date can't be matched with your other results.",
+    "back": "Back to Records",
+    "byNameOnly": "Compared by printed name and unit only: this test isn't in the app's list yet.",
+    "unrecognized": "Not in the app's list yet. Future results with the same name and unit will be compared with this one.",
+    "correct": "Correct",
+    "history": "History",
+    "editDetails": "Edit date or lab",
+    "saveCorrection": "Save correction",
+    "cancel": "Cancel",
+    "removeResult": "Remove result",
+    "removeConfirm": "Remove this result from your record? The original is kept in the change history.",
+    "correctionNote": "The original value is kept in the change history. All comparisons will use the corrected value.",
+    "corrected": "Corrected {{date}}",
+    "was": "was"
+  },
+  "labs": {
+    "status": {
+      "within_range": "Within reported range",
+      "urgent": "Urgent attention may be needed",
+      "no_range": "No range reported",
+      "high": "High",
+      "low": "Low"
+    },
+    "trend": {
+      "improving": "Improving",
+      "worsening": "Worsening",
+      "stable": "Stable",
+      "changed_within_range": "Changed, still within range",
+      "changed": "Changed",
+      "not_comparable": "Not directly comparable"
+    },
+    "liver": {
+      "borderline": "Borderline elevation ({{fold}}× the lab's upper limit). On its own this doesn't establish liver injury; worth discussing with your doctor at your next visit.",
+      "mild": "Mild elevation ({{fold}}× the lab's upper limit). Discuss with your doctor, who may suggest repeating the test.",
+      "moderate": "Moderate elevation ({{fold}}× the lab's upper limit). Contact your doctor soon to review this result.",
+      "severe": "Marked elevation ({{fold}}× the lab's upper limit). Contact your doctor promptly today.",
+      "massive": "Very high result. Seek medical care today."
+    }
+  },
+  "history": {
+    "notFound": "No results found for this test.",
+    "latest": "Latest · {{date}}",
+    "noNumeric": "This test has no numeric results to chart.",
+    "notCompared": "Not included (different unit that can't be converted)",
+    "allResults_one": "1 result",
+    "allResults_other": "All {{count}} results",
+    "changesTitle": "Changes during this period",
+    "changeKinds": {
+      "medication_started": "Started {{name}}",
+      "medication_changed": "Dose changed: {{name}}",
+      "medication_stopped": "Stopped {{name}}",
+      "lifestyle_started": "{{name}}",
+      "lifestyle_ended": "Ended: {{name}}"
+    },
+    "changesNote": "Shown for context. A change around the same time doesn't mean it caused a change in your results."
+  },
+  "chart": {
+    "summary": "Chart of {{count}} results from {{first}} to {{last}}. Latest: {{value}}.",
+    "bandNote": "Shaded band: the normal range printed on your latest report. Tap a point for details; tap again to open its report."
+  },
+  "compare": {
+    "title": "Compare reports",
+    "subtitle": "Two report dates side by side. Changes are calculated by the app, not by AI.",
+    "needTwo": "Confirm at least two lab reports to compare them.",
+    "reportA": "First report",
+    "reportB": "Second report",
+    "pickDifferent": "Choose two different reports.",
+    "notInReport": "Not in this report"
+  },
+  "insights": {
+    "title": "Insights",
+    "subtitle": "What stands out in your confirmed results, with the values and dates behind each point.",
+    "empty": "Nothing stands out in your confirmed results right now.",
+    "hideDismissed": "Hide dismissed",
+    "disclaimer": "Insights are calculated by the app from your confirmed results and published guidelines. They are health information, not a diagnosis. Dismissing an insight never changes your results.",
+    "basis": "Based on",
+    "viewHistory": "View history",
+    "sourceReport": "Source report",
+    "dismiss": "Dismiss",
+    "restore": "Restore",
+    "level": {
+      "urgent": "Urgent medical attention may be needed",
+      "follow_up": "Follow-up recommended",
+      "informational": "For your information"
+    },
+    "rules": {
+      "critical_value": {
+        "title": "{{test}} needs prompt medical attention",
+        "body": "Your {{test}} of {{value}} {{unit}} on {{date}} is beyond a limit that laboratories treat as critical.",
+        "action": "Contact your doctor today. If you feel unwell, call {{emergency}} or go to the nearest emergency department."
+      },
+      "outside_range_high": {
+        "title": "{{test}} is above the lab's range",
+        "body": "{{value}} {{unit}} on {{date}} (lab range {{range}}). A single result outside the range is common and is not a diagnosis on its own.",
+        "action": "Mention it at your next doctor visit."
+      },
+      "outside_range_low": {
+        "title": "{{test}} is below the lab's range",
+        "body": "{{value}} {{unit}} on {{date}} (lab range {{range}}). A single result outside the range is common and is not a diagnosis on its own.",
+        "action": "Mention it at your next doctor visit."
+      },
+      "ldl_severe_190": {
+        "title": "LDL cholesterol is 190 mg/dL or higher",
+        "body": "Your LDL of {{value}} {{unit}} on {{date}} is in the range that cholesterol guidelines treat as severely high.",
+        "action": "Discuss it with your doctor."
+      },
+      "hba1c_diabetes_range": {
+        "title": "HbA1c is in the diabetes range",
+        "body": "{{value}}{{unit}} on {{date}} is 6.5% or higher, the range used to diagnose diabetes. One result is not a diagnosis: guidelines require a confirming test.",
+        "action": "Discuss it with your doctor."
+      },
+      "hba1c_prediabetes_range": {
+        "title": "HbA1c is in the prediabetes range",
+        "body": "{{value}}{{unit}} on {{date}} is between 5.7% and 6.4%, the range guidelines call prediabetes.",
+        "action": "Worth discussing at your next doctor visit."
+      },
+      "egfr_category": {
+        "title": "Kidney filtration (eGFR) is in category {{category}}",
+        "body": "{{value}} {{unit}} on {{date}}. Category {{category}} means kidney filtration is lower than normal.",
+        "action": "Discuss it with your doctor, who may repeat the test."
+      },
+      "liver_elevation": {
+        "title": "{{test}} is above the lab's limit",
+        "action": ""
+      },
+      "trend_improving": {
+        "title": "{{test}} has improved",
+        "body": "From {{previousValue}} on {{previousDate}} to {{value}} {{unit}} on {{date}} ({{percent}}). The change is larger than normal day-to-day variation.",
+        "action": ""
+      },
+      "trend_worsening": {
+        "title": "{{test}} has moved further from the lab's range",
+        "body": "From {{previousValue}} on {{previousDate}} to {{value}} {{unit}} on {{date}} ({{percent}}). The change is larger than normal day-to-day variation.",
+        "action": "Worth discussing at your next doctor visit."
+      }
+    },
+    "showDismissed_one": "Show 1 dismissed",
+    "showDismissed_other": "Show {{count}} dismissed"
+  },
+  "info": {
+    "title": "What this means",
+    "about": "About {{test}}",
+    "high": "What a high result can mean",
+    "low": "What a low result can mean",
+    "positive": "What a positive result means",
+    "within": "Your result is within the range printed by your lab.",
+    "helps": "What can help",
+    "medicines": "If your doctor has prescribed medicine for this, keep taking it exactly as prescribed. Don't stop or change it without talking to your doctor first.",
+    "learnMore": "Learn more at MedlinePlus (US National Library of Medicine)",
+    "disclaimer": "General health information, not personal medical advice. Your doctor will interpret your result with your full history."
+  },
+  "meds": {
+    "freq": {
+      "daily": "Every day",
+      "weekly": "Certain days of the week",
+      "every_n_days": "Every few days",
+      "as_needed": "Only when needed"
+    },
+    "summary": {
+      "weekly": "on {{days}} at {{times}}",
+      "everyN": "every {{n}} days at {{times}}",
+      "daily_one": "once a day at {{times}}",
+      "daily_other": "{{count}} times a day at {{times}}"
+    },
+    "renewalTitle": "Renew prescription: {{name}}",
+    "addTitle": "Add a medication",
+    "addSubtitle": "Enter it as written on your prescription or the package.",
+    "changeTitle": "Change {{name}}",
+    "changeSubtitle": "Record a new dose or timing your doctor gave you. The previous one is kept in the history.",
+    "asWritten": "As written",
+    "checkHighlighted": "Check the highlighted fields against your prescription. Anything not written on it is left for you to fill in.",
+    "name": "Medicine name",
+    "strength": "Strength (e.g. 20 mg)",
+    "formulation": "Form",
+    "forms": {
+      "tablet": "Tablet",
+      "capsule": "Capsule",
+      "syrup": "Syrup",
+      "suspension": "Suspension",
+      "drops": "Drops",
+      "injection": "Injection",
+      "cream": "Cream",
+      "ointment": "Ointment",
+      "inhaler": "Inhaler",
+      "sachet": "Sachet",
+      "suppository": "Suppository",
+      "patch": "Patch",
+      "spray": "Spray",
+      "other": "Other"
+    },
+    "ingredient": "Active ingredient",
+    "prescriber": "Prescribed by",
+    "instructions": "Instructions",
+    "doseAmount": "Dose (how many)",
+    "doseUnit": "Unit",
+    "doseUnitHint": "tablet, ml, puff…",
+    "frequency": "How often",
+    "everyNDays": "Every how many days",
+    "daysOfWeek": "Days",
+    "times": "Times",
+    "removeTime": "Remove this time",
+    "addTime": "Add a time",
+    "timesHint": "Times are in your time zone ({{tz}}).",
+    "effectiveFrom": "New dose starts on",
+    "startDate": "Started on",
+    "endDate": "Ends on (if prescribed for a fixed time)",
+    "supplyEnds": "Supply runs out on (optional)",
+    "supplyHint": "You'll get a reminder 3 days before to renew it.",
+    "remindMe": "Remind me at these times",
+    "confirmChecked": "I have checked the medicine name, strength, dose and times against my prescription or package.",
+    "neverInfer": "The app never guesses a dose or schedule. Take your medicine as your doctor prescribed.",
+    "save": "Save medication",
+    "scanPrescription": "Scan a prescription",
+    "prescriptionsToReview": "Prescriptions to review",
+    "pharmacistReview": "You're taking more than one medicine. The app doesn't check for interactions; ask your pharmacist or doctor to review your full list, including supplements.",
+    "current": "Current",
+    "past": "Past",
+    "stoppedOn": "Stopped {{date}}",
+    "disclaimer": "This list is a record you keep, not a prescription. Don't start, stop or change a medicine without your doctor.",
+    "notFound": "Medication not found.",
+    "currentRegimen": "Current dose",
+    "lastRegimen": "Last dose",
+    "since": "Since {{date}}",
+    "until": "until {{date}}",
+    "prescribedBy": "Prescribed by {{name}}",
+    "logNow": "I took a dose now",
+    "remindersOff": "Turn reminders off",
+    "remindersOn": "Turn reminders on",
+    "changeDose": "Change dose or time",
+    "stop": "Stopped taking it",
+    "stopExplain": "Record the day you stopped, for example because your doctor told you to. It stays in your history.",
+    "stopDate": "Last day taken",
+    "confirmStop": "Record as stopped",
+    "last30": "Last 30 days",
+    "dose": {
+      "taken": "Taken",
+      "skipped": "Skipped",
+      "not_recorded": "Not recorded",
+      "pending": "Due",
+      "snoozed": "Snoozed"
+    },
+    "adherence": "Taken {{taken}} · Skipped {{skipped}} · Not recorded {{notRecorded}}",
+    "selfReported": "Doses are what you record; \"not recorded\" doesn't mean missed.",
+    "history": "Dose history",
+    "now": "now",
+    "sourcePrescription": "Source prescription",
+    "timing": {
+      "before_meals": "Before meals",
+      "after_meals": "After meals",
+      "with_meals": "With meals",
+      "empty_stomach": "On an empty stomach",
+      "bedtime": "At bedtime",
+      "morning": "In the morning",
+      "evening": "In the evening"
+    },
+    "snoozedUntil": "Snoozed until {{time}}",
+    "undo": "Undo",
+    "taken": "Taken",
+    "skip": "Skip",
+    "snooze": "Remind me in 30 minutes",
+    "suggest": {
+      "mine": "From your medications",
+      "brandOf": "Contains {{generic}}",
+      "note": "Suggestions are names only. Check the name and strength against your prescription."
+    },
+    "photo": {
+      "alt": "Photo of {{name}}",
+      "hint": "Your photo helps you recognize this medicine.",
+      "addHint": "Add a photo of the box or pills so you can recognize this medicine easily.",
+      "add": "Add photo",
+      "change": "Change photo",
+      "remove": "Remove"
+    },
+    "uses": {
+      "title": "Commonly used for",
+      "unknown": "We don't have information about this medicine yet. Ask your doctor or pharmacist what it's for.",
+      "note": "General information only. Your doctor may prescribe it for a different reason; follow their instructions.",
+      "learnMore": "Learn more at MedlinePlus (US National Library of Medicine)",
+      "looking": "Looking up this medicine…",
+      "aiLabel": "AI summary, not reviewed by a pharmacist. Check with your doctor or pharmacist.",
+      "likelyContains": "Likely contains {{ingredient}}. Check the package to confirm."
+    },
+    "prescriberHint": "Start typing or pick a doctor you entered before",
+    "editDetails": "Edit details",
+    "editTitle": "Edit medicine details",
+    "editSubtitle": "Fix the name, strength, doctor or instructions.",
+    "saveChanges": "Save changes",
+    "editNote": "To change the dose or times, use \"Change dose or time\" on the medicine's page; that keeps the history of earlier doses. Every edit is kept in the change history.",
+    "correctHint": "Fixing a mistake rather than recording a new dose? Set the date below to {{date}} (when the current dose started); the current dose is then corrected instead of replaced."
+  },
+  "docReview": {
+    "title": "Review your prescription",
+    "subtitle": "Add each medicine after checking it. Nothing is added to your list until you confirm it.",
+    "noMedicines": "No medicines were found in this document.",
+    "unclear": "Some of this was hard to read; you'll be asked to check it.",
+    "added": "Added to your medications",
+    "addMedicine": "Check and add to my medications",
+    "followUps": "Follow-up instructions",
+    "reminderCreated": "Reminder created",
+    "followUpDate": "When",
+    "createReminder": "Create reminder",
+    "followUpNote": "These are your doctor's written instructions. Choose the date yourself if none was written.",
+    "diagnoses": "Diagnoses written by your doctor",
+    "saved": "Saved",
+    "saveCondition": "Save to my conditions",
+    "done": "Done reviewing",
+    "backToMeds": "Back to medications",
+    "medicines_one": "1 medicine",
+    "medicines_other": "{{count}} medicines",
+    "delete": "Delete this scan",
+    "deleteConfirm": "Delete this scanned document? It can't be undone. Medicines you already added from it stay in your list.",
+    "deleteNote": "Deleting removes the scan and what was read from it. Medicines and reminders you already confirmed stay."
+  },
+  "reminders": {
+    "title": "Reminders",
+    "subtitle": "Lab tests, appointments, follow-ups and renewals.",
+    "comingUp": "Coming up",
+    "add": "Add a reminder",
+    "what": "What",
+    "whatHint": "e.g. Repeat cholesterol test",
+    "kind": "Type",
+    "kinds": {
+      "lab_test": "Lab test",
+      "appointment": "Appointment",
+      "follow_up": "Follow-up",
+      "prescription_renewal": "Prescription renewal",
+      "custom": "Other",
+      "medication": "Medication"
+    },
+    "repeat": "Repeat",
+    "repeats": {
+      "none": "Doesn't repeat",
+      "daily": "Every day",
+      "weekly": "Every week",
+      "monthly": "Every month",
+      "yearly": "Every year"
+    },
+    "date": "Date",
+    "time": "Time",
+    "save": "Save",
+    "empty": "No reminders yet. Add one, or create them from a doctor's follow-up instructions.",
+    "snoozedUntil": "Snoozed until {{date}}",
+    "done": "Done",
+    "snoozeDay": "Tomorrow",
+    "cancel": "Cancel reminder",
+    "cancelConfirm": "Cancel this reminder?",
+    "completed": "Recently completed",
+    "deliveryNote": "Reminders appear here and on Home. Phone, email or WhatsApp notifications depend on your settings and device; a reminder is never marked as delivered unless that is confirmed.",
+    "edit": "Edit",
+    "editTitle": "Edit reminder"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "notifications": "Notifications",
+    "notificationsIntro": "How you'd like to be reminded about medicines and follow-ups. Reminders always appear in the app too.",
+    "push": "Phone notifications",
+    "pushState": {
+      "unsupported": "This browser can't show notifications. Try Chrome, Edge, Firefox or Safari.",
+      "needs_install": "On iPhone and iPad, first add the app to your Home Screen (Share → Add to Home Screen), then open it from there.",
+      "not_configured": "Notifications aren't set up on the server yet.",
+      "denied": "Notifications are blocked in your browser settings for this site.",
+      "off": "Off on this device.",
+      "on": "On for this device."
+    },
+    "enablePush": "Turn on notifications",
+    "disablePush": "Turn off on this device",
+    "email": "Email reminders",
+    "emailHint": "For lab tests, appointments and follow-ups when a phone notification can't be sent.",
+    "whatsapp": "WhatsApp reminders",
+    "whatsappHint": "Used when a phone notification can't be sent. Enter your number with country code.",
+    "saved": "Saved.",
+    "saveError": "Couldn't save. Check the WhatsApp number (e.g. +201001234567).",
+    "privacyOfMessages": "Messages never include medicine names or results, only \"open the app to see your reminder\".",
+    "privacy": "Privacy",
+    "account": "Account",
+    "notSetUp": "not set up yet"
+  },
+  "suggestions": {
+    "title": "Suggested checkups",
+    "intro": "Based on your results and medicines, following published medical guidelines. Pick a date and add a reminder, or dismiss.",
+    "rules": {
+      "statin_first_check": "Cholesterol test after starting or changing your cholesterol medicine",
+      "statin_routine": "Routine cholesterol test",
+      "a1c_diabetes": "HbA1c (average blood sugar) test",
+      "kidney_diabetes_egfr": "Kidney function test (creatinine / eGFR)",
+      "kidney_diabetes_acr": "Urine albumin test (kidney check)",
+      "a1c_prediabetes": "Yearly HbA1c test (prediabetes)",
+      "tsh_dose_check": "TSH test after your thyroid dose changed",
+      "tsh_routine": "Routine TSH (thyroid) test"
+    },
+    "basis": {
+      "lastTest": "Your last result was on {{date}}",
+      "medication": "{{medication}} started or changed on {{date}}",
+      "noTest": "No result on record yet"
+    },
+    "intervals": {
+      "weeks4to12": "guidelines suggest 4–12 weeks after a change",
+      "months3to12": "guidelines suggest every 3–12 months",
+      "months3": "guidelines suggest about every 3 months while treatment is changing or above goal",
+      "months6": "guidelines suggest at least twice a year when stable",
+      "yearly": "guidelines suggest at least once a year",
+      "weeks6to8": "guidelines suggest 6–8 weeks after a dose change",
+      "months6to12": "guidelines suggest every 6–12 months when stable"
+    },
+    "overdue": "Due now",
+    "date": "Date",
+    "accept": "Add reminder",
+    "dismiss": "Dismiss",
+    "suggestedDate": "Suggested date was {{date}}",
+    "disclaimer": "Suggested by the app from published guidelines, not your doctor's order. If your doctor gave you a different schedule, follow theirs.",
+    "homeLink_one": "1 suggested checkup",
+    "homeLink_other": "{{count}} suggested checkups"
+  },
+  "lifestyle": {
+    "title": "Life changes",
+    "subtitle": "Record changes in your daily life. They help explain changes in your results.",
+    "homeLink": "Log a life change (exercise, diet, smoking…)",
+    "add": "Add a life change",
+    "category": "Type of change",
+    "categories": {
+      "exercise": "Exercise",
+      "diet": "Diet",
+      "weight": "Weight",
+      "smoking": "Smoking",
+      "alcohol": "Alcohol",
+      "sleep": "Sleep",
+      "stress": "Stress",
+      "other": "Other"
+    },
+    "presets": {
+      "gym": "Started going to the gym",
+      "running": "Started running",
+      "walking": "Started walking regularly",
+      "swimming": "Started swimming",
+      "cycling": "Started cycling",
+      "sports": "Started playing a sport",
+      "low_sugar": "Cut down on sugar",
+      "low_carb": "Started a low-carb diet",
+      "mediterranean": "Started a Mediterranean diet",
+      "intermittent_fasting": "Started intermittent fasting",
+      "less_salt": "Cut down on salt",
+      "less_fat": "Cut down on fatty food",
+      "more_vegetables": "Eating more vegetables and fruit",
+      "vegetarian": "Became vegetarian",
+      "lose_weight": "Trying to lose weight",
+      "gain_weight": "Trying to gain weight",
+      "quit_smoking": "Quit smoking",
+      "cut_smoking": "Cut down on smoking",
+      "quit_alcohol": "Stopped drinking alcohol",
+      "cut_alcohol": "Cut down on alcohol",
+      "better_sleep": "Sleeping better / more",
+      "regular_schedule": "Regular sleep schedule",
+      "stressful_period": "Going through a stressful period",
+      "meditation": "Started meditation or relaxation"
+    },
+    "what": "What changed",
+    "whatHint": "e.g. Started walking 30 minutes a day",
+    "startedOn": "Started on",
+    "endedOnOptional": "Ended on (optional)",
+    "endedOn": "Ended on",
+    "details": "Details (optional)",
+    "detailsHint": "e.g. 3 times a week, 40 minutes",
+    "since": "since {{date}}",
+    "until": "until {{date}}",
+    "stopped": "I stopped this",
+    "current": "Current",
+    "past": "Past",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this life change?",
+    "empty": "No life changes yet. Started exercising, changed your diet or quit smoking? Add it here.",
+    "why": "Life changes appear on your timeline and next to your test results, and the advisor takes them into account. They're private to your account."
+  },
+  "profileFields": {
+    "none": "None",
+    "otherPlaceholder": "Something else? Type it",
+    "add": "Add",
+    "sex": "Sex",
+    "sexes": {
+      "female": "Female",
+      "male": "Male",
+      "intersex": "Intersex",
+      "prefer_not_to_say": "Prefer not to say"
+    },
+    "sexWhy": "Normal ranges for some tests differ by sex.",
+    "countryWhy": "Used for local units and guidelines.",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "bodyWhy": "Used to calculate BMI.",
+    "conditionsLabel": "Conditions you have",
+    "allergiesLabel": "Allergies",
+    "smokingLabel": "Smoking",
+    "pregnancy": {
+      "pregnant": "Pregnant",
+      "breastfeeding": "Breastfeeding",
+      "neither": "Neither",
+      "prefer_not_to_say": "Prefer not to say"
+    },
+    "smoking": {
+      "never": "Never smoked",
+      "former": "Former smoker",
+      "current": "Currently smoke",
+      "prefer_not_to_say": "Prefer not to say"
+    },
+    "goals": {
+      "cholesterol": "Cholesterol",
+      "blood_sugar": "Blood sugar",
+      "blood_pressure": "Blood pressure",
+      "kidneys": "Kidneys",
+      "liver": "Liver",
+      "thyroid": "Thyroid",
+      "weight": "Weight",
+      "medicines": "Taking medicines on time",
+      "checkups": "Regular checkups",
+      "records": "Keeping records organized"
+    },
+    "conditions": {
+      "diabetes": "Diabetes",
+      "prediabetes": "Prediabetes",
+      "hypertension": "High blood pressure",
+      "high_cholesterol": "High cholesterol",
+      "thyroid": "Thyroid disease",
+      "heart": "Heart disease",
+      "kidney": "Kidney disease",
+      "liver": "Liver disease",
+      "asthma": "Asthma",
+      "copd": "COPD",
+      "anemia": "Anemia",
+      "gout": "Gout",
+      "osteoporosis": "Osteoporosis",
+      "mental_health": "Depression or anxiety"
+    },
+    "allergies": {
+      "penicillin": "Penicillin",
+      "sulfa": "Sulfa medicines",
+      "nsaids": "Aspirin or anti-inflammatory painkillers",
+      "peanuts": "Peanuts",
+      "tree_nuts": "Tree nuts",
+      "eggs": "Eggs",
+      "milk": "Milk",
+      "shellfish": "Shellfish",
+      "latex": "Latex"
+    },
+    "family": {
+      "early_heart": "Heart attack or stroke at a young age",
+      "diabetes": "Diabetes",
+      "high_cholesterol": "High cholesterol",
+      "hypertension": "High blood pressure",
+      "kidney": "Kidney disease",
+      "cancer": "Cancer"
+    }
+  },
+  "profile": {
+    "title": "My profile",
+    "subtitle": "Everything here is optional. You can change it any time.",
+    "settingsHint": "Age, conditions, allergies, family history, goals",
+    "bmi": "BMI",
+    "save": "Save changes",
+    "fromDocuments": "Conditions and allergies found in your documents also appear here. Removing one here removes only what you added yourself.",
+    "completeTitle": "Complete your profile",
+    "completeBody": "A few answers make your ranges and suggestions more accurate."
+  },
+  "trust": {
+    "source": {
+      "document": "From your document",
+      "user": "Entered by you",
+      "ai": "Suggested by AI · not confirmed"
+    },
+    "view": "View",
+    "published": "Published {{date}}",
+    "reviewPending": "These rules follow published guidelines. A clinician review is in progress.",
+    "reviewDone": "Reviewed by a clinician."
+  },
+  "privacy": {
+    "badge": "Private",
+    "title": "Privacy Center",
+    "subtitle": "What happens to your records, and your controls over them.",
+    "settingsHint": "AI use, consent history, activity, download, delete account",
+    "facts": {
+      "title": "Your records at a glance",
+      "who": {
+        "title": "Only you can see your records",
+        "body": "Nobody else has access, including other users. We never sell your data or use it for ads."
+      },
+      "where": {
+        "title": "Stored in Frankfurt, Germany",
+        "body": "On Supabase servers in the EU."
+      },
+      "encrypted": {
+        "title": "Encrypted",
+        "body": "Encrypted in transit (HTTPS) and at rest."
+      },
+      "notifications": {
+        "title": "Discreet reminders",
+        "body": "Reminders never show medicine names or results on your lock screen."
+      }
+    },
+    "ai": {
+      "title": "AI reading",
+      "body": "Sends documents and the records relevant to your question to Anthropic (Claude). Anthropic does not use them to train models.",
+      "uses": {
+        "documents": "Reading lab reports and prescriptions you scan",
+        "advisor": "Answering your questions in the advisor",
+        "medicines": "Looking up what an unknown medicine is used for (only the medicine name is sent)"
+      }
+    },
+    "export": {
+      "title": "Download my data",
+      "body": "A ZIP file with all your records (data.json) and the original documents and photos you uploaded.",
+      "button": "Download my data",
+      "records": "Collecting records… {{done}}/{{total}}",
+      "files": "Adding files… {{done}}/{{total}}",
+      "zip": "Creating the file…",
+      "error": "The download couldn't be prepared. Please try again."
+    },
+    "consents": {
+      "title": "Consent history",
+      "granted": "agreed",
+      "declined": "declined"
+    },
+    "activity": {
+      "title": "Recent activity",
+      "body": "Changes to your records, newest first. Only you can see this.",
+      "empty": "No changes yet.",
+      "actions": {
+        "insert": "{{item}} added",
+        "update": "{{item}} changed",
+        "delete": "{{item}} removed"
+      },
+      "tables": {
+        "laboratory_reports": "Lab report",
+        "laboratory_results": "Lab result",
+        "medical_conditions": "Condition",
+        "allergies": "Allergy",
+        "medications": "Medicine",
+        "medication_schedules": "Medicine schedule",
+        "follow_up_plans": "Follow-up",
+        "medical_documents": "Document"
+      }
+    },
+    "signOutAll": {
+      "title": "Sign out everywhere",
+      "body": "Signs you out on every phone and computer, including this one.",
+      "button": "Sign out on all devices"
+    },
+    "delete": {
+      "title": "Delete my account",
+      "body": "Permanently deletes your account, all your health records, documents, photos, medicines and reminders. This cannot be undone.",
+      "exportFirst": "You may want to download your data first.",
+      "word": "DELETE",
+      "typeToConfirm": "Type {{word}} to confirm",
+      "button": "Delete my account permanently",
+      "deleting": "Deleting…",
+      "error": "Your account couldn't be deleted. Nothing more was removed; please try again."
+    }
+  }
+}

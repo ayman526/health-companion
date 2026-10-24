@@ -1,0 +1,14 @@
+# Secrets and local settings: never commit
+.env
+.env.*
+!.env.example
+*.local
+supabase/.temp/
+supabase/.branches/
+
+# Build output and dependencies
+node_modules/
+dist/
+
+.DS_Store
+.vercel

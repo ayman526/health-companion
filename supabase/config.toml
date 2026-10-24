@@ -1,0 +1,13 @@
+project_id = "tbrjbiowutfzpemqwlgf"
+
+[functions.extract-document]
+verify_jwt = false # the function verifies the user token itself
+
+[functions.send-reminders]
+verify_jwt = false # called by pg_cron with x-cron-secret; GET only returns which channels are configured
+
+[functions.medicine-info]
+verify_jwt = false # the function verifies the user token itself
+
+[functions.delete-account]
+verify_jwt = false
