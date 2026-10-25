@@ -1,10 +1,12 @@
 // Daily health data: home readings (blood pressure, blood sugar, weight),
 // daily check-ins, and the reminders that prompt for them.
+import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+import { resizeImage } from './images'
 import { zonedDateTime } from './medications'
 import type { GlucoseContext, VitalKind, VitalReading } from '../domain/vitals'
 
-const VITAL_SELECT = 'id, kind, measured_at, systolic, diastolic, pulse, glucose_mg_dl, glucose_context, weight_kg, note'
+const VITAL_SELECT = 'id, kind, measured_at, systolic, diastolic, pulse, glucose_mg_dl, glucose_context, weight_kg, spo2, temperature_c, note'
 
 /** Readings from the last `days` days, newest first. */
 export async function loadVitals(days = 120): Promise<VitalReading[]> {
@@ -18,10 +20,13 @@ export type NewReading =
   | { kind: 'blood_pressure'; systolic: number; diastolic: number; pulse: number | null }
   | { kind: 'glucose'; glucose_mg_dl: number; glucose_context: GlucoseContext }
   | { kind: 'weight'; weight_kg: number }
+  | { kind: 'heart_rate'; pulse: number }
+  | { kind: 'oxygen'; spo2: number; pulse: number | null }
+  | { kind: 'temperature'; temperature_c: number }
 
-export async function addVital(profileId: string, reading: NewReading, measuredAt: string, note: string): Promise<boolean> {
+export async function addVital(profileId: string, reading: NewReading, measuredAt: string, note: string, source: 'user_entered' | 'photo' = 'user_entered'): Promise<boolean> {
   if (!supabase) return false
-  const { error } = await supabase.from('vital_readings').insert({ profile_id: profileId, measured_at: measuredAt, note: note.trim() || null, ...reading })
+  const { error } = await supabase.from('vital_readings').insert({ profile_id: profileId, measured_at: measuredAt, note: note.trim() || null, source, ...reading })
   return !error
 }
 
@@ -79,6 +84,42 @@ export async function setRepeatingReminder(profileId: string, kind: 'vital_check
     ? await supabase.from('reminders').update({ ...fields, snoozed_until: null, last_notified_at: null }).eq('id', existing.id)
     : await supabase.from('reminders').insert({ profile_id: profileId, ...fields })
   return !error
+}
+
+export interface MonitorReading {
+  device: 'blood_pressure' | 'glucose' | 'oxygen' | 'temperature' | 'weight' | 'none'
+  confidence: 'high' | 'medium' | 'low'
+  problem: 'none' | 'not_a_device' | 'unreadable' | 'several_devices'
+  systolic: number | null
+  diastolic: number | null
+  pulse: number | null
+  glucose: number | null
+  glucose_unit: 'mg/dL' | 'mmol/L' | null
+  spo2: number | null
+  temperature: number | null
+  temperature_unit: 'C' | 'F' | null
+  weight: number | null
+  weight_unit: 'kg' | 'lb' | null
+}
+
+/**
+ * Reads the numbers on a device's screen from a photo. The photo is sent to
+ * the read-monitor function (not stored) and the values come back for the
+ * person to check before saving.
+ */
+export async function readMonitor(file: File): Promise<MonitorReading | { error: string }> {
+  if (!supabase) return { error: 'no_backend' }
+  const small = await resizeImage(file, 1600, 3_000_000)
+  if (!small) return { error: 'unreadable_file' }
+  const bytes = new Uint8Array(await small.arrayBuffer())
+  let binary = ''
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  const { data, error } = await supabase.functions.invoke('read-monitor', { body: { image: btoa(binary), media_type: 'image/jpeg' } })
+  if (error) {
+    const code = error instanceof FunctionsHttpError ? (await error.context.json().catch(() => ({}))).error : null
+    return { error: code ?? 'ai_unavailable' }
+  }
+  return data as MonitorReading
 }
 
 export type { VitalKind }

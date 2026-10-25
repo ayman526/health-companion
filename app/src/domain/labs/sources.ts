@@ -88,6 +88,24 @@ export const SOURCES = {
     url: 'https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight',
     published: '2024',
   },
+  aha_heart_rate: {
+    short: 'AHA',
+    title: 'American Heart Association: a normal resting heart rate for adults is 60–100 beats per minute; well-trained athletes and people on some medicines can be lower',
+    url: 'https://www.heart.org/en/healthy-living/fitness/fitness-basics/target-heart-rates',
+    published: '2024',
+  },
+  nhs_pulse_oximeter: {
+    short: 'NHS',
+    title: 'NHS: pulse oximeters. Usually 95% or higher; 93–94% get advice the same day; 92% or below get urgent help. Readings can be less accurate on darker skin, cold fingers or nail polish; follow any different target your doctor gave you',
+    url: 'https://www.nhs.uk/conditions/pulse-oximetry/',
+    published: '2024',
+  },
+  nhs_fever: {
+    short: 'NHS',
+    title: 'NHS: a high temperature (fever) is 38°C or above; babies under 3 months with 38°C or above need urgent medical advice; below 35°C can be hypothermia',
+    url: 'https://www.nhs.uk/conditions/fever-in-adults/',
+    published: '2024',
+  },
   eflm_bv: {
     short: 'EFLM',
     title: 'EFLM Biological Variation Database (2021 + updates), as tabulated in Bio-Rad Q-1680',

@@ -1076,13 +1076,16 @@
   },
   "vitals": {
     "title": "Readings",
-    "subtitle": "Blood pressure, blood sugar and weight you measure at home.",
+    "subtitle": "What you measure at home: blood pressure, blood sugar, weight, heart rate, oxygen and temperature.",
     "logReading": "Log a reading",
     "latestTitle": "Latest readings",
     "kinds": {
       "blood_pressure": "Blood pressure",
       "glucose": "Blood sugar",
-      "weight": "Weight"
+      "weight": "Weight",
+      "heart_rate": "Heart rate",
+      "oxygen": "Oxygen",
+      "temperature": "Temperature"
     },
     "add": "Add a reading",
     "systolic": "Top number (systolic)",
@@ -1105,7 +1108,10 @@
     "invalid": {
       "blood_pressure": "Enter both numbers; the top number must be higher than the bottom one.",
       "glucose": "Enter your blood sugar reading.",
-      "weight": "Enter your weight in kg."
+      "weight": "Enter your weight in kg.",
+      "heart_rate": "Enter a heart rate between 20 and 250.",
+      "oxygen": "Enter an oxygen level between 50 and 100%.",
+      "temperature": "Enter a temperature (°C or °F)."
     },
     "save": "Save reading",
     "latest": "Latest",
@@ -1125,7 +1131,10 @@
     "chart": {
       "blood_pressure": "Top number over time",
       "glucose": "Blood sugar over time",
-      "weight": "Weight over time"
+      "weight": "Weight over time",
+      "heart_rate": "Heart rate over time",
+      "oxygen": "Oxygen over time",
+      "temperature": "Temperature over time"
     },
     "chartStatus": {
       "within_range": "Normal or in target",
@@ -1137,14 +1146,20 @@
     "band": {
       "blood_pressure": "Shaded: normal and elevated range for the top number (90–129).",
       "glucose": "Shaded: usual target before meals for people with diabetes.",
-      "weight": ""
+      "weight": "",
+      "heart_rate": "Shaded: normal resting range for adults (60–100).",
+      "oxygen": "Shaded: usual range (95–100%).",
+      "temperature": "Shaded: no fever."
     },
     "remindDaily": "Remind me every day at",
     "reminderTitle": "Log today's reading",
     "empty": {
       "blood_pressure": "No blood pressure readings yet. Measuring at the same time each morning gives the most useful average.",
       "glucose": "No blood sugar readings yet.",
-      "weight": "No weight entries yet. Once a week is enough."
+      "weight": "No weight entries yet. Once a week is enough.",
+      "heart_rate": "No heart rate readings yet. Measure at rest, at the same time of day.",
+      "oxygen": "No oxygen readings yet.",
+      "temperature": "No temperature readings yet."
     },
     "categories": {
       "bp_normal": "Normal",
@@ -1165,7 +1180,18 @@
       "bmi_under": "Underweight",
       "bmi_healthy": "Healthy weight",
       "bmi_over": "Overweight",
-      "bmi_obesity": "Obesity"
+      "bmi_obesity": "Obesity",
+      "hr_normal": "Normal",
+      "hr_low": "Low",
+      "hr_high": "High at rest",
+      "spo2_normal": "Normal",
+      "spo2_borderline": "Borderline",
+      "spo2_low": "Low",
+      "temp_normal": "No fever",
+      "temp_fever": "Fever",
+      "temp_very_high": "High fever",
+      "temp_fever_baby": "Fever in a baby",
+      "temp_low": "Low"
     },
     "meaning": {
       "bp_normal": "This reading is in the normal range for adults.",
@@ -1186,7 +1212,37 @@
       "bmi_under": "Your BMI (from your height and weight) is in the underweight range.",
       "bmi_healthy": "Your BMI (from your height and weight) is in the healthy range.",
       "bmi_over": "Your BMI (from your height and weight) is in the overweight range. BMI doesn't account for muscle; your doctor can tell you what it means for you.",
-      "bmi_obesity": "Your BMI (from your height and weight) is in the obesity range. BMI doesn't account for muscle; your doctor can tell you what it means for you."
+      "bmi_obesity": "Your BMI (from your height and weight) is in the obesity range. BMI doesn't account for muscle; your doctor can tell you what it means for you.",
+      "hr_normal": "A normal resting heart rate for adults.",
+      "hr_low": "Below 60 at rest. This can be normal for fit people or with some medicines. If you feel dizzy, faint or short of breath, contact your doctor.",
+      "hr_high": "Above 100 at rest. Rest for a few minutes and measure again. If it stays high or you feel chest pain, dizziness or shortness of breath, contact your doctor; with chest pain or fainting, call emergency services.",
+      "spo2_normal": "In the usual range. If your doctor gave you a different target, follow theirs.",
+      "spo2_borderline": "93–94% is lower than usual. Warm your hands, sit still and measure again. If it stays here, get advice from your doctor today. If your doctor gave you a different target, follow theirs.",
+      "spo2_low": "92% or below is low. Measure again with warm hands; if it's still this low, or you're short of breath, get urgent medical help now. Readings can be less accurate on darker skin, cold fingers or with nail polish.",
+      "temp_normal": "No fever.",
+      "temp_fever": "38°C (100.4°F) or above is a fever. Rest and drink fluids. Contact your doctor if it lasts more than 3 days, or if you feel very unwell.",
+      "temp_very_high": "40°C (104°F) or above is a high fever. Contact your doctor today. Get urgent help if there's confusion, a stiff neck, a rash that doesn't fade under a glass, or trouble breathing.",
+      "temp_fever_baby": "A baby under 3 months with 38°C (100.4°F) or above needs urgent medical advice now. For older babies, contact their doctor.",
+      "temp_low": "Below 35°C (95°F) can be dangerous (hypothermia). Measure again; if it's still this low, get urgent medical help, especially for older people and babies."
+    },
+    "heartRate": "Heart rate (beats per minute)",
+    "restingHint": "Measure after sitting quietly for 5 minutes.",
+    "spo2": "Oxygen (SpO2 %)",
+    "photo": {
+      "button": "Read from a photo of your device",
+      "hint": "Blood pressure monitor, glucose meter, oximeter, thermometer or scale. The photo isn't saved.",
+      "reading": "Reading the screen…",
+      "check": "Check these numbers match your device's screen, then save.",
+      "checkLow": "Some digits were hard to read. Please check every number carefully before saving.",
+      "errors": {
+        "not_a_device": "That doesn't look like a health device's screen. Try a closer photo of the display.",
+        "unreadable": "The numbers couldn't be read clearly. Try again with less glare, closer to the screen.",
+        "several_devices": "More than one screen is visible. Take a photo of just one device.",
+        "consent_required": "Reading photos needs AI reading turned on. You can turn it on in the Privacy Center.",
+        "quota_exceeded": "You've reached this month's limit for reading photos. You can still type your readings.",
+        "unreadable_file": "This image format couldn't be opened. Try taking the photo again.",
+        "ai_unavailable": "Couldn't read the photo right now. You can type the numbers instead."
+      }
     }
   },
   "checkin": {

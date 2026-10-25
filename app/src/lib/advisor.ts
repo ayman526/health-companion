@@ -51,7 +51,8 @@ function summariseReadings(vitals: VitalReading[], person: { age: number | null;
   const latest = (kind: VitalReading['kind']) => vitals.find((r) => r.kind === kind)
   const describe = (r: VitalReading | undefined) => r && {
     date: r.measured_at.slice(0, 10),
-    value: r.kind === 'blood_pressure' ? `${r.systolic}/${r.diastolic} mmHg` : r.kind === 'glucose' ? `${r.glucose_mg_dl} mg/dL (${r.glucose_context})` : `${r.weight_kg} kg`,
+    value: r.kind === 'blood_pressure' ? `${r.systolic}/${r.diastolic} mmHg` : r.kind === 'glucose' ? `${r.glucose_mg_dl} mg/dL (${r.glucose_context})`
+      : r.kind === 'heart_rate' ? `${r.pulse} bpm` : r.kind === 'oxygen' ? `${r.spo2}% SpO2` : r.kind === 'temperature' ? `${r.temperature_c} °C` : `${r.weight_kg} kg`,
     category: assessReading(r, person)?.category ?? null,
   }
   const bp7 = bpAverage(vitals, 7)
@@ -61,7 +62,7 @@ function summariseReadings(vitals: VitalReading[], person: { age: number | null;
   const f30 = average(fasting, (r) => r.glucose_mg_dl, 30)
   const weights = vitals.filter((r) => r.kind === 'weight')
   return {
-    note: 'home readings entered by the person; categories from AHA/ACC (blood pressure) and ADA (glucose); averages calculated by the app',
+    note: 'home readings entered by the person (or read from a photo of their device and confirmed by them); categories from AHA/ACC (blood pressure, heart rate), ADA (glucose), NHS (oxygen, temperature); averages calculated by the app',
     latest_blood_pressure: describe(latest('blood_pressure')),
     blood_pressure_average_7_days: bp7 && `${bp7.systolic}/${bp7.diastolic} mmHg (${bp7.count} readings)`,
     blood_pressure_average_30_days: bp30 && `${bp30.systolic}/${bp30.diastolic} mmHg (${bp30.count} readings)`,
@@ -69,6 +70,9 @@ function summariseReadings(vitals: VitalReading[], person: { age: number | null;
     latest_glucose: describe(latest('glucose')),
     fasting_glucose_average_30_days: f30 && `${f30.value} mg/dL (${f30.count} readings)`,
     latest_weight: describe(weights[0]),
+    latest_heart_rate: describe(latest('heart_rate')),
+    latest_oxygen: describe(latest('oxygen')),
+    latest_temperature: describe(latest('temperature')),
     weight_90_days_ago: weights.length > 1 ? `${weights[weights.length - 1].weight_kg} kg on ${weights[weights.length - 1].measured_at.slice(0, 10)}` : null,
   }
 }

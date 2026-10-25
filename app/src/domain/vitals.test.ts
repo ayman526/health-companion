@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assessBloodPressure, assessBmi, assessGlucose, bmi, bpAverage, mgToMmol, mmolToMg, type VitalReading } from './vitals'
+import { assessBloodPressure, assessBmi, assessGlucose, assessHeartRate, assessOxygen, assessTemperature, bmi, bpAverage, cToF, fToC, mgToMmol, mmolToMg, type VitalReading } from './vitals'
 
 describe('blood pressure categories (ACC/AHA, adults)', () => {
   it.each([
@@ -65,5 +65,30 @@ describe('averages', () => {
     expect(bpAverage(list, 7, now)).toEqual({ systolic: 135, diastolic: 85, count: 2 })
     expect(bpAverage(list, 7, now, 7)).toEqual({ systolic: 150, diastolic: 95, count: 1 })
     expect(bpAverage([], 7, now)).toBeNull()
+  })
+})
+
+describe('heart rate, oxygen and temperature', () => {
+  it('uses the adult resting heart rate range', () => {
+    expect(assessHeartRate(72, 40)?.category).toBe('hr_normal')
+    expect(assessHeartRate(52, 40)?.category).toBe('hr_low')
+    expect(assessHeartRate(110, 40)?.category).toBe('hr_high')
+    expect(assessHeartRate(110, 6)).toBeNull()
+  })
+  it('follows NHS pulse oximeter thresholds', () => {
+    expect(assessOxygen(97)).toMatchObject({ category: 'spo2_normal', level: 'ok' })
+    expect(assessOxygen(94)).toMatchObject({ category: 'spo2_borderline', level: 'follow_up' })
+    expect(assessOxygen(92)).toMatchObject({ category: 'spo2_low', level: 'urgent' })
+  })
+  it('flags fever, very high fever, babies and low temperature', () => {
+    expect(assessTemperature(37.2, 30).category).toBe('temp_normal')
+    expect(assessTemperature(38.0, 30)).toMatchObject({ category: 'temp_fever', level: 'watch' })
+    expect(assessTemperature(40.1, 30).category).toBe('temp_very_high')
+    expect(assessTemperature(38.1, 0)).toMatchObject({ category: 'temp_fever_baby', level: 'urgent' })
+    expect(assessTemperature(34.6, 70)).toMatchObject({ category: 'temp_low', level: 'urgent' })
+  })
+  it('converts Fahrenheit', () => {
+    expect(cToF(38)).toBe(100.4)
+    expect(fToC(100.4)).toBe(38)
   })
 })

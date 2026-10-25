@@ -3,7 +3,7 @@
 // One reading never diagnoses anything; the app says so and shows averages.
 import type { SourceId } from './labs/sources'
 
-export type VitalKind = 'blood_pressure' | 'glucose' | 'weight'
+export type VitalKind = 'blood_pressure' | 'glucose' | 'weight' | 'heart_rate' | 'oxygen' | 'temperature'
 export type GlucoseContext = 'fasting' | 'before_meal' | 'after_meal' | 'bedtime' | 'random'
 export type Level = 'ok' | 'watch' | 'follow_up' | 'urgent'
 
@@ -17,6 +17,8 @@ export interface VitalReading {
   glucose_mg_dl: number | null
   glucose_context: GlucoseContext | null
   weight_kg: number | null
+  spo2?: number | null
+  temperature_c?: number | null
   note: string | null
 }
 
@@ -67,6 +69,36 @@ export function assessGlucose(mg: number, context: GlucoseContext, hasDiabetes: 
   return mg < 200 ? { category: 'glucose_typical', level: 'ok', sources } : { category: 'glucose_high_random', level: 'follow_up', sources }
 }
 
+/** Resting heart rate, adults (AHA): 60–100 is normal; lower can be normal for fit people or on some medicines. */
+export function assessHeartRate(bpm: number, age: number | null): Assessment | null {
+  if (age != null && age < 18) return null
+  const sources: SourceId[] = ['aha_heart_rate']
+  if (bpm > 100) return { category: 'hr_high', level: 'watch', sources }
+  if (bpm < 60) return { category: 'hr_low', level: 'watch', sources }
+  return { category: 'hr_normal', level: 'ok', sources }
+}
+
+/** Blood oxygen from a pulse oximeter (NHS thresholds). */
+export function assessOxygen(spo2: number): Assessment {
+  const sources: SourceId[] = ['nhs_pulse_oximeter']
+  if (spo2 <= 92) return { category: 'spo2_low', level: 'urgent', sources }
+  if (spo2 <= 94) return { category: 'spo2_borderline', level: 'follow_up', sources }
+  return { category: 'spo2_normal', level: 'ok', sources }
+}
+
+/** Body temperature in °C (NHS): fever from 38, very high from 40, below 35 can be hypothermia. */
+export function assessTemperature(c: number, age: number | null): Assessment {
+  const sources: SourceId[] = ['nhs_fever']
+  if (c < 35) return { category: 'temp_low', level: 'urgent', sources }
+  if (c >= 38 && age === 0) return { category: 'temp_fever_baby', level: 'urgent', sources }
+  if (c >= 40) return { category: 'temp_very_high', level: 'follow_up', sources }
+  if (c >= 38) return { category: 'temp_fever', level: 'watch', sources }
+  return { category: 'temp_normal', level: 'ok', sources }
+}
+
+export const cToF = (c: number) => Math.round((c * 9 / 5 + 32) * 10) / 10
+export const fToC = (f: number) => Math.round(((f - 32) * 5 / 9) * 10) / 10
+
 export function bmi(weightKg: number, heightCm: number | null): number | null {
   if (!heightCm) return null
   return Math.round((weightKg / (heightCm / 100) ** 2) * 10) / 10
@@ -116,6 +148,9 @@ export interface PersonFacts { age: number | null; heightCm: number | null; hasD
 export function assessReading(r: VitalReading, p: PersonFacts): Assessment | null {
   if (r.kind === 'blood_pressure') return assessBloodPressure(r.systolic!, r.diastolic!, p.age)
   if (r.kind === 'glucose') return assessGlucose(r.glucose_mg_dl!, r.glucose_context ?? 'random', p.hasDiabetes)
+  if (r.kind === 'heart_rate') return assessHeartRate(r.pulse!, p.age)
+  if (r.kind === 'oxygen') return assessOxygen(r.spo2!)
+  if (r.kind === 'temperature') return assessTemperature(r.temperature_c!, p.age)
   const index = bmi(r.weight_kg!, p.heightCm)
   return index != null ? assessBmi(index, p.age) : null
 }

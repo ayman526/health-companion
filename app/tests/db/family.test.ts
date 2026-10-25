@@ -82,6 +82,14 @@ describe('family profiles', () => {
     expect(await as(USER_B, MOM_A, () => rows('select * from vital_readings'))).toHaveLength(0)
   })
 
+  it('accepts heart rate, oxygen and temperature, and photo-read values', async () => {
+    await as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind, pulse) values ('${SELF_A}', 'heart_rate', 64);
+      insert into vital_readings (profile_id, kind, spo2, source) values ('${SELF_A}', 'oxygen', 97, 'photo');
+      insert into vital_readings (profile_id, kind, temperature_c) values ('${SELF_A}', 'temperature', 38.2)`))
+    await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind, spo2) values ('${SELF_A}', 'oxygen', 101)`))).rejects.toThrow()
+    await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind) values ('${SELF_A}', 'temperature')`))).rejects.toThrow()
+  })
+
   it('checks reading shapes and one check-in per day', async () => {
     await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind, systolic, diastolic) values ('${SELF_A}', 'blood_pressure', 80, 120)`))).rejects.toThrow()
     await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind) values ('${SELF_A}', 'glucose')`))).rejects.toThrow()

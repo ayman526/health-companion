@@ -22,6 +22,7 @@ Run every file in [`supabase/migrations/`](supabase/migrations/) **once each, in
 10. `20261024090000_profile_details.sql`: optional profile details from sign-up (height, weight, pregnancy, smoking, onboarding progress)
 11. `20261024100000_account_deletion.sql`: lets "Delete my account" remove everything (fixes the change log blocking it)
 12. `20261025000000_daily_health_and_family.sql`: home readings, daily check-ins, family profiles (each person's records kept separate)
+13. `20261025010000_more_readings.sql`: heart rate, oxygen and temperature readings; reading a monitor from a photo
 
 Pick one way:
 
@@ -79,7 +80,7 @@ Until the key is set, uploads still work and the app says report reading isn't s
 ## 7. Reminders (Phase 5)
 
 - Secrets set on the server: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`. The public VAPID key is also in `app/.env.local` as `VITE_VAPID_PUBLIC_KEY`.
-- Functions: `extract-document`, `send-reminders`, `advisor`, `medicine-info`, `delete-account` (deploy with `npx supabase@2.122.0 functions deploy <name> --project-ref tbrjbiowutfzpemqwlgf --use-api`).
+- Functions: `extract-document`, `send-reminders`, `advisor`, `medicine-info`, `delete-account`, `read-monitor` (deploy with `npx supabase@2.122.0 functions deploy <name> --project-ref tbrjbiowutfzpemqwlgf --use-api`).
 - Run [`supabase/setup/reminders_cron.sql`](supabase/setup/reminders_cron.sql) once, with `<CRON_SECRET>` replaced by the real value (never commit it). It calls `send-reminders` every minute.
 - Optional fallbacks: email needs `RESEND_API_KEY` + `EMAIL_FROM` (a verified Resend domain); WhatsApp needs `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID` and an approved template name in `WHATSAPP_TEMPLATE`. Until set, Settings shows them as "not set up yet".
 - iPhone/iPad: push works only after Share → Add to Home Screen (iOS 16.4+).
