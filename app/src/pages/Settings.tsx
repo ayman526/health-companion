@@ -7,6 +7,7 @@ import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
 import { deliveryChannels, disablePush, enablePush, pushState, type PushState } from '../lib/push'
 import { CONSENT_VERSION } from '../lib/consent'
+import { findRepeatingReminder, setRepeatingReminder } from '../lib/daily'
 import { PageHeader } from '../components/ui'
 import { toWesternDigits } from '../domain/numbers'
 
@@ -27,7 +28,8 @@ function Section({ icon: Icon, title, children }: { icon: typeof Bell; title: st
 
 export function SettingsPage() {
   const { t, i18n } = useTranslation()
-  const { session, signOut } = useAuth()
+  const { session, profile, signOut } = useAuth()
+  const [sunday, setSunday] = useState(false)
   const userId = session?.user.id ?? ''
   const [push, setPush] = useState<PushState | null>(null)
   const [channels, setChannels] = useState<{ push: boolean; email: boolean; whatsapp: boolean } | null>(null)
@@ -38,6 +40,7 @@ export function SettingsPage() {
   useEffect(() => {
     void pushState().then(setPush)
     void deliveryChannels().then(setChannels)
+    void findRepeatingReminder('weekly_summary').then((r) => setSunday(!!r))
     if (supabase) {
       void supabase.from('notification_preferences').select('email_enabled, whatsapp_enabled, whatsapp_number').maybeSingle()
         .then(({ data }) => data && setPrefs({ ...data, whatsapp_number: data.whatsapp_number ?? '' }))
@@ -115,6 +118,14 @@ export function SettingsPage() {
                 </div>
               )}
             </div>
+            <label className="flex items-start gap-2 text-sm">
+              <input type="checkbox" className="mt-0.5 size-5 accent-brand-700" checked={sunday} disabled={!profile}
+                onChange={async (e) => {
+                  const on = e.target.checked
+                  if (profile && await setRepeatingReminder(profile.id, 'weekly_summary', on, t('weekly.reminderTitle'), '18:00', profile.time_zone)) setSunday(on)
+                }} />
+              <span><span className="font-medium">{t('weekly.remindSunday')}</span><span className="block text-muted">{t('settings.weeklyHint')}</span></span>
+            </label>
             {saved && <p role="status" className="text-sm text-status-ok">{t('settings.saved')}</p>}
             {error && <p role="alert" className="text-sm text-status-urgent">{t('settings.saveError')}</p>}
             <p className="text-xs text-muted">{t('settings.privacyOfMessages')}</p>

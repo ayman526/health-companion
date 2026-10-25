@@ -1,135 +1,126 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AlertTriangle, Camera, ChevronDown, ChevronRight, ClipboardList, FileText, MessageCircleHeart, Plus, Sparkles, TrendingUp, UserRound, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { Camera, MessageCircleHeart, BellRing, TrendingUp, FileText, ChevronRight, Sparkles, Footprints, UserRound, HeartPulse, ClipboardList, Users } from 'lucide-react'
-import { CheckInCard } from '../components/CheckInCard'
-import { WeeklyCard } from '../components/WeeklyCard'
-import { LatestReadingsCard } from '../components/LatestReadingsCard'
 import { loadProfileDetails, profileCompleteness } from '../lib/profile'
 import { useAuth } from '../auth/AuthProvider'
-import { setInsightStatus, syncInsights, type Insight } from '../lib/insights'
-import { InsightCard } from '../components/InsightCard'
-import { TodayCard } from '../components/TodayCard'
+import { renderInsight, syncInsights, type Insight } from '../lib/insights'
 import { loadSuggestions } from '../lib/suggestions'
+import { formatDate } from '../lib/format'
 import { todayIn } from '../lib/medications'
-import { Card, PageHeader } from '../components/ui'
+import { YourDayCard } from '../components/home/YourDayCard'
+import { WeekTiles } from '../components/home/WeekTiles'
 
-const HOME_LIMIT = 3
-
+/**
+ * Home, most important first: anything needing attention (only when there is
+ * something), today's checklist, quick actions, this week at a glance.
+ * Explanations live on the detail screens, not here.
+ */
 export function HomePage() {
-  const { t } = useTranslation()
-  const { profile, profiles } = useAuth()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language
+  const { profile } = useAuth()
   const [toReview, setToReview] = useState(0)
   const [insights, setInsights] = useState<Insight[] | null>(null)
   const [suggested, setSuggested] = useState(0)
   const [completeness, setCompleteness] = useState<number | null>(null)
+  const bannerKey = `hc.profileBanner.${profile?.id ?? ''}`
+  const [bannerHidden, setBannerHidden] = useState(() => { try { return localStorage.getItem(bannerKey) === '1' } catch { return false } })
 
   useEffect(() => {
     if (!supabase || !profile) return
-    void supabase
-      .from('laboratory_reports')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'draft')
+    void supabase.from('laboratory_reports').select('id', { count: 'exact', head: true }).eq('status', 'draft')
       .then(({ count }) => setToReview(count ?? 0))
     void syncInsights(profile.id).then(setInsights)
     void loadSuggestions(todayIn(profile.time_zone)).then((list) => setSuggested(list.length))
     void loadProfileDetails().then(({ profile: p, lists }) => p && setCompleteness(profileCompleteness(p, lists)))
   }, [profile])
 
-  async function dismiss(id: string) {
-    if (await setInsightStatus(id, 'dismissed')) setInsights((list) => list?.map((i) => (i.id === id ? { ...i, status: 'dismissed' } : i)) ?? null)
-  }
-
+  if (!profile) return null
+  const country = profile.country
   const visible = (insights ?? []).filter((i) => i.status !== 'dismissed')
   const attention = visible.filter((i) => i.kind === 'attention')
   const changes = visible.filter((i) => i.kind === 'change')
-  const country = profile?.country ?? 'EG'
-  const forFamily = profile && profile.relationship !== 'self'
-  const greeting = forFamily
-    ? t('family.healthOf', { name: profile.display_name || t(`family.relationships.${profile.relationship}`) })
-    : profile?.display_name ? t('home.greetingName', { name: profile.display_name }) : t('home.greeting')
+  const forFamily = profile.relationship !== 'self'
+  const personName = profile.display_name || t(`family.relationships.${profile.relationship}`)
+  const greeting = forFamily ? t('family.healthOf', { name: personName })
+    : profile.display_name ? t('home.greetingName', { name: profile.display_name }) : t('home.greeting')
+  const hasAttention = attention.length > 0 || toReview > 0 || suggested > 0
+
+  const actions = [
+    { to: '/vitals', icon: Plus, label: t('home.actions.log'), primary: true },
+    { to: '/records/scan', icon: Camera, label: t('home.actions.scan') },
+    { to: '/advisor', icon: MessageCircleHeart, label: t('home.actions.ask') },
+    { to: '/summary', icon: ClipboardList, label: t('home.actions.visit') },
+  ]
 
   return (
-    <>
-      <PageHeader title={greeting} subtitle={t('home.subtitle')} />
-      <Link to="/family" className="-mt-3 mb-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-medium">
-        <Users className="size-4 text-brand-700" aria-hidden />
-        {profiles.length > 1 ? t('family.switchPerson') : t('family.addSomeone')}
-      </Link>
-      <div className="mb-6 grid grid-cols-2 gap-3">
-        <Link to="/records/scan" className="flex min-h-14 w-full items-center gap-3 rounded-2xl bg-brand-700 px-4 font-medium text-white">
-          <Camera className="size-5 shrink-0" aria-hidden /> {t('actions.scan')}
+    <div className="flex flex-col gap-4">
+      <header className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs text-muted">{new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date())}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{greeting}</h1>
+        </div>
+        <Link to="/family" className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-sm font-medium">
+          <UserRound className="size-4 text-brand-700" aria-hidden />
+          <span className="max-w-24 truncate">{forFamily ? personName : t('family.you')}</span>
+          <ChevronDown className="size-3.5 text-muted" aria-hidden />
         </Link>
-        <Link to="/advisor" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium">
-          <MessageCircleHeart className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('actions.ask')}
-        </Link>
-        <Link to="/vitals" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium">
-          <HeartPulse className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('vitals.logReading')}
-        </Link>
-        <Link to="/lifestyle" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium">
-          <Footprints className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('lifestyle.homeShort')}
-        </Link>
-      </div>
-      <div className="grid gap-4">
-        {completeness != null && completeness < 1 && (
-          <Link to="/profile" className="flex items-center gap-3 rounded-2xl border border-brand-100 bg-brand-50 p-4">
-            <UserRound className="size-6 shrink-0 text-brand-700" aria-hidden />
-            <span className="flex-1">
-              <span className="block font-semibold">{t('profile.completeTitle')}</span>
-              <span className="block text-sm text-muted">{t('profile.completeBody')}</span>
-              <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-line" aria-hidden>
-                <span className="block h-full rounded-full bg-brand-600" style={{ width: `${Math.round(completeness * 100)}%` }} />
-              </span>
-            </span>
-            <ChevronRight className="size-5 text-muted rtl:rotate-180" aria-hidden />
-          </Link>
-        )}
-        <TodayCard timeZone={profile?.time_zone ?? 'Africa/Cairo'} />
-        <LatestReadingsCard />
-        <CheckInCard />
-        <WeeklyCard />
-        <Link to="/summary" className="flex min-h-14 items-center gap-3 rounded-2xl border border-brand-100 bg-brand-50 px-4 font-medium text-brand-700">
-          <ClipboardList className="size-5 shrink-0" aria-hidden />
-          <span className="flex-1">{t('summary.homeLink')}</span>
-          <ChevronRight className="size-5 rtl:rotate-180" aria-hidden />
-        </Link>
-        <Card title={t('home.attention')}>
-          <div className="flex flex-col gap-3">
-            {suggested > 0 && (
-              <Link to="/reminders" className="flex min-h-11 items-center gap-2 text-sm font-medium text-brand-700">
-                <Sparkles className="size-4" aria-hidden /> {t('suggestions.homeLink', { count: suggested })}
-              </Link>
-            )}
+      </header>
+
+      {hasAttention && (
+        <section className="rounded-2xl border border-status-watch/30 bg-status-watch-bg p-4">
+          <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-status-watch"><AlertTriangle className="size-4" aria-hidden /> {t('home.attention')}</h2>
+          <ul className="flex flex-col">
+            {attention.slice(0, 3).map((i) => (
+              <li key={i.id}>
+                <Link to={`/records/tests/${encodeURIComponent(i.testKey)}`} className={`flex min-h-11 items-center gap-2 text-sm ${i.level === 'urgent' ? 'font-semibold text-status-urgent' : ''}`}>
+                  <span className="sensitive flex-1">{renderInsight(i, lang, country).title}</span>
+                  <ChevronRight className="size-4 shrink-0 text-muted rtl:rotate-180" aria-hidden />
+                </Link>
+              </li>
+            ))}
             {toReview > 0 && (
-              <Link to="/records" className="flex min-h-11 items-center gap-2 text-sm font-medium text-status-watch">
-                <FileText className="size-4" aria-hidden /> {t('home.reviewsPending', { count: toReview })}
-              </Link>
+              <li><Link to="/records" className="flex min-h-11 items-center gap-2 text-sm"><FileText className="size-4 shrink-0 text-status-watch" aria-hidden /><span className="flex-1">{t('home.reviewsPending', { count: toReview })}</span><ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden /></Link></li>
             )}
-            {attention.slice(0, HOME_LIMIT).map((i) => <InsightCard key={i.id} insight={i} country={country} compact onDismiss={() => void dismiss(i.id)} />)}
-            {toReview === 0 && suggested === 0 && attention.length === 0 && insights && (
-              <p className="flex items-center gap-2 text-sm text-muted">
-                <BellRing className="size-4" aria-hidden /> {t('home.emptyAttention')}
-              </p>
+            {suggested > 0 && (
+              <li><Link to="/reminders" className="flex min-h-11 items-center gap-2 text-sm"><Sparkles className="size-4 shrink-0 text-status-watch" aria-hidden /><span className="flex-1">{t('suggestions.homeLink', { count: suggested })}</span><ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden /></Link></li>
             )}
-          </div>
-        </Card>
-        <Card title={t('home.changed')}>
-          <div className="flex flex-col gap-3">
-            {changes.slice(0, HOME_LIMIT).map((i) => <InsightCard key={i.id} insight={i} country={country} compact onDismiss={() => void dismiss(i.id)} />)}
-            {changes.length === 0 && insights && (
-              <p className="flex items-center gap-2 text-sm text-muted">
-                <TrendingUp className="size-4 shrink-0" aria-hidden /> {t('home.emptyChanged')}
-              </p>
-            )}
-          </div>
-        </Card>
-        {visible.length > 0 && (
-          <Link to="/insights" className="flex min-h-11 items-center justify-between rounded-2xl border border-line bg-surface px-4 text-sm font-medium text-brand-700">
-            {t('home.allInsights', { count: visible.length })} <ChevronRight className="size-4 rtl:-scale-x-100" aria-hidden />
+          </ul>
+        </section>
+      )}
+
+      <YourDayCard timeZone={profile.time_zone} />
+
+      <nav aria-label={t('home.quickActions')} className="grid grid-cols-4 gap-2">
+        {actions.map(({ to, icon: Icon, label, primary }) => (
+          <Link key={to} to={to} className="flex flex-col items-center gap-1.5 text-center text-xs font-medium">
+            <span className={`grid size-14 place-items-center rounded-2xl ${primary ? 'bg-brand-700 text-white' : 'bg-brand-50 text-brand-700'}`}><Icon className="size-6" aria-hidden /></span>
+            {label}
           </Link>
-        )}
-      </div>
-    </>
+        ))}
+      </nav>
+
+      <WeekTiles profileId={profile.id} />
+
+      {changes.length > 0 && (
+        <Link to="/insights" className="flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-sm">
+          <TrendingUp className="size-4 shrink-0 text-brand-700" aria-hidden />
+          <span className="flex-1">{t('home.changesLine', { count: changes.length, date: formatDate(changes[0].date ?? new Date(), lang) })}</span>
+          <ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden />
+        </Link>
+      )}
+
+      {completeness != null && completeness < 1 && !bannerHidden && (
+        <div className="flex items-center gap-2 rounded-2xl bg-brand-50 px-4 py-2 text-sm">
+          <Link to="/profile" className="flex min-h-10 flex-1 items-center gap-2 font-medium text-brand-700">
+            <UserRound className="size-4 shrink-0" aria-hidden /> {t('home.completeProfile', { percent: Math.round(completeness * 100) })}
+          </Link>
+          <button type="button" aria-label={t('home.hide')} onClick={() => { setBannerHidden(true); try { localStorage.setItem(bannerKey, '1') } catch { /* optional */ } }}
+            className="grid min-h-10 min-w-10 place-items-center rounded-full text-muted"><X className="size-4" aria-hidden /></button>
+        </div>
+      )}
+    </div>
   )
 }

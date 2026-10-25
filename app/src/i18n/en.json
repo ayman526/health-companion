@@ -18,7 +18,7 @@
   "home": {
     "greeting": "Good to see you",
     "subtitle": "Here is where your health stands.",
-    "attention": "Needs your attention",
+    "attention": "Needs attention",
     "changed": "What has changed",
     "today": "Today",
     "emptyAttention": "Nothing needs your attention right now.",
@@ -28,7 +28,28 @@
     "reviewsPending_other": "{{count}} reports are waiting for your review",
     "greetingName": "Good to see you, {{name}}",
     "allInsights_one": "See 1 insight",
-    "allInsights_other": "See all {{count}} insights"
+    "allInsights_other": "See all {{count}} insights",
+    "yourDay": "Your day",
+    "doneOf": "{{done}} of {{total}}",
+    "moreOptions": "More options",
+    "readingTask": "Today's reading",
+    "nextUp": "Next:",
+    "actions": {
+      "log": "Log reading",
+      "scan": "Scan",
+      "ask": "Ask",
+      "visit": "Visit summary"
+    },
+    "quickActions": "Quick actions",
+    "fastingSugar": "Fasting sugar",
+    "dosesTaken": "doses taken",
+    "thisWeekOnly": "this week",
+    "vsLastWeek": "{{change}} vs last week",
+    "weekEmpty": "Log a reading or take your medicines, and your week will show here.",
+    "changesLine_one": "1 change since your last report",
+    "changesLine_other": "{{count}} changes since your last report",
+    "completeProfile": "Complete your profile ({{percent}}%)",
+    "hide": "Hide"
   },
   "records": {
     "title": "Health records",
@@ -767,7 +788,8 @@
     "privacyOfMessages": "Messages never include medicine names or results, only \"open the app to see your reminder\".",
     "privacy": "Privacy",
     "account": "Account",
-    "notSetUp": "not set up yet"
+    "notSetUp": "not set up yet",
+    "weeklyHint": "A short notification; the summary itself opens in the app."
   },
   "suggestions": {
     "title": "Suggested checkups",
@@ -1197,7 +1219,8 @@
     "done": "Done",
     "doneToday": "Today's check-in is done",
     "edit": "Edit",
-    "listSep": ", "
+    "listSep": ", ",
+    "addDetails": "Add sleep or symptoms"
   },
   "weekly": {
     "title": "This week",

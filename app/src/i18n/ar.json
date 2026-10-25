@@ -36,7 +36,33 @@
     "allInsights_two": "اعرض الملاحظتين",
     "allInsights_few": "اعرض كل الملاحظات ({{count}})",
     "allInsights_many": "اعرض كل الملاحظات ({{count}})",
-    "allInsights_other": "اعرض كل الملاحظات ({{count}})"
+    "allInsights_other": "اعرض كل الملاحظات ({{count}})",
+    "yourDay": "يومك",
+    "doneOf": "{{done}} من {{total}}",
+    "moreOptions": "خيارات أخرى",
+    "readingTask": "قراءة اليوم",
+    "nextUp": "التالي:",
+    "actions": {
+      "log": "تسجيل قراءة",
+      "scan": "مسح",
+      "ask": "اسأل",
+      "visit": "ملخص الزيارة"
+    },
+    "quickActions": "إجراءات سريعة",
+    "fastingSugar": "السكر الصائم",
+    "dosesTaken": "جرعات تم أخذها",
+    "thisWeekOnly": "هذا الأسبوع",
+    "vsLastWeek": "{{change}} مقارنة بالأسبوع الماضي",
+    "weekEmpty": "سجّل قراءة أو خذ أدويتك، وسيظهر أسبوعك هنا.",
+    "changesLine": "تغييرات منذ آخر تقرير: {{count}}",
+    "completeProfile": "أكمل ملفك الشخصي ({{percent}}%)",
+    "hide": "إخفاء",
+    "changesLine_zero": "تغييرات منذ آخر تقرير: {{count}}",
+    "changesLine_one": "تغييرات منذ آخر تقرير: {{count}}",
+    "changesLine_two": "تغييرات منذ آخر تقرير: {{count}}",
+    "changesLine_few": "تغييرات منذ آخر تقرير: {{count}}",
+    "changesLine_many": "تغييرات منذ آخر تقرير: {{count}}",
+    "changesLine_other": "تغييرات منذ آخر تقرير: {{count}}"
   },
   "records": {
     "title": "السجلات الصحية",
@@ -807,7 +833,8 @@
     "privacyOfMessages": "لا تتضمن الرسائل أسماء الأدوية أو النتائج أبدًا، فقط \"افتح التطبيق لرؤية تذكيرك\".",
     "privacy": "الخصوصية",
     "account": "الحساب",
-    "notSetUp": "غير مُعدّ بعد"
+    "notSetUp": "غير مُعدّ بعد",
+    "weeklyHint": "إشعار قصير؛ الملخص نفسه يُفتح داخل التطبيق."
   },
   "suggestions": {
     "title": "فحوصات مقترحة",
@@ -1246,7 +1273,8 @@
     "done": "تم",
     "doneToday": "تم تسجيل حالتك اليوم",
     "edit": "تعديل",
-    "listSep": "، "
+    "listSep": "، ",
+    "addDetails": "أضف النوم أو الأعراض"
   },
   "weekly": {
     "title": "هذا الأسبوع",
