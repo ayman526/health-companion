@@ -328,7 +328,7 @@
     },
     "start": {
       "consent_required": "AI reading isn't allowed for your account. Allow it above, or enter results manually.",
-      "quota_exceeded": "You've reached this month's limit of 30 scanned documents. You can still enter results manually.",
+      "quota_exceeded": "You've reached this month's limit of 15 scanned documents. You can still enter results manually.",
       "ai_not_configured": "Report reading isn't set up yet. Your file is saved; try again later or enter results manually.",
       "error": "We couldn't start reading this report. Your file is saved; try again."
     },
