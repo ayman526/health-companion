@@ -70,6 +70,8 @@ html {
 }
 
 body {
+  /* Long file names or links wrap instead of widening the page. */
+  overflow-wrap: anywhere;
   background: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);

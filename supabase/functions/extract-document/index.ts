@@ -260,6 +260,7 @@ Rules:
   - Structured fields only when the directions explicitly state them: dose_amount (number as text, e.g. "1", "0.5", "5"), dose_unit ("tablet", "capsule", "ml", "drop", "puff", "unit", "sachet", "application"), times_per_day ("1".."6"), every_n_days (for "every other day" = "2", weekly = "7"), as_needed true for "PRN", "when needed", "عند اللزوم", duration_days ("7" for "for a week", "لمدة أسبوع"), timing.
   - Common conventions: "1×3" / "1x3" / "١×٣" = 1 unit, 3 times a day; "1×2" = twice a day; OD/QD = once daily, BID = twice, TID = 3 times, QID = 4 times, HS/QHS = at bedtime, PRN = as needed; "مرة/مرتين/ثلاث مرات يوميا" = 1/2/3 times a day; "قبل الأكل" before meals, "بعد الأكل" after meals, "على الريق" empty stomach, "قبل النوم" bedtime.
   - Never infer a dose, frequency or duration from the drug name or from typical use. If it is not written or not legible, leave it "" and add the field to uncertain_fields when something is written but unclear.
+- A photo of a medicine box, bottle, tube or blister strip: document_type "prescription", one medication with name_as_written (the brand name as printed), active_ingredient and strength as printed on the pack, and directions only if a pharmacist's label states them; leave dose and frequency "" otherwise.
   - prescription.prescriber and prescription.prescribed_on (YYYY-MM-DD) when written.
 - Follow-up instructions: only what is explicitly written.
 - If the document is not readable or not medical, set readable false and explain briefly in unreadable_reason.

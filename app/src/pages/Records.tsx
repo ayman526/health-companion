@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, ChevronRight, Columns2, FileText, FolderHeart, LineChart, Loader2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
+import { startExtraction } from '../lib/documents'
 import { formatDate, formatNumber } from '../lib/format'
 import { loadHistories } from '../lib/labData'
 import type { TestHistory } from '../domain/labs/history'
@@ -35,28 +36,30 @@ export function RecordsPage() {
   const [docs, setDocs] = useState<DocItem[]>([])
   const [tests, setTests] = useState<TestHistory[]>([])
 
-  useEffect(() => {
+  const reload = useCallback(async () => {
     if (!supabase) return
-    void (async () => {
-      const [{ data: reps }, { data: ds }] = await Promise.all([
-        supabase
-          .from('laboratory_reports')
-          .select('id, document_id, status, lab_name, collected_at, created_at, laboratory_results(count)')
-          .in('status', ['draft', 'confirmed'])
-          .neq('laboratory_results.status', 'discarded')
-          .order('collected_at', { ascending: false, nullsFirst: true }),
-        supabase
-          .from('medical_documents')
-          .select('id, status, title, failure_reason, created_at')
-          .in('status', ['uploaded', 'processing', 'needs_review', 'failed'])
-          .order('created_at', { ascending: false }),
-      ])
-      setTests([...(await loadHistories()).values()].filter((h) => h.series.points.length > 0))
-      setReports((reps ?? []) as ReportItem[])
-      setDocs((ds ?? []) as DocItem[])
-      setLoading(false)
-    })()
+    const [{ data: reps }, { data: ds }] = await Promise.all([
+      supabase
+        .from('laboratory_reports')
+        .select('id, document_id, status, lab_name, collected_at, created_at, laboratory_results(count)')
+        .in('status', ['draft', 'confirmed'])
+        .neq('laboratory_results.status', 'discarded')
+        .order('collected_at', { ascending: false, nullsFirst: true }),
+      supabase
+        .from('medical_documents')
+        .select('id, status, title, failure_reason, created_at')
+        .in('status', ['uploaded', 'processing', 'needs_review', 'failed'])
+        .order('created_at', { ascending: false }),
+    ])
+    setTests([...(await loadHistories()).values()].filter((h) => h.series.points.length > 0))
+    setReports((reps ?? []) as ReportItem[])
+    setDocs((ds ?? []) as DocItem[])
+    setLoading(false)
   }, [])
+
+  useEffect(() => {
+    void reload()
+  }, [reload])
 
   const drafts = reports.filter((r) => r.status === 'draft')
   const confirmed = reports.filter((r) => r.status === 'confirmed')
@@ -104,8 +107,8 @@ export function RecordsPage() {
                   <li key={d.id}>
                     <Link to={`/records/documents/${d.id}`} className="flex min-h-14 items-center gap-3 rounded-2xl border border-status-watch bg-status-watch-bg px-4 text-status-watch">
                       <FileText className="size-5 shrink-0" aria-hidden />
-                      <span className="flex-1">
-                        <span className="block font-medium">{d.title || t('records.document')}</span>
+                      <span className="min-w-0 flex-1">
+                        <span dir="auto" className="block truncate text-start font-medium">{d.title || t('records.document')}</span>
                         <span className="text-xs">{t('records.docStatus.needs_review')}</span>
                       </span>
                       <ChevronRight className="size-4 rtl:-scale-x-100" aria-hidden />
@@ -114,11 +117,17 @@ export function RecordsPage() {
                 ) : (
                   <li key={d.id} className="flex min-h-14 items-center gap-3 rounded-2xl border border-line bg-surface px-4">
                     {d.status === 'processing' || d.status === 'uploaded' ? <Loader2 className="size-5 shrink-0 animate-spin text-muted" aria-hidden /> : <FileText className="size-5 shrink-0 text-muted" aria-hidden />}
-                    <span className="flex-1">
-                      <span className="block text-sm font-medium">{d.title || t('records.document')}</span>
-                      <span className="text-xs text-muted">
+                    <span className="min-w-0 flex-1">
+                      <span dir="auto" className="block truncate text-start text-sm font-medium">{d.title || t('records.document')}</span>
+                      <span className="block text-xs text-muted">
                         {d.status === 'failed' ? t(`scan.failure.${d.failure_reason ?? 'ai_unavailable'}`, t('scan.failure.ai_unavailable')) : t(`records.docStatus.${d.status}`)}
                       </span>
+                      {d.status === 'failed' && (
+                        <span className="mt-1 flex gap-3">
+                          <button type="button" onClick={async () => { await startExtraction(d.id); await reload() }} className="min-h-9 text-xs font-medium text-brand-700">{t('records.retry')}</button>
+                          <button type="button" onClick={async () => { if (supabase && !(await supabase.rpc('discard_document', { p_document_id: d.id })).error) await reload() }} className="min-h-9 text-xs font-medium text-muted">{t('records.remove')}</button>
+                        </span>
+                      )}
                     </span>
                   </li>
                 ))}

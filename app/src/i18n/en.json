@@ -83,7 +83,9 @@
     "resultsToReview_other": "{{count}} results to check",
     "resultCount_one": "1 result",
     "resultCount_other": "{{count}} results",
-    "tests": "Your tests"
+    "tests": "Your tests",
+    "retry": "Try again",
+    "remove": "Remove"
   },
   "advisor": {
     "title": "AI health advisor",
@@ -637,7 +639,7 @@
     "confirmChecked": "I have checked the medicine name, strength, dose and times against my prescription or package.",
     "neverInfer": "The app never guesses a dose or schedule. Take your medicine as your doctor prescribed.",
     "save": "Save medication",
-    "scanPrescription": "Scan a prescription",
+    "scanPrescription": "Scan a prescription or medicine",
     "prescriptionsToReview": "Prescriptions to review",
     "pharmacistReview": "You're taking more than one medicine. The app doesn't check for interactions; ask your pharmacist or doctor to review your full list, including supplements.",
     "current": "Current",
