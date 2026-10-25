@@ -149,7 +149,7 @@ export function RemindersPage() {
                 <div className="flex items-start gap-3">
                   <CalendarClock className={`mt-0.5 size-5 shrink-0 ${overdue ? 'text-status-watch' : 'text-brand-700'}`} aria-hidden />
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium">{r.title}</p>
+                    <p className="sensitive font-medium">{r.title}</p>
                     <p className="text-xs text-muted">
                       {t(`reminders.kinds.${r.kind}`)} · {formatDate(r.due_at, lang, r.time_zone)} <span dir="ltr">{localTime(r.due_at, r.time_zone, lang)}</span>
                       {r.repeat_rule !== 'none' && ` · ${t(`reminders.repeats.${r.repeat_rule}`)}`}
@@ -183,7 +183,7 @@ export function RemindersPage() {
         <section className="mt-6">
           <h2 className="mb-2 text-sm font-semibold text-muted">{t('reminders.completed')}</h2>
           <ul className="flex flex-col gap-1 text-sm text-muted">
-            {done.map((r) => <li key={r.id}>✓ {r.title} · {r.completed_at && formatDate(r.completed_at, lang, r.time_zone)}</li>)}
+            {done.map((r) => <li key={r.id}>✓ <span className="sensitive">{r.title}</span> · {r.completed_at && formatDate(r.completed_at, lang, r.time_zone)}</li>)}
           </ul>
         </section>
       )}

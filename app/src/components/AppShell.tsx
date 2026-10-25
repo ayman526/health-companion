@@ -1,7 +1,8 @@
 import { Suspense } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, FolderHeart, MessageCircleHeart, Pill, CalendarClock, Languages, Bell, Settings, LockKeyhole } from 'lucide-react'
+import { Home, FolderHeart, MessageCircleHeart, Pill, CalendarClock, Languages, Bell, Settings, LockKeyhole, Eye, EyeOff } from 'lucide-react'
+import { setDiscreet, useDiscreet } from '../lib/discreet'
 import { setLanguage } from '../i18n'
 
 const NAV = [
@@ -31,16 +32,24 @@ function PrivacyBadge() {
   const { t } = useTranslation()
   return (
     <Link to="/privacy" className="inline-flex min-h-8 items-center gap-1 rounded-full bg-brand-50 px-2.5 text-xs font-medium text-brand-700">
-      <LockKeyhole className="size-3.5" aria-hidden /> {t('privacy.badge')}
+      <LockKeyhole className="size-3.5" aria-hidden />
+      {/* Icon only on narrow phones, where the header is tight. */}
+      <span className="max-[400px]:sr-only">{t('privacy.badge')}</span>
     </Link>
   )
 }
 
 function HeaderLinks({ withLabels }: { withLabels?: boolean }) {
   const { t } = useTranslation()
+  const discreet = useDiscreet()
   const cls = 'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-sm font-medium text-muted hover:bg-canvas hover:text-ink'
+  const DiscreetIcon = discreet ? EyeOff : Eye
   return (
     <>
+      <button type="button" aria-pressed={discreet} aria-label={t(discreet ? 'discreet.off' : 'discreet.on')} title={t(discreet ? 'discreet.off' : 'discreet.on')}
+        onClick={() => setDiscreet(!discreet)} className={`${cls} ${discreet ? 'bg-brand-50 text-brand-700' : ''}`}>
+        <DiscreetIcon className="size-5" aria-hidden />{withLabels && t(discreet ? 'discreet.off' : 'discreet.on')}
+      </button>
       <Link to="/reminders" aria-label={t('reminders.title')} className={cls}><Bell className="size-5" aria-hidden />{withLabels && t('reminders.title')}</Link>
       <Link to="/settings" aria-label={t('settings.title')} className={cls}><Settings className="size-5" aria-hidden />{withLabels && t('settings.title')}</Link>
     </>
@@ -84,8 +93,8 @@ export function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile header */}
         <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface/90 px-4 py-3 backdrop-blur md:hidden">
-          <span className="flex items-center gap-2">
-            <span className="text-base font-semibold text-brand-700">{t('app.name')}</span>
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="whitespace-nowrap text-base font-semibold text-brand-700">{t('app.name')}</span>
             <PrivacyBadge />
           </span>
           <div className="flex items-center gap-1">

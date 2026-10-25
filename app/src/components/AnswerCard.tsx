@@ -50,7 +50,7 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
   const [feedback, setFeedback] = useState<string | null>(null)
   const [factsDone, setFactsDone] = useState<Set<number>>(new Set())
   const a = message.answer
-  if (!a) return <p className="text-sm">{message.text}</p>
+  if (!a) return <p className="sensitive text-sm">{message.text}</p>
   const byId = new Map((message.citations ?? []).map((c) => [c.id, c]))
   const flags = message.safety_flags ?? []
   const dir = a.language === 'ar' ? 'rtl' : 'ltr'
@@ -86,19 +86,19 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
   const section = (title: string, text: string) => text && (
     <section>
       <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">{title}</h4>
-      <p className="mt-0.5 whitespace-pre-line text-sm">{text}</p>
+      <p className="sensitive mt-0.5 whitespace-pre-line text-sm">{text}</p>
     </section>
   )
 
   return (
     <article dir={dir} className="space-y-3 rounded-2xl border border-line bg-surface p-4">
-      <p className="font-medium whitespace-pre-line">{a.direct_answer}</p>
+      <p className="sensitive font-medium whitespace-pre-line">{a.direct_answer}</p>
 
       {a.record_points.length > 0 && (
         <ul className="space-y-2">
           {a.record_points.map((p, i) => (
             <li key={i} className="rounded-xl bg-canvas px-3 py-2 text-sm">
-              <p>{p.text}</p>
+              <p className="sensitive">{p.text}</p>
               {p.refs.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1.5">{p.refs.map((r) => <CitationChip key={r} c={byId.get(r) ?? { id: r }} />)}</div>}
             </li>
           ))}
@@ -113,7 +113,7 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
       {a.warning_signs && (
         <section className="rounded-xl bg-status-watch-bg px-3 py-2 text-sm text-status-watch">
           <h4 className="flex items-center gap-1 font-semibold"><AlertTriangle className="size-4" aria-hidden /> {t('advisor.sections.warningSigns')}</h4>
-          <p className="mt-0.5 whitespace-pre-line">{a.warning_signs}</p>
+          <p className="sensitive mt-0.5 whitespace-pre-line">{a.warning_signs}</p>
         </section>
       )}
 

@@ -94,14 +94,14 @@ export function ComparePage() {
                 {[older, newer].map((p, i) => (
                   <div key={i}>
                     <p className="text-xs text-muted">{p ? formatDate(p.collectedAt, lang) : '—'}</p>
-                    <p className="font-semibold"><span className="ltr-value">{p ? `${formatNumber(p.value, lang)} ${p.unit}` : t('compare.notInReport')}</span></p>
+                    <p className="font-semibold"><span className="ltr-value sensitive">{p ? `${formatNumber(p.value, lang)} ${p.unit}` : t('compare.notInReport')}</span></p>
                   </div>
                 ))}
               </div>
               {c && (
                 <p className="mt-2 text-sm">
                   <TrendLabel trend={c.trend} />{' · '}
-                  <span className="ltr-value text-muted">
+                  <span className="ltr-value sensitive text-muted">
                     {c.absoluteChange > 0 ? '+' : ''}{formatNumber(c.absoluteChange, lang)} {c.current.unit}
                     {c.percentChange != null && ` (${c.percentChange > 0 ? '+' : ''}${formatNumber(c.percentChange, lang, 1)}%)`}
                   </span>

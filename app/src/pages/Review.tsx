@@ -339,7 +339,7 @@ export function ReviewPage() {
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
           {status && <StatusBadge status={status} />}
-          {r.ref_text && <span>{t('review.rangeAsPrinted')}: <span className="ltr-value">{r.ref_text}</span></span>}
+          {r.ref_text && <span>{t('review.rangeAsPrinted')}: <span className="ltr-value sensitive">{r.ref_text}</span></span>}
           {r.lab_flag && <span>· {t('review.labMarked', { flag: t(`review.flags.${r.lab_flag}`) })}</span>}
         </div>
         {unitProblem(r) && test && <p className="mt-2 text-xs text-status-watch">{t('review.unitNotComparable', { unit: test.canonicalUnit })}</p>}
@@ -421,8 +421,8 @@ export function ReviewPage() {
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium">{testName(r)}</span>
                       <span className="block text-xs text-muted">
-                        <span className="ltr-value">{r.value_comparator}{r.value || r.value_text} {r.unit}</span>
-                        {r.ref_text && <> · <span className="ltr-value">{r.ref_text}</span></>}
+                        <span className="ltr-value sensitive">{r.value_comparator}{r.value || r.value_text} {r.unit}</span>
+                        {r.ref_text && <> · <span className="ltr-value sensitive">{r.ref_text}</span></>}
                       </span>
                     </span>
                     {status && status !== 'no_range' && <StatusBadge status={status} />}

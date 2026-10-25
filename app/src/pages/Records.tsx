@@ -141,7 +141,7 @@ export function RecordsPage() {
                           <span className="min-w-0 flex-1">
                             <span className="block truncate text-sm font-medium">{h.byNameOnly ? h.test.name.en : h.test.name[lang === 'ar' ? 'ar' : 'en']}</span>
                             <span className="block text-xs text-muted">
-                              <span className="ltr-value">{formatNumber(latest.value, lang)} {latest.unit}</span> · {formatDate(latest.collectedAt, lang)}
+                              <span className="ltr-value sensitive">{formatNumber(latest.value, lang)} {latest.unit}</span> · {formatDate(latest.collectedAt, lang)}
                               {h.series.points.length > 1 && ` · ${t('records.resultCount', { count: h.series.points.length })}`}
                             </span>
                           </span>

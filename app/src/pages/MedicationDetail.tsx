@@ -107,7 +107,7 @@ export function MedicationDetailPage() {
 
   return (
     <>
-      <PageHeader title={`${med.brand_name}${med.strength ? ` ${med.strength}` : ''}`} subtitle={med.active_ingredient ?? undefined} />
+      <PageHeader title={`${med.brand_name}${med.strength ? ` ${med.strength}` : ''}`} subtitle={med.active_ingredient ?? undefined} sensitive />
       <div className="mb-4">
         <SourceChip kind={provenanceOf(med.source, !!med.document_id)} to={med.document_id ? `/records/documents/${med.document_id}` : undefined}
           detail={med.document_id ? t('trust.view') : undefined} />

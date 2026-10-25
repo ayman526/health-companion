@@ -111,7 +111,7 @@ export function AdvisorPage() {
         )}
 
         {messages.map((m) => m.role === 'user' ? (
-          <p key={m.id} dir="auto" className="ms-auto max-w-[85%] whitespace-pre-line rounded-2xl bg-brand-700 px-4 py-2 text-sm text-white">{m.text}</p>
+          <p key={m.id} dir="auto" className="sensitive ms-auto max-w-[85%] whitespace-pre-line rounded-2xl bg-brand-700 px-4 py-2 text-sm text-white">{m.text}</p>
         ) : (
           <AnswerCard key={m.id} message={m} profileId={profile!.id} />
         ))}

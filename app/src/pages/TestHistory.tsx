@@ -62,7 +62,7 @@ export function TestHistoryPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs text-muted">{t('history.latest', { date: formatDate(latest.collectedAt, lang) })}</p>
-                <p className="text-2xl font-semibold"><span className="ltr-value">{formatNumber(latest.value, lang)} {latest.unit}</span></p>
+                <p className="text-2xl font-semibold"><span className="ltr-value sensitive">{formatNumber(latest.value, lang)} {latest.unit}</span></p>
               </div>
               <StatusBadge status={measurementStatus(test, latest)} />
             </div>
@@ -110,8 +110,8 @@ export function TestHistoryPage() {
                   <Link to={`/records/reports/${p.reportId}`} className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-2">
                     <span className="min-w-0 flex-1">
                       <span className="block text-xs text-muted">{formatDate(p.collectedAt, lang)}{reportOf.get(p.resultId)?.laboratory_reports.lab_name ? ` · ${reportOf.get(p.resultId)!.laboratory_reports.lab_name}` : ''}</span>
-                      <span className="block font-semibold"><span className="ltr-value">{formatNumber(p.value, lang)} {p.unit}</span></span>
-                      {c && <span className="block text-xs"><TrendLabel trend={c.trend} />{c.percentChange != null && <span className="ltr-value text-muted"> ({c.percentChange > 0 ? '+' : ''}{formatNumber(c.percentChange, lang, 1)}%)</span>}</span>}
+                      <span className="block font-semibold"><span className="ltr-value sensitive">{formatNumber(p.value, lang)} {p.unit}</span></span>
+                      {c && <span className="block text-xs"><TrendLabel trend={c.trend} />{c.percentChange != null && <span className="ltr-value sensitive text-muted"> ({c.percentChange > 0 ? '+' : ''}{formatNumber(c.percentChange, lang, 1)}%)</span>}</span>}
                     </span>
                     <StatusBadge status={measurementStatus(test, p)} />
                     <ChevronRight className="size-4 shrink-0 text-muted rtl:-scale-x-100" aria-hidden />
@@ -132,7 +132,7 @@ export function TestHistoryPage() {
             {excluded.map((r) => (
               <li key={r!.id}>
                 <Link to={`/records/reports/${r!.report_id}`} className="block rounded-xl border border-line bg-surface px-4 py-2">
-                  {r!.laboratory_reports.collected_at && formatDate(r!.laboratory_reports.collected_at, lang)} · <span className="ltr-value">{r!.value_numeric} {r!.unit}</span>
+                  {r!.laboratory_reports.collected_at && formatDate(r!.laboratory_reports.collected_at, lang)} · <span className="ltr-value sensitive">{r!.value_numeric} {r!.unit}</span>
                 </Link>
               </li>
             ))}

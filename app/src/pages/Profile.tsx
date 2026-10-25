@@ -84,7 +84,7 @@ export function ProfilePage() {
       <div className="flex flex-col gap-4">
         <Section title={t('onboarding.profileTitle')}>
           <AboutFields value={about} onChange={setAbout} />
-          {index != null && <p className="mt-3 text-sm">{t('profile.bmi')}: <span className="ltr-value font-semibold">{index}</span></p>}
+          {index != null && <p className="mt-3 text-sm">{t('profile.bmi')}: <span className="ltr-value sensitive font-semibold">{index}</span></p>}
         </Section>
         {askPregnancy(about.sex || null, about.date_of_birth || null, today) && (
           <Section title={t('onboarding.pregnancyTitle')} hint={t('onboarding.pregnancyIntro')}>

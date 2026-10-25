@@ -32,8 +32,8 @@ export function InsightCard({ insight, country, onDismiss, onRestore, compact }:
         <Icon className={`mt-0.5 size-5 shrink-0 ${iconColor}`} aria-hidden />
         <div className="min-w-0 flex-1">
           <p className={`text-xs font-medium ${iconColor}`}>{t(LEVEL_LABEL_KEY[insight.level])}</p>
-          <h3 className="font-medium">{text.title}</h3>
-          {!compact && <p className="mt-1 text-sm text-muted">{text.body}</p>}
+          <h3 className="sensitive font-medium">{text.title}</h3>
+          {!compact && <p className="sensitive mt-1 text-sm text-muted">{text.body}</p>}
           {!compact && text.action && <p className="mt-2 text-sm font-medium">{text.action}</p>}
           {!compact && <EvidenceChips sources={insight.sources} />}
           <div className="mt-2 flex flex-wrap items-center gap-x-4">

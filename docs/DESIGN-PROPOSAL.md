@@ -34,14 +34,14 @@ One place that answers "what happens to my data?" in plain words, with live fact
 
 - **Who can see your records:** "Only you." Later, when sharing with a doctor exists, this lists each person with a "Stop sharing" button.
 - **Where it's stored:** "Supabase, Frankfurt, Germany · encrypted in transit and at rest."
-- **What's sent to AI:** one row per feature (reading documents, answering questions, medicine notes), each with an on/off switch. "Anthropic (Claude) · not used for training."
+- **What's sent to AI:** one row per feature (reading documents, answering questions, medicine notes), each with an on/off switch. "a secure AI model · not used for training."
 - **Consent history:** a dated list from `user_consents`, e.g. "24 Oct 2026: you agreed to AI reading".
 - **Recent activity:** from the audit log, e.g. "Today 09:12: you confirmed a lab report", "Yesterday: you signed in on iPhone". This makes the invisible visible.
 - **Download my data** (JSON + original files) and **Delete my account**. Both are promised in the consent text and are already on the must-do list.
 - **Sign out on all devices.**
 
 ### 2.3 "What will be shared" line before every AI action
-Under the Scan button and the advisor's send box, a one-line notice: *"This document will be read by Claude (Anthropic). Not used for training. [Details]"*. Show it every time, not only on first use. It costs one line and removes the biggest fear.
+Under the Scan button and the advisor's send box, a one-line notice: *"This document will be read by a secure AI model. Not used for training. [Details]"*. Show it every time, not only on first use. It costs one line and removes the biggest fear.
 
 ### 2.4 Source chip on every value
 Every result, medicine and condition shows where it came from:
@@ -89,6 +89,8 @@ Notifications already say "Time for your medicine" with no names. Say so in Sett
 ---
 
 ## 3. Words matter
+
+- Never name the AI model or company in the app (decided 2026-10-25, so the provider can change). Say "a secure AI model". The provider is still named in the full privacy policy, where the law expects it.
 
 - Use "your records", not "data".
 - Use "Only you can see this", not "secure".

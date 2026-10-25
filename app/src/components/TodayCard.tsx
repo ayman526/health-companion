@@ -76,7 +76,7 @@ export function TodayCard({ timeZone }: { timeZone: string }) {
               <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-3">
                 <span className="w-12 shrink-0 text-sm font-semibold" dir="ltr">{localTime(d.scheduled_for, timeZone, lang)}</span>
                 <Link to={`/medications/${s.medication_id}`} className="min-w-0 flex-1">
-                  <span className="flex items-center gap-1.5 truncate text-sm font-medium">
+                  <span className="sensitive flex items-center gap-1.5 truncate text-sm font-medium">
                     {s.medications.photo_path && photos[s.medications.photo_path]
                       ? <img src={photos[s.medications.photo_path]} alt="" className="size-7 shrink-0 rounded object-cover" />
                       : <Pill className="size-4 shrink-0 text-brand-700" aria-hidden />}
@@ -116,7 +116,7 @@ export function TodayCard({ timeZone }: { timeZone: string }) {
             {reminders.map((r) => (
               <li key={r.id}>
                 <Link to="/reminders" className="flex items-center justify-between gap-2 text-sm">
-                  <span className="truncate">{r.title}</span>
+                  <span className="sensitive truncate">{r.title}</span>
                   <span className="shrink-0 text-xs text-muted">{formatDate(r.due_at, lang, timeZone)}</span>
                 </Link>
               </li>

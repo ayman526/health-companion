@@ -91,7 +91,7 @@ export function TrendChart({ points, unit, refLow, refHigh, onSelect }: Props) {
 
   return (
     // Time runs left to right in both languages; the surrounding page stays RTL in Arabic.
-    <div ref={wrap} dir="ltr" className="relative w-full select-none" onPointerLeave={() => setActive(null)}>
+    <div ref={wrap} dir="ltr" className="sensitive relative w-full select-none" onPointerLeave={() => setActive(null)}>
       <svg width={width} height={HEIGHT} role="img" aria-label={summary} className="block">
         {/* Recessive grid and y-axis labels */}
         {ticks.map((v) => (

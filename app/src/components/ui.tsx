@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-export function PageHeader({ title, subtitle }: { title: string; subtitle?: string }) {
+export function PageHeader({ title, subtitle, sensitive }: { title: string; subtitle?: string; sensitive?: boolean }) {
   return (
     <div className="mb-6">
-      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-      {subtitle && <p className="mt-1 text-muted">{subtitle}</p>}
+      <h1 className={`text-2xl font-semibold tracking-tight ${sensitive ? 'sensitive' : ''}`}>{title}</h1>
+      {subtitle && <p className={`mt-1 text-muted ${sensitive ? 'sensitive' : ''}`}>{subtitle}</p>}
     </div>
   )
 }

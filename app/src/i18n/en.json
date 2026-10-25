@@ -201,7 +201,7 @@
       },
       "ai_processing": {
         "title": "AI reading and explanations",
-        "body": "Lets the app send your documents and relevant records to Anthropic (Claude) to read reports and answer your questions. Anthropic does not use this data to train models. Without it, you can still enter results manually."
+        "body": "Lets the app send your documents and relevant records to a secure AI model to read reports and answer your questions. Your data is not used to train AI models. Without it, you can still enter results yourself."
       }
     },
     "adultConfirm": "I confirm I am 18 or older",
@@ -259,7 +259,7 @@
       },
       "ai": {
         "title": "AI reading is essential",
-        "body": "It's how the app reads your reports and prescriptions. Anthropic (Claude) doesn't use your data for training."
+        "body": "It's how the app reads your reports and prescriptions. Your data is never used to train AI models."
       }
     },
     "readFull": "Read the details",
@@ -988,7 +988,7 @@
     },
     "ai": {
       "title": "AI reading",
-      "body": "Sends documents and the records relevant to your question to Anthropic (Claude). Anthropic does not use them to train models.",
+      "body": "Sends documents and the records relevant to your question to a secure AI model. Your data is not used to train AI models.",
       "uses": {
         "documents": "Reading lab reports and prescriptions you scan",
         "advisor": "Answering your questions in the advisor",
@@ -1044,5 +1044,9 @@
       "deleting": "Deleting…",
       "error": "Your account couldn't be deleted. Nothing more was removed; please try again."
     }
+  },
+  "discreet": {
+    "on": "Hide health details",
+    "off": "Show health details"
   }
 }

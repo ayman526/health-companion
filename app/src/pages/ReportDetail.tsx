@@ -238,16 +238,16 @@ export function ReportDetailPage() {
                 </div>
                 {status && <StatusBadge status={status} />}
               </div>
-              <p className="mt-2 text-lg font-semibold"><span className="ltr-value">{value}</span></p>
+              <p className="mt-2 text-lg font-semibold"><span className="ltr-value sensitive">{value}</span></p>
               {(row.ref_text || row.ref_low != null || row.ref_high != null) && (
                 <p className="text-xs text-muted">
-                  {t('report.range')}: <span className="ltr-value">{row.ref_text || `${row.ref_low ?? ''} – ${row.ref_high ?? ''}`}</span>
+                  {t('report.range')}: <span className="ltr-value sensitive">{row.ref_text || `${row.ref_low ?? ''} – ${row.ref_high ?? ''}`}</span>
                 </p>
               )}
               {fixes.length > 0 && (
                 <p className="mt-1 text-xs text-status-info">
                   {t('report.corrected', { date: formatDate(fixes[0].at, lang) })}{' '}
-                  {fixes[0].oldValue != null && <span className="ltr-value">({t('report.was')} {fixes[0].oldValue} {fixes[0].oldUnit ?? ''})</span>}
+                  {fixes[0].oldValue != null && <span className="ltr-value sensitive">({t('report.was')} {fixes[0].oldValue} {fixes[0].oldUnit ?? ''})</span>}
                 </p>
               )}
               {liver && <p className="mt-2 text-sm text-status-watch">{t(`labs.liver.${liver.grade}`, { fold: formatNumber(liver.foldUln, lang) })}</p>}

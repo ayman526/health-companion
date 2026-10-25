@@ -146,7 +146,7 @@ export function DocumentReviewPage() {
               const added = addedNames.has(nameOf(m).toLowerCase()) || state?.added === i
               return (
                 <li key={i} className="rounded-2xl border border-line bg-surface p-4">
-                  <p className="font-medium">{nameOf(m)} {m.strength && <span className="ltr-value text-sm font-normal text-muted">{m.strength}</span>}</p>
+                  <p className="sensitive font-medium">{nameOf(m)} {m.strength && <span className="ltr-value text-sm font-normal text-muted">{m.strength}</span>}</p>
                   {(m.directions_as_written || m.dose || m.frequency) && (
                     <p className="mt-1 text-sm"><span className="text-muted">{t('meds.asWritten')}: </span>{m.directions_as_written ?? [m.dose, m.frequency].filter(Boolean).join(' ')}</p>
                   )}

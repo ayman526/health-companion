@@ -102,7 +102,7 @@ export function TimelinePage() {
                     <span className="flex items-start gap-3">
                       <Icon className="mt-0.5 size-4 shrink-0 text-brand-700" aria-hidden />
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium">{t(`timeline.types.${e.event_type}`, { title: e.title })}</span>
+                        <span className="sensitive block text-sm font-medium">{t(`timeline.types.${e.event_type}`, { title: e.title })}</span>
                         <span className="block text-xs text-muted">{formatDate(e.occurred_on, lang)}</span>
                       </span>
                     </span>

@@ -108,7 +108,7 @@ export function MedicationsPage() {
                           <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-canvas"><Pill className={`size-5 ${m.is_active ? 'text-brand-700' : 'text-muted'}`} aria-hidden /></span>
                         )}
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate font-medium">{m.brand_name} {m.strength && <span className="ltr-value text-sm font-normal text-muted">{m.strength}</span>}</span>
+                          <span className="sensitive block truncate font-medium">{m.brand_name} {m.strength && <span className="ltr-value text-sm font-normal text-muted">{m.strength}</span>}</span>
                           {s && <span className="block text-xs text-muted">{describe(s)}</span>}
                           {!m.is_active && s?.valid_to && <span className="block text-xs text-muted">{t('meds.stoppedOn', { date: formatDate(s.valid_to, i18n.language) })}</span>}
                         </span>
