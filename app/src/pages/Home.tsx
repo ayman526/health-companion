@@ -1,25 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, Camera, ChevronDown, ChevronRight, ClipboardList, FileText, MessageCircleHeart, Plus, Sparkles, TrendingUp, UserRound, X } from 'lucide-react'
+import { ChevronRight, FileText, Sparkles, TrendingUp, UserRound } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { loadProfileDetails, profileCompleteness } from '../lib/profile'
 import { useAuth } from '../auth/AuthProvider'
 import { renderInsight, syncInsights, type Insight } from '../lib/insights'
 import { loadSuggestions } from '../lib/suggestions'
-import { formatDate } from '../lib/format'
 import { todayIn } from '../lib/medications'
 import { YourDayCard } from '../components/home/YourDayCard'
 import { WeekTiles } from '../components/home/WeekTiles'
+import { AddButton } from '../components/home/AddButton'
 import { InstallPrompt } from '../components/InstallPrompt'
-import { VoiceLog } from '../components/VoiceLog'
 import { ContextCard } from '../components/ContextCard'
+import { Sheet } from '../components/Sheet'
 import { loadUserTopics } from '../lib/userTopics'
 
+interface Notice { key: string; to: string; text: string; icon: typeof FileText; urgent?: boolean; info?: boolean }
+
 /**
- * Home, most important first: anything needing attention (only when there is
- * something), today's checklist, quick actions, this week at a glance.
- * Explanations live on the detail screens, not here.
+ * Home, kept short: one line for anything needing attention, today's
+ * checklist (only what's left), two tiles for this week, one line "For you".
+ * Everything you can add sits behind the "+" button.
  */
 export function HomePage() {
   const { t, i18n } = useTranslation()
@@ -28,10 +29,8 @@ export function HomePage() {
   const [toReview, setToReview] = useState(0)
   const [insights, setInsights] = useState<Insight[] | null>(null)
   const [suggested, setSuggested] = useState(0)
-  const [completeness, setCompleteness] = useState<number | null>(null)
   const [topics, setTopics] = useState<Map<string, number> | null>(null)
-  const bannerKey = `hc.profileBanner.${profile?.id ?? ''}`
-  const [bannerHidden, setBannerHidden] = useState(() => { try { return localStorage.getItem(bannerKey) === '1' } catch { return false } })
+  const [noticesOpen, setNoticesOpen] = useState(false)
 
   useEffect(() => {
     if (!supabase || !profile) return
@@ -39,100 +38,81 @@ export function HomePage() {
       .then(({ count }) => setToReview(count ?? 0))
     void syncInsights(profile.id).then(setInsights)
     void loadSuggestions(todayIn(profile.time_zone)).then((list) => setSuggested(list.length))
-    void loadProfileDetails().then(({ profile: p, lists }) => p && setCompleteness(profileCompleteness(p, lists)))
     void loadUserTopics(todayIn(profile.time_zone)).then(setTopics)
   }, [profile])
 
   if (!profile) return null
-  const country = profile.country
   const visible = (insights ?? []).filter((i) => i.status !== 'dismissed')
-  const attention = visible.filter((i) => i.kind === 'attention')
   const changes = visible.filter((i) => i.kind === 'change')
   const forFamily = profile.relationship !== 'self'
   const personName = profile.display_name || t(`family.relationships.${profile.relationship}`)
   const greeting = forFamily ? t('family.healthOf', { name: personName })
     : profile.display_name ? t('home.greetingName', { name: profile.display_name }) : t('home.greeting')
-  const hasAttention = attention.length > 0 || toReview > 0 || suggested > 0
 
-  const actions = [
-    { to: '/vitals', icon: Plus, label: t('home.actions.log'), primary: true },
-    { to: '/records/scan', icon: Camera, label: t('home.actions.scan') },
-    { to: '/advisor', icon: MessageCircleHeart, label: t('home.actions.ask') },
-    { to: '/visits', icon: ClipboardList, label: t('home.actions.visit') },
+  // Everything that needs a look, most important first; Home shows the first in one line.
+  const notices: Notice[] = [
+    ...visible.filter((i) => i.kind === 'attention').map((i) => ({
+      key: i.id, to: `/records/tests/${encodeURIComponent(i.testKey)}`, text: renderInsight(i, lang, profile.country).title, icon: TrendingUp, urgent: i.level === 'urgent',
+    })),
+    ...(toReview > 0 ? [{ key: 'review', to: '/records', text: t('home.reviewsPending', { count: toReview }), icon: FileText }] : []),
+    ...(suggested > 0 ? [{ key: 'suggested', to: '/reminders', text: t('suggestions.homeLink', { count: suggested }), icon: Sparkles }] : []),
+    ...(changes.length > 0 ? [{ key: 'changes', to: '/insights', text: t('home.changesLine', { count: changes.length }), icon: TrendingUp, info: true }] : []),
   ]
+  const first = notices[0]
+  const onlyInfo = notices.every((n) => n.info)
 
   return (
-    <div className="flex flex-col gap-4">
-      <header className="flex items-start justify-between gap-3">
+    <div className="flex flex-col gap-4 pb-24">
+      <header className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs text-muted">{new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }).format(new Date())}</p>
-          <h1 className="text-2xl font-semibold tracking-tight">{greeting}</h1>
+          <p className="text-xs text-muted">{new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())}</p>
+          <h1 className="truncate text-xl font-semibold tracking-tight">{greeting}</h1>
         </div>
-        <Link to="/family" className="inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-sm font-medium">
-          <UserRound className="size-4 text-brand-700" aria-hidden />
-          <span className="max-w-24 truncate">{forFamily ? personName : t('family.you')}</span>
-          <ChevronDown className="size-3.5 text-muted" aria-hidden />
+        <Link to="/family" aria-label={t('family.switchPerson')} className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
+          {forFamily ? personName.slice(0, 1) : <UserRound className="size-5" aria-hidden />}
         </Link>
       </header>
 
-      {hasAttention && (
-        <section className="rounded-2xl border border-status-watch/30 bg-status-watch-bg p-4">
-          <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-status-watch"><AlertTriangle className="size-4" aria-hidden /> {t('home.attention')}</h2>
-          <ul className="flex flex-col">
-            {attention.slice(0, 3).map((i) => (
-              <li key={i.id}>
-                <Link to={`/records/tests/${encodeURIComponent(i.testKey)}`} className={`flex min-h-11 items-center gap-2 text-sm ${i.level === 'urgent' ? 'font-semibold text-status-urgent' : ''}`}>
-                  <span className="sensitive flex-1">{renderInsight(i, lang, country).title}</span>
-                  <ChevronRight className="size-4 shrink-0 text-muted rtl:rotate-180" aria-hidden />
-                </Link>
-              </li>
-            ))}
-            {toReview > 0 && (
-              <li><Link to="/records" className="flex min-h-11 items-center gap-2 text-sm"><FileText className="size-4 shrink-0 text-status-watch" aria-hidden /><span className="flex-1">{t('home.reviewsPending', { count: toReview })}</span><ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden /></Link></li>
-            )}
-            {suggested > 0 && (
-              <li><Link to="/reminders" className="flex min-h-11 items-center gap-2 text-sm"><Sparkles className="size-4 shrink-0 text-status-watch" aria-hidden /><span className="flex-1">{t('suggestions.homeLink', { count: suggested })}</span><ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden /></Link></li>
-            )}
-          </ul>
-        </section>
+      {first && (
+        notices.length === 1 ? (
+          <Link to={first.to} className={`flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm ${onlyInfo ? 'bg-brand-50 text-brand-700' : 'bg-status-watch-bg text-status-watch'}`}>
+            <span className={`size-2 shrink-0 rounded-full ${first.urgent ? 'bg-status-urgent' : 'bg-current'}`} aria-hidden />
+            <span className="sensitive min-w-0 flex-1 truncate">{first.text}</span>
+            <ChevronRight className="size-4 shrink-0 rtl:rotate-180" aria-hidden />
+          </Link>
+        ) : (
+          <button type="button" onClick={() => setNoticesOpen(true)} className={`flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-start text-sm ${onlyInfo ? 'bg-brand-50 text-brand-700' : 'bg-status-watch-bg text-status-watch'}`}>
+            <span className={`size-2 shrink-0 rounded-full ${first.urgent ? 'bg-status-urgent' : 'bg-current'}`} aria-hidden />
+            <span className="sensitive min-w-0 flex-1 truncate">{first.text}</span>
+            <span className="shrink-0 rounded-full bg-surface/60 px-2 text-xs font-medium">+{notices.length - 1}</span>
+            <ChevronRight className="size-4 shrink-0 rtl:rotate-180" aria-hidden />
+          </button>
+        )
       )}
 
       <InstallPrompt />
 
       <YourDayCard timeZone={profile.time_zone} />
 
-      <nav aria-label={t('home.quickActions')} className="grid grid-cols-4 gap-2">
-        {actions.map(({ to, icon: Icon, label, primary }) => (
-          <Link key={to} to={to} className="flex flex-col items-center gap-1.5 text-center text-xs font-medium">
-            <span className={`grid size-14 place-items-center rounded-2xl ${primary ? 'bg-brand-700 text-white' : 'bg-brand-50 text-brand-700'}`}><Icon className="size-6" aria-hidden /></span>
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <WeekTiles profileId={profile.id} max={2} />
 
-      <VoiceLog />
+      {topics && <ContextCard topics={topics} allowGeneral heading={t('library.forYou')} teaser />}
 
-      <WeekTiles profileId={profile.id} />
+      <AddButton />
 
-      {topics && <ContextCard topics={topics} allowGeneral heading={t('library.forYou')} />}
-
-      {changes.length > 0 && (
-        <Link to="/insights" className="flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-sm">
-          <TrendingUp className="size-4 shrink-0 text-brand-700" aria-hidden />
-          <span className="flex-1">{t('home.changesLine', { count: changes.length, date: formatDate(changes[0].date ?? new Date(), lang) })}</span>
-          <ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden />
-        </Link>
-      )}
-
-      {completeness != null && completeness < 1 && !bannerHidden && (
-        <div className="flex items-center gap-2 rounded-2xl bg-brand-50 px-4 py-2 text-sm">
-          <Link to="/profile" className="flex min-h-10 flex-1 items-center gap-2 font-medium text-brand-700">
-            <UserRound className="size-4 shrink-0" aria-hidden /> {t('home.completeProfile', { percent: Math.round(completeness * 100) })}
-          </Link>
-          <button type="button" aria-label={t('home.hide')} onClick={() => { setBannerHidden(true); try { localStorage.setItem(bannerKey, '1') } catch { /* optional */ } }}
-            className="grid min-h-10 min-w-10 place-items-center rounded-full text-muted"><X className="size-4" aria-hidden /></button>
-        </div>
-      )}
+      <Sheet open={noticesOpen} onClose={() => setNoticesOpen(false)} title={t('home.attention')}>
+        <ul className="flex flex-col">
+          {notices.map((n) => (
+            <li key={n.key}>
+              <Link to={n.to} onClick={() => setNoticesOpen(false)} className={`flex min-h-12 items-center gap-3 border-b border-line text-sm last:border-0 ${n.urgent ? 'font-semibold text-status-urgent' : ''}`}>
+                <n.icon className={`size-4 shrink-0 ${n.urgent ? '' : n.info ? 'text-brand-700' : 'text-status-watch'}`} aria-hidden />
+                <span className="sensitive flex-1">{n.text}</span>
+                <ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Sheet>
     </div>
   )
 }

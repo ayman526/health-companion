@@ -36,7 +36,7 @@ function Tile({ to, label, value, unit, foot, children }: { to: string; label: s
 const arrow = (n: number) => (n > 0 ? '↑' : n < 0 ? '↓' : '→')
 
 /** "This week": up to four tiles, only for what the person actually tracks. */
-export function WeekTiles({ profileId }: { profileId: string }) {
+export function WeekTiles({ profileId, max = 4 }: { profileId: string; max?: number }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language
   const [summary, setSummary] = useState<WeeklySummary | null>(null)
@@ -82,7 +82,7 @@ export function WeekTiles({ profileId }: { profileId: string }) {
         <Sparkline values={series((r) => r.weight_kg, (r) => r.kind === 'weight')} />
       </Tile>
     ),
-  ].filter(Boolean)
+  ].filter(Boolean).slice(0, max)
 
   return (
     <section>

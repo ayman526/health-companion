@@ -2,6 +2,7 @@ import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { activeProfileId } from './activeProfile'
 import { bmi } from '../domain/profileOptions'
+import { formatDose } from '../domain/medications'
 import { loadCheckIns, loadVitals } from './daily'
 import { assessReading, average, bpAverage, type VitalReading } from '../domain/vitals'
 import { loadConfirmedResults } from './labData'
@@ -115,7 +116,7 @@ export async function contextFor(question: string, profileId: string, today: str
   const medications: AdvisorMedication[] = meds.map((m) => ({
     id: m.id, name: m.brand_name, ingredient: m.active_ingredient, strength: m.strength, active: m.is_active,
     regimens: m.medication_schedules.map((s) => ({
-      from: s.valid_from, to: s.valid_to, dose: s.dose_amount ? `${s.dose_amount} ${s.dose_unit ?? ''}`.trim() : '', frequency: freqText(s),
+      from: s.valid_from, to: s.valid_to, dose: formatDose(s.dose_amount, s.dose_unit), frequency: freqText(s),
     })),
   }))
   const p = profile.data

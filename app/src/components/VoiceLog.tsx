@@ -15,10 +15,10 @@ type Phase = { kind: 'idle' } | { kind: 'listening' } | { kind: 'reading' } | { 
  * the person to confirm before saving. Typing works too (and when the browser
  * can't listen).
  */
-export function VoiceLog({ className = '' }: { className?: string }) {
+export function VoiceLog({ className = '', startOpen = false, onClose }: { className?: string; startOpen?: boolean; onClose?: () => void }) {
   const { t, i18n } = useTranslation()
   const { profile } = useAuth()
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(startOpen)
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const [text, setText] = useState('')
   const [typing, setTyping] = useState(!speechSupported)
@@ -26,6 +26,12 @@ export function VoiceLog({ className = '' }: { className?: string }) {
   const stop = useRef<() => void>(() => {})
 
   useEffect(() => () => stop.current(), [])
+  // Opened from the "+" menu: start listening straight away.
+  useEffect(() => {
+    if (startOpen && speechSupported) start()
+  // Only on first open.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function understand(spoken: string) {
     if (!spoken.trim()) return setPhase({ kind: 'idle' })
@@ -77,7 +83,7 @@ export function VoiceLog({ className = '' }: { className?: string }) {
     setPhase({ kind: 'done', ...r })
   }
 
-  const close = () => { stop.current(); setOpen(false); setPhase({ kind: 'idle' }); setText('') }
+  const close = () => { stop.current(); setOpen(false); setPhase({ kind: 'idle' }); setText(''); onClose?.() }
 
   if (!open) {
     return (
@@ -89,8 +95,8 @@ export function VoiceLog({ className = '' }: { className?: string }) {
   }
 
   return (
-    <section className={`rounded-2xl border border-brand-600 bg-surface p-4 ${className}`} aria-live="polite">
-      <div className="flex items-center justify-between gap-2">
+    <section className={startOpen ? className : `rounded-2xl border border-brand-600 bg-surface p-4 ${className}`} aria-live="polite">
+      <div className={startOpen ? 'hidden' : 'flex items-center justify-between gap-2'}>
         <h2 className="flex items-center gap-2 font-semibold"><Mic className="size-5 text-brand-700" aria-hidden /> {t('voice.title')}</h2>
         <button type="button" aria-label={t('report.cancel')} onClick={close} className="grid min-h-10 min-w-10 place-items-center rounded-full text-muted"><X className="size-4" aria-hidden /></button>
       </div>

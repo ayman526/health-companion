@@ -2,7 +2,7 @@
 // Prescription text is turned into a *proposed* schedule only where the
 // directions state it explicitly; the user always confirms it (SPEC §9).
 
-import { parseNumber } from './numbers'
+import { normalizeNumberInput, parseNumber } from './numbers'
 
 export type Frequency = 'daily' | 'weekly' | 'every_n_days' | 'as_needed'
 export type Timing = '' | 'before_meals' | 'after_meals' | 'with_meals' | 'empty_stomach' | 'bedtime' | 'morning' | 'evening'
@@ -118,11 +118,29 @@ export function validateSchedule(f: ScheduleForm): string[] {
 }
 
 /** Payload for save_medication / change_regimen. */
+/**
+ * Splits a unit that also carries the amount ("1 قرص", "2 tablets") into
+ * amount and unit, so the amount isn't shown twice. Keeps a typed amount.
+ */
+export function splitDoseUnit(amount: string, unit: string): { amount: string; unit: string } {
+  const m = normalizeNumberInput(unit.trim()).match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
+  if (!m) return { amount, unit: unit.trim() }
+  return { amount: amount.trim() || m[1].replace(',', '.'), unit: m[2].trim() }
+}
+
+/** "1 قرص", "2 drops" - never repeating the number. */
+export function formatDose(amount: number | string | null, unit: string | null): string {
+  if (amount == null || amount === '') return ''
+  const split = splitDoseUnit(String(amount), unit ?? '')
+  return `${split.amount} ${split.unit}`.trim()
+}
+
 export function schedulePayload(f: ScheduleForm, timeZone: string) {
   const asNeeded = f.frequency === 'as_needed'
+  const dose = splitDoseUnit(f.dose_amount, f.dose_unit)
   return {
-    dose_amount: posNum(f.dose_amount),
-    dose_unit: f.dose_unit.trim() || null,
+    dose_amount: posNum(dose.amount),
+    dose_unit: dose.unit || null,
     frequency: f.frequency,
     every_n_days: f.frequency === 'every_n_days' ? posInt(f.every_n_days) : null,
     days_of_week: f.frequency === 'weekly' ? [...f.days_of_week].sort() : null,

@@ -62,7 +62,32 @@
     "changesLine_two": "تغييرات منذ آخر تقرير: {{count}}",
     "changesLine_few": "تغييرات منذ آخر تقرير: {{count}}",
     "changesLine_many": "تغييرات منذ آخر تقرير: {{count}}",
-    "changesLine_other": "تغييرات منذ آخر تقرير: {{count}}"
+    "changesLine_other": "تغييرات منذ آخر تقرير: {{count}}",
+    "left": "باقي {{count}}",
+    "allDone": "تم كل شيء",
+    "doneList": "سابقًا اليوم ({{count}}): {{names}}",
+    "checkInShort": "تسجيل الحالة",
+    "add": {
+      "title": "أضف",
+      "voice": "قُلها بصوتك",
+      "voiceHint": "قراءة، دواء أخذته، حالتك…",
+      "reading": "تسجيل قراءة",
+      "scan": "مسح تقرير أو روشتة",
+      "medicine": "إضافة دواء",
+      "visit": "زيارة طبيب"
+    },
+    "left_zero": "باقي {{count}}",
+    "doneList_zero": "سابقًا اليوم ({{count}}): {{names}}",
+    "left_one": "باقي {{count}}",
+    "doneList_one": "سابقًا اليوم ({{count}}): {{names}}",
+    "left_two": "باقي {{count}}",
+    "doneList_two": "سابقًا اليوم ({{count}}): {{names}}",
+    "left_few": "باقي {{count}}",
+    "doneList_few": "سابقًا اليوم ({{count}}): {{names}}",
+    "left_many": "باقي {{count}}",
+    "doneList_many": "سابقًا اليوم ({{count}}): {{names}}",
+    "left_other": "باقي {{count}}",
+    "doneList_other": "سابقًا اليوم ({{count}}): {{names}}"
   },
   "records": {
     "title": "السجلات الصحية",

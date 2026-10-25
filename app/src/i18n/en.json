@@ -49,7 +49,22 @@
     "changesLine_one": "1 change since your last report",
     "changesLine_other": "{{count}} changes since your last report",
     "completeProfile": "Complete your profile ({{percent}}%)",
-    "hide": "Hide"
+    "hide": "Hide",
+    "left_one": "1 left",
+    "left_other": "{{count}} left",
+    "allDone": "All done",
+    "doneList_one": "Earlier today: {{names}}",
+    "doneList_other": "Earlier today ({{count}}): {{names}}",
+    "checkInShort": "Check-in",
+    "add": {
+      "title": "Add",
+      "voice": "Say it",
+      "voiceHint": "A reading, a medicine you took, how you feel…",
+      "reading": "Log a reading",
+      "scan": "Scan a report or prescription",
+      "medicine": "Add a medicine",
+      "visit": "Doctor visit"
+    }
   },
   "records": {
     "title": "Health records",

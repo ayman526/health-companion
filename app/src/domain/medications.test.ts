@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { adherenceSummary, proposeSchedule, schedulePayload, suggestTimes, validateSchedule } from './medications'
+import { adherenceSummary, formatDose, proposeSchedule, schedulePayload, splitDoseUnit, suggestTimes, validateSchedule } from './medications'
 
 const start = '2026-10-24'
 
@@ -51,5 +51,15 @@ describe('adherence', () => {
       { scheduled_for: '2026-10-25T09:00:00Z', status: 'pending' },
     ], now)
     expect(s).toEqual({ taken: 2, skipped: 1, notRecorded: 1, total: 4, takenOfRecorded: 67 })
+  })
+})
+
+describe('dose amount and unit', () => {
+  it("doesn't repeat an amount the unit already contains", () => {
+    expect(formatDose(1, '1 قرص')).toBe('1 قرص')
+    expect(formatDose('2', 'drops')).toBe('2 drops')
+    expect(formatDose(null, '1 قرص')).toBe('')
+    expect(splitDoseUnit('', '٢ نقطة')).toEqual({ amount: '2', unit: 'نقطة' })
+    expect(splitDoseUnit('1', 'tablet')).toEqual({ amount: '1', unit: 'tablet' })
   })
 })

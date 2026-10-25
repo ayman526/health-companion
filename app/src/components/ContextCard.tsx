@@ -12,13 +12,14 @@ import { track } from '../lib/usage'
  * no card fits, so it never adds unrelated content. With `topics` as a map,
  * the strongest of the person's topics wins (used for "For you" on Home).
  */
-export function ContextCard({ topics, allowGeneral = false, className = '', heading }: { topics: string[] | Map<string, number>; allowGeneral?: boolean; className?: string; heading?: string }) {
+export function ContextCard({ topics, allowGeneral = false, className = '', heading, teaser = false }: { topics: string[] | Map<string, number>; allowGeneral?: boolean; className?: string; heading?: string; teaser?: boolean }) {
   const { t, i18n } = useTranslation()
   const ar = i18n.language === 'ar'
   const { profile } = useAuth()
   const [pick, setPick] = useState<{ card: LibraryCard; reason: string } | null>(null)
   const [reaction, setLocalReaction] = useState<Reaction | null>(null)
   const [open, setOpen] = useState(false)
+  const [expanded, setExpanded] = useState(!teaser)
   const shown = useRef<string | null>(null)
   const key = Array.isArray(topics) ? topics.join(',') : [...topics.entries()].map(([k, v]) => `${k}=${v}`).join(',')
 
@@ -60,6 +61,16 @@ export function ContextCard({ topics, allowGeneral = false, className = '', head
       setLocalReaction(next)
       if (next) track(next === 'helpful' ? 'card_helpful' : 'card_not_relevant')
     }
+  }
+
+  if (!expanded) {
+    return (
+      <button type="button" onClick={() => setExpanded(true)} className={`flex min-h-12 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-start text-sm ${className}`}>
+        <BookOpen className="size-4 shrink-0 text-brand-700" aria-hidden />
+        <span className="min-w-0 flex-1 truncate"><span className="font-medium">{heading}: </span>{ar ? card.title_ar : card.title_en}<span className="text-muted"> · {card.source_name}</span></span>
+        <ChevronDown className="size-4 shrink-0 text-muted" aria-hidden />
+      </button>
+    )
   }
 
   return (
