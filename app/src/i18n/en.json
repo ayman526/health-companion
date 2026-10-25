@@ -33,6 +33,7 @@
     "doneOf": "{{done}} of {{total}}",
     "moreOptions": "More options",
     "readingTask": "Today's reading",
+    "logReading": "Log today's reading",
     "nextUp": "Next:",
     "actions": {
       "log": "Log reading",

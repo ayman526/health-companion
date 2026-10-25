@@ -41,6 +41,7 @@
     "doneOf": "{{done}} من {{total}}",
     "moreOptions": "خيارات أخرى",
     "readingTask": "قراءة اليوم",
+    "logReading": "سجّل قراءة اليوم",
     "nextUp": "التالي:",
     "actions": {
       "log": "تسجيل قراءة",

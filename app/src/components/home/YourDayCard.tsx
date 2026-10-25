@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Check, ChevronDown, ChevronRight, Clock, HeartPulse, MoreHorizontal } from 'lucide-react'
+import { Check, ChevronDown, ChevronRight, Clock, HeartPulse, MoreHorizontal, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { loadDosesBetween, localDayBounds, localTime, logDose, type TodayDose } from '../../lib/medications'
 import { findRepeatingReminder, loadCheckIns, loadVitals, type CheckIn } from '../../lib/daily'
@@ -88,16 +88,6 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
           </li>
         ))}
 
-        {reading.show && !reading.done && (
-          <li className="border-b border-line py-2">
-            <Link to="/vitals" className="flex min-h-8 items-center gap-3">
-              <span className="size-6 shrink-0 rounded-full border-2 border-brand-700" aria-hidden />
-              <span className="flex-1 text-sm font-medium">{t('home.readingTask')}</span>
-              <HeartPulse className="size-4 text-brand-700" aria-hidden />
-            </Link>
-          </li>
-        )}
-
         {!checkedIn && (
           <li className="border-b border-line py-2">
             <button type="button" onClick={() => setCheckInOpen(true)} className="flex min-h-8 w-full items-center gap-3 text-start">
@@ -134,6 +124,15 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
           </li>
         )}
       </ul>
+
+      {/* Logging a reading is an action, not a tick-box: its own row with a "+". */}
+      {reading.show && !reading.done && (
+        <Link to="/vitals" className="mt-3 flex min-h-12 items-center gap-3 rounded-xl bg-brand-50 px-3 text-brand-700">
+          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-700 text-white"><Plus className="size-4" aria-hidden /></span>
+          <span className="flex-1 text-sm font-semibold">{t('home.logReading')}</span>
+          <HeartPulse className="size-4" aria-hidden />
+        </Link>
+      )}
 
       <Sheet open={checkInOpen} onClose={() => { setCheckInOpen(false); void load() }} title={t('checkin.title')}>
         <CheckInRow />
