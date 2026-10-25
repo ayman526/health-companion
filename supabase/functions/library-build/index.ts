@@ -14,7 +14,7 @@
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
 
-const MODEL = 'claude-opus-5-5'
+const MODEL = 'claude-sonnet-5-5'
 const MAX_PAGE_CHARS = 60_000
 const UA = 'Mozilla/5.0 (compatible; HealthJournalLibrary/1.0; +https://health-journal.vercel.app)'
 
@@ -123,7 +123,10 @@ Deno.serve(async (req) => {
   if (!secret || req.headers.get('x-admin-secret') !== secret) return json(401, { error: 'unauthorized' })
   if (req.method !== 'POST') return json(405, { error: 'method_not_allowed' })
 
-  const { url, source_name, extra_urls, store, action } = await req.json().catch(() => ({}))
+  const { url, source_name, extra_urls, store, action, test_model } = await req.json().catch(() => ({}))
+  // Team testing only: try a sample (never stored) with another model.
+  const model = !store && (test_model === 'claude-haiku-5-5' || test_model === 'claude-opus-5-5') ? test_model : MODEL
+  const haiku = model === 'claude-haiku-5-5'
   if (action === 'list') {
     // For the team to review the library: every card, newest first.
     const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
@@ -157,14 +160,15 @@ Deno.serve(async (req) => {
   try {
     const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
     const message = await client.beta.messages.stream({
-      model: MODEL,
+      model,
       max_tokens: 16000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
-      system: SYSTEM,
+      // Haiku has no server-side fallback model.
+      ...(haiku ? {} : { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' as const }),
+      system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
       messages: [{ role: 'user', content: `Source: ${source_name}\nURL: ${pageUrl}\n\n<page>\n${text}\n</page>` }],
     }).finalMessage()
+    console.log(JSON.stringify({ event: 'ai_usage', fn: 'library-build', model: message.model, usage: message.usage }))
     if (message.stop_reason === 'refusal') return json(422, { error: 'refused' })
     const out = JSON.parse(message.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join(''))
     if (admin) {

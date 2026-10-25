@@ -14,9 +14,13 @@ import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.5
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void }
 
-const MODEL = 'claude-opus-5-5'
+// Most documents (typed lab reports) are read well by Sonnet at half the cost.
+// When Sonnet isn't sure (unreadable, unclear medicine names, several unclear
+// values - typically handwriting), the document is read again by Opus.
+const MODEL = 'claude-sonnet-5-5'
+const SECOND_LOOK_MODEL = 'claude-opus-5-5'
 const PROMPT_VERSION = 'extract-2026-10-24.5'
-const MONTHLY_EXTRACTION_LIMIT = 30
+const MONTHLY_EXTRACTION_LIMIT = 15
 const MAX_PDF_PAGES = 20
 // The API accepts images up to 5 MB; the app uploads a downsized reading copy for larger photos.
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -314,6 +318,16 @@ function parseNumber(s: string | undefined): number | null {
   return Number.isFinite(n) ? n : null
 }
 
+/** Whether a first reading is unsure enough to ask the stronger model: unreadable, unclear medicine names, or several unclear values. */
+function needsSecondLook(ex: Extraction): boolean {
+  if (!ex.readable) return true
+  const meds = ex.medications as { uncertain_fields?: string[] }[]
+  if (meds.some((m) => (m.uncertain_fields ?? []).some((f) => f === 'name_as_written' || f === 'dose_amount' || f === 'times_per_day'))) return true
+  const results = ex.lab_report?.results ?? []
+  const unclear = results.filter((r) => r.confidence === 'low' || r.uncertain_fields.includes('value_number')).length
+  return unclear >= 2 || (results.length > 0 && unclear / results.length > 0.15)
+}
+
 class ExtractionError extends Error {
   constructor(public code: string) {
     super(code)
@@ -336,7 +350,7 @@ function countPdfPages(bytes: Uint8Array): number {
 }
 
 // ---------------------------------------------------------------- Claude call
-async function extractWithClaude(mime: string, bytes: Uint8Array): Promise<{ data: Extraction; model: string }> {
+async function extractWithClaude(mime: string, bytes: Uint8Array, model = MODEL, effort: 'medium' | 'high' = 'medium'): Promise<{ data: Extraction; model: string }> {
   const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
   const data = toBase64(bytes)
   const fileBlock =
@@ -345,15 +359,16 @@ async function extractWithClaude(mime: string, bytes: Uint8Array): Promise<{ dat
       : { type: 'image' as const, source: { type: 'base64' as const, media_type: mime as 'image/jpeg' | 'image/png' | 'image/webp', data } }
 
   const stream = client.beta.messages.stream({
-    model: MODEL,
+    model,
     max_tokens: 64000,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
-    system: SYSTEM_PROMPT,
-    output_config: { effort: 'high', format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
+    system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+    output_config: { effort, format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
     messages: [{ role: 'user', content: [fileBlock, { type: 'text', text: 'Transcribe this document.' }] }],
   })
   const message = await stream.finalMessage()
+  console.log(JSON.stringify({ event: 'ai_usage', fn: 'extract-document', model: message.model, usage: message.usage }))
 
   if (message.stop_reason === 'refusal') throw new ExtractionError('ai_refused')
   if (message.stop_reason === 'max_tokens') throw new ExtractionError('document_too_long')
@@ -472,7 +487,11 @@ async function processDocument(admin: SupabaseClient, doc: { id: string; profile
       if (pages > 0) await admin.from('medical_documents').update({ page_count: pages }).eq('id', doc.id)
     }
 
-    const { data, model } = await extractWithClaude(mime, bytes)
+    let { data, model } = await extractWithClaude(mime, bytes)
+    if (needsSecondLook(data)) {
+      console.log(JSON.stringify({ event: 'extract_second_look', document_id: doc.id }))
+      ;({ data, model } = await extractWithClaude(mime, bytes, SECOND_LOOK_MODEL, 'high'))
+    }
     if (!data.readable) throw new ExtractionError('unreadable')
     await saveDrafts(admin, doc, data, model)
     console.log(JSON.stringify({ event: 'extracted', document_id: doc.id }))

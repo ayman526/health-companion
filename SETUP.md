@@ -98,3 +98,19 @@ Dashboard → Table Editor → `unrecognized_test_names` lists test names users 
 | Resend account + domain | Magic-link email (SMTP), email reminders | Before beta users |
 | Meta WhatsApp Business + approved template | WhatsApp reminders | Phase 5 |
 | VAPID key pair (generated locally) | Web push | Phase 5 |
+
+## AI models and limits
+
+Chosen to keep running costs low (October 2026):
+
+| Feature | Model | Monthly limit per account |
+|---|---|---|
+| Scanning reports and prescriptions | Sonnet 5.5; read again by Opus 5.5 when unsure (handwriting, unclear values) | 15 documents |
+| AI advisor | Sonnet 5.5 | 100 questions |
+| Voice logging, monitor photos | Haiku 5.5 | 100 together |
+| "Commonly used for" medicine notes | Haiku 5.5 (saved after the first lookup) | - |
+| Reading library build/refresh | Sonnet 5.5 (team only) | - |
+
+Long instructions are cached between requests. Every AI call logs an `ai_usage` line (token counts only,
+no content) in the function logs, to measure real costs. Set a monthly spending limit in the Anthropic
+console so a surprise can't happen.

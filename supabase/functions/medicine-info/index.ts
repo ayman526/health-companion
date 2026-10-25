@@ -8,7 +8,7 @@
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
 
-const MODEL = 'claude-opus-5-5'
+const MODEL = 'claude-haiku-5-5'
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -78,12 +78,11 @@ Deno.serve(async (req) => {
     const message = await client.beta.messages.stream({
       model: MODEL,
       max_tokens: 4000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
       system: SYSTEM,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
       messages: [{ role: 'user', content: `Medicine name: ${JSON.stringify(name.slice(0, 120))}` }],
     }).finalMessage()
+    console.log(JSON.stringify({ event: 'ai_usage', fn: 'medicine-info', model: message.model, usage: message.usage }))
     if (message.stop_reason === 'refusal') return json(200, { recognized: false })
     const text = message.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join('')
     const r = JSON.parse(text) as { recognized: boolean; confidence: string; active_ingredient: string; uses_en: string; uses_ar: string }

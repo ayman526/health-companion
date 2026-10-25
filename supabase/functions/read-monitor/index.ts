@@ -9,8 +9,8 @@
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
 
-const MODEL = 'claude-opus-5-5'
-const MONTHLY_LIMIT = 200
+const MODEL = 'claude-haiku-5-5'
+const MONTHLY_LIMIT = 100
 const MAX_BASE64 = 7_000_000 // ~5 MB image
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -85,8 +85,6 @@ Deno.serve(async (req) => {
     const message = await client.beta.messages.stream({
       model: MODEL,
       max_tokens: 2000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
       system: SYSTEM,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
       messages: [{
@@ -97,6 +95,7 @@ Deno.serve(async (req) => {
         ],
       }],
     }).finalMessage()
+    console.log(JSON.stringify({ event: 'ai_usage', fn: 'read-monitor', model: message.model, usage: message.usage }))
     if (message.stop_reason === 'refusal') return json(200, { device: 'none', problem: 'unreadable' })
     const text = message.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join('')
     const r = JSON.parse(text) as Record<string, string>

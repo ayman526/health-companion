@@ -12,8 +12,8 @@ import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.5
 import { detectEmergency, EMERGENCY_NUMBERS } from './emergency.ts'
 import { cleanCitations, isAnswerShape, safetyIssues, unverifiedNumbers, type AdvisorAnswer, type SafetyIssue } from './validate.ts'
 
-const MODEL = 'claude-opus-5-5'
-const MONTHLY_MESSAGE_LIMIT = 300
+const MODEL = 'claude-sonnet-5-5'
+const MONTHLY_MESSAGE_LIMIT = 100
 const MAX_QUESTION = 2000
 const MAX_CONTEXT = 120_000
 
@@ -103,11 +103,12 @@ async function callClaude(messages: Anthropic.Beta.BetaMessageParam[]): Promise<
     max_tokens: 16000,
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
-    system: SYSTEM_PROMPT,
+    system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     output_config: { effort: 'medium', format: { type: 'json_schema', schema: ANSWER_SCHEMA } },
     messages,
   })
   const message = await stream.finalMessage()
+  console.log(JSON.stringify({ event: 'ai_usage', fn: 'advisor', model: message.model, usage: message.usage }))
   if (message.stop_reason === 'refusal') throw new AdvisorError('ai_refused', 422)
   if (message.stop_reason === 'max_tokens') throw new AdvisorError('answer_too_long', 502)
   const text = message.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join('')

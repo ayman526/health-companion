@@ -112,7 +112,7 @@
       "invalid_ai_output": "The answer didn't come through properly. Please try again.",
       "ai_not_configured": "The advisor isn't set up yet.",
       "consent_required": "AI answers aren't allowed for your account. You can turn them on in Settings.",
-      "quota_exceeded": "You've reached this month's limit of 300 questions.",
+      "quota_exceeded": "You've reached this month's limit of 100 questions.",
       "no_profile": "Your profile couldn't be found. Try signing out and in again.",
       "conversation_not_found": "This conversation couldn't be found. Start a new one.",
       "bad_request": "That message couldn't be sent. Try a shorter question.",

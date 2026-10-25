@@ -9,8 +9,8 @@
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
 
-const MODEL = 'claude-opus-5-5'
-const MONTHLY_LIMIT = 200 // shared with photo reading ("quick AI reads")
+const MODEL = 'claude-haiku-5-5'
+const MONTHLY_LIMIT = 100 // shared with photo reading ("quick AI reads")
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -89,12 +89,11 @@ Deno.serve(async (req) => {
     const message = await client.beta.messages.stream({
       model: MODEL,
       max_tokens: 4000,
-      betas: ['server-side-fallback-2026-07-01'],
-      fallbacks: 'default',
       system: SYSTEM,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
       messages: [{ role: 'user', content: `<medicines>\n${medicines.join('\n')}\n</medicines>\n<note>\n${text}\n</note>` }],
     }).finalMessage()
+    console.log(JSON.stringify({ event: 'ai_usage', fn: 'parse-voice', model: message.model, usage: message.usage }))
     if (message.stop_reason === 'refusal') return json(200, { items: [], not_understood: true })
     const out = JSON.parse(message.content.filter((b) => b.type === 'text').map((b) => (b as { text: string }).text).join(''))
     // Only names from the person's own list can come back as a medicine.
