@@ -95,6 +95,7 @@ export function VoiceLog({ className = '' }: { className?: string }) {
         <button type="button" aria-label={t('report.cancel')} onClick={close} className="grid min-h-10 min-w-10 place-items-center rounded-full text-muted"><X className="size-4" aria-hidden /></button>
       </div>
       <p className="mt-1 text-xs text-muted">{t('voice.examples')}</p>
+      {!typing && <p className="mt-1 text-[11px] text-muted">{t('voice.privacy')}</p>}
 
       {phase.kind === 'listening' && (
         <div className="mt-3 flex items-center gap-3">

@@ -1592,11 +1592,12 @@
     },
     "errors": {
       "not_understood": "Sorry, I couldn't find anything to log. Try saying a reading or a medicine, e.g. \"blood pressure 130 over 85\".",
-      "mic_blocked": "The microphone is blocked. Allow it in your browser settings, or type instead.",
+      "mic_blocked": "The microphone is blocked for this site. On Android: tap the icon left of the address bar → Permissions → Microphone → Allow, then try again. On iPhone: Settings → Safari → Microphone → Allow. Or type instead.",
       "unsupported": "This browser can't listen. Type instead.",
       "consent_required": "Understanding speech needs AI reading turned on. You can turn it on in the Privacy Center.",
       "quota_exceeded": "You've reached this month's limit. You can still log by hand.",
       "ai_unavailable": "Couldn't understand that right now. Please try again, or log by hand."
-    }
+    },
+    "privacy": "Your browser's speech service (Google on Android, Apple on iPhone) turns your voice into text. Prefer not to? Type instead."
   }
 }

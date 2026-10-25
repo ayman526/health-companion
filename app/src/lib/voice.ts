@@ -6,9 +6,11 @@ import { fToC, mmolToMg, type GlucoseContext } from '../domain/vitals'
 import { normalizeNumberInput } from '../domain/numbers'
 import { track } from './usage'
 
-// Voice logging: the phone's own speech recognition turns speech into text
-// (no audio leaves the phone for this), the parse-voice function turns the
-// text into entries, and the person confirms them before anything is saved.
+// Voice logging: the browser's speech service turns speech into text (Google
+// on Android Chrome, Apple on iPhone; it may send the audio to their servers,
+// and the app says so), the parse-voice function turns the text into entries,
+// and the person confirms them before anything is saved. Typing skips the
+// speech service entirely.
 
 interface Recognition {
   lang: string
