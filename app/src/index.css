@@ -28,6 +28,38 @@
   --color-status-info-bg: #eff6ff;
 }
 
+/* Dark mode: chosen in Settings (System / Light / Dark); lib/theme.ts sets
+   data-theme on <html>. Filled buttons become light teal or light red with
+   dark text (--color-white is the "text on a filled colour" token). All
+   text/background pairs here are at least WCAG AA (4.5:1). Printouts always
+   use the light colours. */
+@media screen {
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-brand-50: #16302f;
+    --color-brand-100: #1f403e;
+    --color-brand-500: #4fb3ac;
+    --color-brand-600: #6cc3bb;
+    --color-brand-700: #8ad3ca;
+
+    --color-surface: #172024;
+    --color-canvas: #0f1416;
+    --color-ink: #e6ecea;
+    --color-muted: #a3b0ad;
+    --color-line: #2a3539;
+    --color-white: #0f1416;
+
+    --color-status-ok: #7dd69a;
+    --color-status-ok-bg: #13281b;
+    --color-status-watch: #e9b566;
+    --color-status-watch-bg: #2e2414;
+    --color-status-urgent: #f28b82;
+    --color-status-urgent-bg: #3a1a1a;
+    --color-status-info: #8ab4f8;
+    --color-status-info-bg: #172238;
+  }
+}
+
 html[lang="ar"] {
   --font-sans: "IBM Plex Sans Arabic", "Inter", system-ui, sans-serif;
 }

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, Moon, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { setThemePref, useThemePref, type ThemePref } from '../lib/theme'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
@@ -29,6 +30,7 @@ function Section({ icon: Icon, title, children }: { icon: typeof Bell; title: st
 export function SettingsPage() {
   const { t, i18n } = useTranslation()
   const { session, profile, signOut } = useAuth()
+  const theme = useThemePref()
   const [sunday, setSunday] = useState(false)
   const userId = session?.user.id ?? ''
   const [push, setPush] = useState<PushState | null>(null)
@@ -91,6 +93,18 @@ export function SettingsPage() {
               </button>
             ))}
           </div>
+        </Section>
+
+        <Section icon={Moon} title={t('settings.appearance')}>
+          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t('settings.appearance')}>
+            {(['system', 'light', 'dark'] as ThemePref[]).map((v) => (
+              <button key={v} type="button" role="radio" aria-checked={theme === v} onClick={() => setThemePref(v)}
+                className={`min-h-11 rounded-full border px-4 text-sm font-medium ${theme === v ? 'border-brand-700 bg-brand-700 text-white' : 'border-line'}`}>
+                {t(`settings.themes.${v}`)}
+              </button>
+            ))}
+          </div>
+          {theme === 'system' && <p className="mt-2 text-xs text-muted">{t('settings.themeSystemHint')}</p>}
         </Section>
 
         <Section icon={Bell} title={t('settings.notifications')}>

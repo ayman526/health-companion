@@ -789,7 +789,14 @@
     "privacy": "Privacy",
     "account": "Account",
     "notSetUp": "not set up yet",
-    "weeklyHint": "A short notification; the summary itself opens in the app."
+    "weeklyHint": "A short notification; the summary itself opens in the app.",
+    "appearance": "Appearance",
+    "themes": {
+      "system": "Automatic",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "themeSystemHint": "Follows your phone's light or dark setting."
   },
   "suggestions": {
     "title": "Suggested checkups",
