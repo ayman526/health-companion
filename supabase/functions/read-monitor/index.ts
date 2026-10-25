@@ -8,9 +8,11 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
+import { aiSetting, fallbackOptions, type AiSetting, type Model } from '../_shared/aiSettings.ts'
 
-const MODEL = 'claude-haiku-5-5'
-const MONTHLY_LIMIT = 100
+// Model and monthly limit can be changed in the ai_settings table ('monitor_photo' row).
+// The monthly counter is shared by voice logging and photo reading ("quick AI reads").
+const DEFAULTS: AiSetting = { model: 'claude-haiku-5-5', backupModel: null, monthlyLimit: 100, enabled: true }
 const MAX_BASE64 = 7_000_000 // ~5 MB image
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -77,13 +79,16 @@ Deno.serve(async (req) => {
 
   const { data: self } = await admin.from('health_profiles').select('id').eq('owner_id', auth.user.id).eq('relationship', 'self').eq('is_demo', false).maybeSingle()
   if (!self) return json(404, { error: 'no_profile' })
-  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: self.id, p_kind: 'monitor_reads', p_limit: MONTHLY_LIMIT })
+  const settings = await aiSetting('monitor_photo', DEFAULTS)
+  if (!settings.enabled) return json(503, { error: 'ai_unavailable' })
+  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: self.id, p_kind: 'monitor_reads', p_limit: settings.monthlyLimit ?? 100000 })
   if (!allowed) return json(429, { error: 'quota_exceeded' })
 
   try {
     const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
     const message = await client.beta.messages.stream({
-      model: MODEL,
+      model: settings.model,
+      ...fallbackOptions(settings.model),
       max_tokens: 2000,
       system: SYSTEM,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },

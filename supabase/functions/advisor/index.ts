@@ -9,11 +9,12 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.50.0'
+import { aiSetting, fallbackOptions, type AiSetting, type Model } from '../_shared/aiSettings.ts'
 import { detectEmergency, EMERGENCY_NUMBERS } from './emergency.ts'
 import { cleanCitations, isAnswerShape, safetyIssues, unverifiedNumbers, type AdvisorAnswer, type SafetyIssue } from './validate.ts'
 
-const MODEL = 'claude-sonnet-5-5'
-const MONTHLY_MESSAGE_LIMIT = 100
+// Model and monthly limit can be changed in the ai_settings table ('advisor' row).
+const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: null, monthlyLimit: 100, enabled: true }
 const MAX_QUESTION = 2000
 const MAX_CONTEXT = 120_000
 
@@ -96,13 +97,12 @@ function plainText(a: AdvisorAnswer): string {
   return [a.direct_answer, a.explanation].filter(Boolean).join('\n')
 }
 
-async function callClaude(messages: Anthropic.Beta.BetaMessageParam[]): Promise<AdvisorAnswer> {
+async function callClaude(model: Model, messages: Anthropic.Beta.BetaMessageParam[]): Promise<AdvisorAnswer> {
   const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
   const stream = client.beta.messages.stream({
-    model: MODEL,
+    model,
     max_tokens: 16000,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
+    ...fallbackOptions(model),
     system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     output_config: { effort: 'medium', format: { type: 'json_schema', schema: ANSWER_SCHEMA } },
     messages,
@@ -167,8 +167,10 @@ Deno.serve(async (req) => {
     if (!conv) return json(404, { error: 'conversation_not_found' })
   }
 
+  const settings = await aiSetting('advisor', DEFAULTS)
+  if (!settings.enabled) return json(503, { error: 'ai_unavailable' })
   const emergency = detectEmergency(question)
-  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: self.id, p_kind: 'advisor_messages', p_limit: MONTHLY_MESSAGE_LIMIT })
+  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: self.id, p_kind: 'advisor_messages', p_limit: settings.monthlyLimit ?? 100000 })
   if (!allowed) return json(429, { error: 'quota_exceeded' })
 
   if (!conversationId) {
@@ -207,7 +209,7 @@ Deno.serve(async (req) => {
   const flags: string[] = emergency.map((k) => `emergency:${k}`)
   try {
     const messages: Anthropic.Beta.BetaMessageParam[] = [...history, { role: 'user', content: current }]
-    answer = await callClaude(messages)
+    answer = await callClaude(settings.model, messages)
     let issues: SafetyIssue[] = safetyIssues(answer)
     let unverified = unverifiedNumbers(answer, contextJson, question)
     if (issues.length || unverified.length) {
@@ -216,7 +218,7 @@ Deno.serve(async (req) => {
         issues.length ? `These sentences break the rules (no medication instructions, no definitive diagnosis): ${issues.map((i) => JSON.stringify(i.sentence)).join(' ')}` : '',
         unverified.length ? `These numbers are not in <records>: ${unverified.join(', ')}. Use only numbers from <records>.` : '',
       ].filter(Boolean).join('\n')
-      answer = await callClaude([...messages, { role: 'assistant', content: JSON.stringify(answer) }, { role: 'user', content: `Rewrite your answer. ${feedback}` }])
+      answer = await callClaude(settings.model, [...messages, { role: 'assistant', content: JSON.stringify(answer) }, { role: 'user', content: `Rewrite your answer. ${feedback}` }])
       issues = safetyIssues(answer)
       unverified = unverifiedNumbers(answer, contextJson, question)
       flags.push('rewritten')
@@ -247,7 +249,7 @@ Deno.serve(async (req) => {
     .map((id) => ({ id, ...(refMap[id] && ['test', 'report', 'medication'].includes(refMap[id].kind) ? { kind: refMap[id].kind, target: String(refMap[id].target).slice(0, 200), label: String(refMap[id].label).slice(0, 120) } : {}) }))
   const { data: saved } = await admin.from('ai_messages').insert({
     profile_id: profile.id, conversation_id: conversationId, role: 'assistant', content: JSON.stringify(answer),
-    citations, safety_flags: flags, model: MODEL,
+    citations, safety_flags: flags, model: settings.model,
   }).select('id, created_at').single()
   await admin.from('ai_conversations').update({
     title: answer.conversation_title.slice(0, 120) || null,

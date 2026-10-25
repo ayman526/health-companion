@@ -13,8 +13,10 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
+import { aiSetting, fallbackOptions, type AiSetting, type Model } from '../_shared/aiSettings.ts'
 
-const MODEL = 'claude-sonnet-5-5'
+// The model can be changed in the ai_settings table ('library' row).
+const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: null, monthlyLimit: null, enabled: true }
 const MAX_PAGE_CHARS = 60_000
 const UA = 'Mozilla/5.0 (compatible; HealthJournalLibrary/1.0; +https://health-journal.vercel.app)'
 
@@ -125,8 +127,8 @@ Deno.serve(async (req) => {
 
   const { url, source_name, extra_urls, store, action, test_model } = await req.json().catch(() => ({}))
   // Team testing only: try a sample (never stored) with another model.
-  const model = !store && (test_model === 'claude-haiku-5-5' || test_model === 'claude-opus-5-5') ? test_model : MODEL
-  const haiku = model === 'claude-haiku-5-5'
+  const settings = await aiSetting('library', DEFAULTS)
+  const model: Model = !store && (test_model === 'claude-haiku-5-5' || test_model === 'claude-sonnet-5-5' || test_model === 'claude-opus-5-5') ? test_model : settings.model
   if (action === 'list') {
     // For the team to review the library: every card, newest first.
     const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
@@ -162,8 +164,7 @@ Deno.serve(async (req) => {
     const message = await client.beta.messages.stream({
       model,
       max_tokens: 16000,
-      // Haiku has no server-side fallback model.
-      ...(haiku ? {} : { betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' as const }),
+      ...fallbackOptions(model),
       system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
       messages: [{ role: 'user', content: `Source: ${source_name}\nURL: ${pageUrl}\n\n<page>\n${text}\n</page>` }],

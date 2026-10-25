@@ -7,8 +7,10 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient } from 'npm:@supabase/supabase-js@2.50.0'
+import { aiSetting, fallbackOptions, type AiSetting, type Model } from '../_shared/aiSettings.ts'
 
-const MODEL = 'claude-haiku-5-5'
+// The model can be changed in the ai_settings table ('medicine_info' row).
+const DEFAULTS: AiSetting = { model: 'claude-haiku-5-5', backupModel: null, monthlyLimit: null, enabled: true }
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -72,11 +74,14 @@ Deno.serve(async (req) => {
 
   const { data: consented } = await admin.rpc('has_consent', { p_user_id: auth.user.id, p_type: 'ai_processing' })
   if (!consented) return json(403, { error: 'consent_required' })
+  const settings = await aiSetting('medicine_info', DEFAULTS)
+  if (!settings.enabled) return json(503, { error: 'ai_unavailable' })
 
   try {
     const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
     const message = await client.beta.messages.stream({
-      model: MODEL,
+      model: settings.model,
+      ...fallbackOptions(settings.model),
       max_tokens: 4000,
       system: SYSTEM,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },

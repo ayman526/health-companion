@@ -111,6 +111,12 @@ Chosen to keep running costs low (October 2026):
 | "Commonly used for" medicine notes | Haiku 5.5 (saved after the first lookup) | - |
 | Reading library build/refresh | Sonnet 5.5 (team only) | - |
 
+**Changing them:** edit the `ai_settings` table in the Supabase Table Editor (one row per feature:
+`model`, `backup_model`, `monthly_limit`, `enabled`). Changes apply within about a minute, with no deploy.
+Allowed models: `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`; anything else is ignored and
+the built-in default is used. `enabled = false` pauses a feature (the app shows "temporarily unavailable").
+An empty `backup_model` on `scan` turns the second look off. `voice` and `monitor_photo` share one counter.
+
 Long instructions are cached between requests. Every AI call logs an `ai_usage` line (token counts only,
 no content) in the function logs, to measure real costs. Set a monthly spending limit in the Anthropic
 console so a surprise can't happen.

@@ -11,16 +11,16 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.50.0'
+import { aiSetting, fallbackOptions, type AiSetting, type Model } from '../_shared/aiSettings.ts'
 
 declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void }
 
 // Most documents (typed lab reports) are read well by Sonnet at half the cost.
 // When Sonnet isn't sure (unreadable, unclear medicine names, several unclear
 // values - typically handwriting), the document is read again by Opus.
-const MODEL = 'claude-sonnet-5-5'
-const SECOND_LOOK_MODEL = 'claude-opus-5-5'
+// The ai_settings table ('scan' row) can change both models and the limit.
+const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: 'claude-opus-5-5', monthlyLimit: 15, enabled: true }
 const PROMPT_VERSION = 'extract-2026-10-24.5'
-const MONTHLY_EXTRACTION_LIMIT = 15
 const MAX_PDF_PAGES = 20
 // The API accepts images up to 5 MB; the app uploads a downsized reading copy for larger photos.
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -350,7 +350,7 @@ function countPdfPages(bytes: Uint8Array): number {
 }
 
 // ---------------------------------------------------------------- Claude call
-async function extractWithClaude(mime: string, bytes: Uint8Array, model = MODEL, effort: 'medium' | 'high' = 'medium'): Promise<{ data: Extraction; model: string }> {
+async function extractWithClaude(mime: string, bytes: Uint8Array, model: Model, effort: 'medium' | 'high' = 'medium'): Promise<{ data: Extraction; model: string }> {
   const client = new Anthropic({ apiKey: Deno.env.get('ANTHROPIC_API_KEY') })
   const data = toBase64(bytes)
   const fileBlock =
@@ -361,8 +361,7 @@ async function extractWithClaude(mime: string, bytes: Uint8Array, model = MODEL,
   const stream = client.beta.messages.stream({
     model,
     max_tokens: 64000,
-    betas: ['server-side-fallback-2026-07-01'],
-    fallbacks: 'default',
+    ...fallbackOptions(model),
     system: [{ type: 'text', text: SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
     output_config: { effort, format: { type: 'json_schema', schema: OUTPUT_SCHEMA } },
     messages: [{ role: 'user', content: [fileBlock, { type: 'text', text: 'Transcribe this document.' }] }],
@@ -487,10 +486,11 @@ async function processDocument(admin: SupabaseClient, doc: { id: string; profile
       if (pages > 0) await admin.from('medical_documents').update({ page_count: pages }).eq('id', doc.id)
     }
 
-    let { data, model } = await extractWithClaude(mime, bytes)
-    if (needsSecondLook(data)) {
+    const settings = await aiSetting('scan', DEFAULTS)
+    let { data, model } = await extractWithClaude(mime, bytes, settings.model)
+    if (settings.backupModel && needsSecondLook(data)) {
       console.log(JSON.stringify({ event: 'extract_second_look', document_id: doc.id }))
-      ;({ data, model } = await extractWithClaude(mime, bytes, SECOND_LOOK_MODEL, 'high'))
+      ;({ data, model } = await extractWithClaude(mime, bytes, settings.backupModel, 'high'))
     }
     if (!data.readable) throw new ExtractionError('unreadable')
     await saveDrafts(admin, doc, data, model)
@@ -544,9 +544,12 @@ Deno.serve(async (req) => {
   const { data: consented } = await admin.rpc('has_consent', { p_user_id: auth.user.id, p_type: 'ai_processing' })
   if (!consented) return json(403, { error: 'consent_required' })
 
+  const settings = await aiSetting('scan', DEFAULTS)
+  if (!settings.enabled) return json(503, { error: 'ai_unavailable' })
+
   // Limits are per account, not per family member.
   const { data: selfProfile } = await admin.from('health_profiles').select('id').eq('owner_id', auth.user.id).eq('relationship', 'self').eq('is_demo', false).maybeSingle()
-  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: selfProfile?.id ?? doc.profile_id, p_kind: 'extractions', p_limit: MONTHLY_EXTRACTION_LIMIT })
+  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: selfProfile?.id ?? doc.profile_id, p_kind: 'extractions', p_limit: settings.monthlyLimit ?? 100000 })
   if (!allowed) return json(429, { error: 'quota_exceeded' })
 
   await admin.from('medical_documents').update({ status: 'processing', failure_reason: null }).eq('id', doc.id)
