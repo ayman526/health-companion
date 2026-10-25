@@ -19,7 +19,7 @@ export const SOURCES = {
   aha_acc_2018_chol: {
     short: 'AHA/ACC 2018',
     title: '2018 AHA/ACC Guideline on the Management of Blood Cholesterol (LDL-C ≥ 190 mg/dL statin benefit group)',
-    url: 'https://www.lipid.org/sites/default/files/nla_clinicianhandout_2018cholgl.pdf',
+    url: 'https://doi.org/10.1161/CIR.0000000000000625',
     published: '2018-11',
   },
   kdigo_gfr: {
@@ -94,10 +94,10 @@ export const SOURCES = {
     url: 'https://www.heart.org/en/healthy-living/fitness/fitness-basics/target-heart-rates',
     published: '2024',
   },
-  nhs_pulse_oximeter: {
-    short: 'NHS',
-    title: 'NHS: pulse oximeters. Usually 95% or higher; 93–94% get advice the same day; 92% or below get urgent help. Readings can be less accurate on darker skin, cold fingers or nail polish; follow any different target your doctor gave you',
-    url: 'https://www.nhs.uk/conditions/pulse-oximetry/',
+  medlineplus_pulse_ox: {
+    short: 'MedlinePlus',
+    title: 'MedlinePlus (US National Library of Medicine): pulse oximetry. Normal 95–100%; contact your provider at 92% or lower; seek immediate medical attention at 88% or lower. Lower levels may be acceptable with lung disease such as COPD',
+    url: 'https://medlineplus.gov/lab-tests/pulse-oximetry/',
     published: '2024',
   },
   nhs_fever: {
@@ -105,6 +105,66 @@ export const SOURCES = {
     title: 'NHS: a high temperature (fever) is 38°C or above; babies under 3 months with 38°C or above need urgent medical advice; below 35°C can be hypothermia',
     url: 'https://www.nhs.uk/conditions/fever-in-adults/',
     published: '2024',
+  },
+  uspstf_bp: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: screen adults 18+ for high blood pressure; every year from age 40 or with higher risk, every 3–5 years for ages 18–39',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/hypertension-in-adults-screening',
+    published: '2021-04',
+  },
+  aha_chol_testing: {
+    short: 'AHA',
+    title: 'American Heart Association: adults 20 and older should have their cholesterol checked every 4–6 years, more often with higher risk',
+    url: 'https://www.heart.org/en/health-topics/cholesterol/about-cholesterol/how-to-get-your-cholesterol-tested',
+    published: '2024',
+  },
+  ada_screening: {
+    short: 'ADA 2025',
+    title: 'ADA Standards of Care in Diabetes—2025, §2: test for prediabetes and type 2 diabetes from age 35 (earlier with risk factors such as overweight), at least every 3 years if normal',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11635041/',
+    published: '2024-12',
+  },
+  uspstf_colorectal: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: colorectal (bowel) cancer screening for adults 45–75; the interval depends on the test (e.g. stool test every year, colonoscopy every 10 years)',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening',
+    published: '2021-05',
+  },
+  uspstf_breast: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: mammogram every 2 years for women 40–74',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening',
+    published: '2024-04',
+  },
+  uspstf_cervical: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: cervical cancer screening for women 21–65 (Pap test every 3 years from 21; from 30, HPV test every 5 years or Pap every 3 years)',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/cervical-cancer-screening',
+    published: '2018-08',
+  },
+  uspstf_hcv: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: test adults 18–79 for hepatitis C at least once',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/hepatitis-c-screening',
+    published: '2020-03',
+  },
+  uspstf_osteoporosis: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: bone density screening for women 65 and older (and younger postmenopausal women at higher risk)',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/osteoporosis-screening',
+    published: '2025-01',
+  },
+  uspstf_aaa: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: one ultrasound for abdominal aortic aneurysm in men 65–75 who have ever smoked',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/abdominal-aortic-aneurysm-screening',
+    published: '2019-12',
+  },
+  uspstf_lung: {
+    short: 'USPSTF',
+    title: 'US Preventive Services Task Force: yearly low-dose CT for adults 50–80 with a 20 pack-year smoking history who smoke now or quit within the past 15 years',
+    url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/lung-cancer-screening',
+    published: '2021-03',
   },
   eflm_bv: {
     short: 'EFLM',

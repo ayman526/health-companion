@@ -90,6 +90,28 @@ describe('family profiles', () => {
     await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind) values ('${SELF_A}', 'temperature')`))).rejects.toThrow()
   })
 
+  it('lets people read published cards but not write them, and counts usage anonymously', async () => {
+    await db.exec(`insert into library_items (source_name, source_url, title_en, title_ar, summary_en, summary_ar, primary_tags)
+      values ('NHS', 'https://www.nhs.uk/x', 'T', 'ع', 'S', 'م', '{condition:hypertension}'),
+             ('NHS', 'https://www.nhs.uk/hidden', 'H', 'ع', 'S', 'م', '{}')`)
+    await db.exec(`update library_items set status = 'hidden' where source_url like '%hidden'`)
+    expect(await as(USER_A, SELF_A, () => rows('select title_en from library_items'))).toEqual([{ title_en: 'T' }])
+    await expect(as(USER_A, SELF_A, () => db.exec(`insert into library_items (source_name, source_url, title_en, title_ar, summary_en, summary_ar) values ('x','https://x','a','b','c','d')`))).rejects.toThrow()
+
+    const item = (await rows(`select id from library_items where title_en = 'T'`))[0].id
+    await as(USER_A, SELF_A, () => db.exec(`insert into library_feedback (profile_id, item_id, reaction) values ('${SELF_A}', '${item}', 'not_relevant')`))
+    expect(await as(USER_A, MOM_A, () => rows('select * from library_feedback'))).toHaveLength(0)
+
+    await as(USER_A, SELF_A, () => db.exec(`select track_event('card_shown'); select track_event('card_shown'); select track_event('made_up_event')`))
+    expect(await rows(`select event, count from usage_daily`)).toEqual([{ event: 'card_shown', count: 2 }])
+    await expect(as(USER_A, SELF_A, () => rows('select * from usage_daily'))).rejects.toThrow()
+  })
+
+  it('records a checkup as already done, with its date', async () => {
+    await as(USER_A, SELF_A, () => db.exec(`insert into suggestion_decisions (profile_id, suggestion_key, decision, done_on) values ('${SELF_A}', 'screen_colorectal|none', 'done', '2024-03-01')`))
+    expect(await as(USER_A, SELF_A, () => rows(`select decision, done_on::text from suggestion_decisions`))).toEqual([{ decision: 'done', done_on: '2024-03-01' }])
+  })
+
   it('checks reading shapes and one check-in per day', async () => {
     await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind, systolic, diastolic) values ('${SELF_A}', 'blood_pressure', 80, 120)`))).rejects.toThrow()
     await expect(as(USER_A, SELF_A, () => db.exec(`insert into vital_readings (profile_id, kind) values ('${SELF_A}', 'glucose')`))).rejects.toThrow()

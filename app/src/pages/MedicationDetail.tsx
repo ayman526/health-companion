@@ -12,6 +12,8 @@ import { PageHeader } from '../components/ui'
 import { SourceChip, provenanceOf } from '../components/TrustChips'
 import { photoUrls, removeMedicationPhoto, setMedicationPhoto } from '../lib/medicationPhotos'
 import { medlinePlusDrugUrl, usesFor } from '../domain/medicineInfo'
+import { ContextCard } from '../components/ContextCard'
+import { medicationTags } from '../domain/libraryTags'
 import { fetchMedicineInfo, type AiMedicineInfo } from '../lib/medicineInfo'
 
 const DOT: Record<DoseLog['status'], string> = {
@@ -234,6 +236,7 @@ export function MedicationDetailPage() {
         </section>
       )}
 
+      <ContextCard className="mb-4" topics={medicationTags([{ name: med.brand_name, ingredient: med.active_ingredient, active: true }])} />
       <p className="text-xs text-muted">{t('meds.disclaimer')}</p>
     </>
   )

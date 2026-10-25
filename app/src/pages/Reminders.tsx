@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Bell, CalendarClock, Check, Clock, Pencil, Plus, X } from 'lucide-react'
+import { Bell, CalendarClock, Check, Clock, Pencil, Plus, Stethoscope, X } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { localTime, todayIn, zonedDateTime } from '../lib/medications'
@@ -20,7 +21,7 @@ interface ReminderRow {
   completed_at: string | null
 }
 
-const KINDS = ['lab_test', 'appointment', 'follow_up', 'prescription_renewal', 'custom'] as const
+const KINDS = ['lab_test', 'follow_up', 'prescription_renewal', 'custom'] as const
 const REPEATS = ['none', 'daily', 'weekly', 'monthly', 'yearly'] as const
 const inputClass = 'min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-sm'
 
@@ -98,6 +99,9 @@ export function RemindersPage() {
   return (
     <>
       <PageHeader title={t('reminders.title')} subtitle={t('reminders.subtitle')} />
+      <Link to="/visits" className="mb-4 flex min-h-12 items-center gap-2 rounded-2xl border border-line bg-surface px-4 text-sm font-medium text-brand-700">
+        <Stethoscope className="size-4" aria-hidden /> <span className="flex-1">{t('visits.addFromReminders')}</span>
+      </Link>
       {profile && <SuggestedCheckups profileId={profile.id} timeZone={tz} today={todayIn(tz)} onAccepted={() => void load()} />}
       {!adding && !editingId ? (
         <button type="button" onClick={() => setAdding(true)} className="mb-4 flex min-h-14 w-full items-center gap-3 rounded-2xl bg-brand-700 px-4 font-medium text-white sm:w-auto">

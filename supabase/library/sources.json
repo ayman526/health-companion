@@ -1,0 +1,270 @@
+[
+ {
+  "url": "https://www.nhs.uk/conditions/statins/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/live-well/eat-well/food-types/different-fats-nutrition/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhlbi.nih.gov/health/blood-cholesterol",
+  "source_name": "NHLBI (NIH)"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/low-blood-pressure-hypotension/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/live-well/eat-well/food-types/salt-nutrition/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhlbi.nih.gov/health/dash-eating-plan",
+  "source_name": "NHLBI (NIH)",
+  "extra_urls": [
+   "https://www.nhlbi.nih.gov/health/dash/following-dash",
+   "https://www.nhlbi.nih.gov/health/dash/health-benefits"
+  ]
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/blood-pressure-test/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes/prediabetes-insulin-resistance",
+  "source_name": "NIDDK (NIH)"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/low-blood-sugar-hypoglycaemia/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/type-2-diabetes/food-and-keeping-active/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/preventing-problems/foot-problems",
+  "source_name": "NIDDK (NIH)"
+ },
+ {
+  "url": "https://www.diabetes.org.uk/guide-to-diabetes/managing-your-diabetes/ramadan",
+  "source_name": "Diabetes UK"
+ },
+ {
+  "url": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/",
+  "source_name": "MedlinePlus"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/kidney-disease/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd",
+  "source_name": "NIDDK (NIH)"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/nsaids/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/non-alcoholic-fatty-liver-disease/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://medlineplus.gov/lab-tests/liver-function-tests/",
+  "source_name": "MedlinePlus"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/underactive-thyroid-hypothyroidism/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/overactive-thyroid-hyperthyroidism/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/",
+  "source_name": "MedlinePlus"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/iron-deficiency-anaemia/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/vitamin-b12-or-folate-deficiency-anaemia/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/vitamins-and-minerals/vitamin-d/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/heart-attack/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/stroke/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/coronary-heart-disease/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)",
+  "source_name": "WHO"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/gout/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/asthma/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/chronic-obstructive-pulmonary-disease-copd/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/osteoporosis/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/mental-health/conditions/depression-in-adults/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/mental-health/conditions/generalised-anxiety-disorder/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/live-well/healthy-weight/managing-your-weight/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/obesity/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/live-well/exercise/exercise-guidelines/physical-activity-guidelines-for-adults-aged-19-to-64/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+  "source_name": "WHO"
+ },
+ {
+  "url": "https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/the-eatwell-guide/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+  "source_name": "WHO"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/insomnia/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/better-health/quit-smoking/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/tobacco",
+  "source_name": "WHO"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/headaches/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nia.nih.gov/health/medicines-and-medication-management/taking-medicines-safely-you-age",
+  "source_name": "NIA (NIH)"
+ },
+ {
+  "url": "https://www.nia.nih.gov/health/medical-care-and-appointments/how-prepare-doctors-appointment",
+  "source_name": "NIA (NIH)"
+ },
+ {
+  "url": "https://www.nhs.uk/pregnancy/keeping-well/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/nhs-health-check/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/fever-in-adults/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/fever-in-children/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://medlineplus.gov/lab-tests/pulse-oximetry/",
+  "source_name": "MedlinePlus"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/hypertension",
+  "source_name": "WHO"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+  "source_name": "WHO"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/heart-palpitations/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/dizziness/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/healthy-living-with-diabetes",
+  "source_name": "NIDDK (NIH)"
+ },
+ {
+  "url": "https://www.nhlbi.nih.gov/health/anemia",
+  "source_name": "NHLBI (NIH)"
+ },
+ {
+  "url": "https://www.nhs.uk/live-well/alcohol-advice/the-risks-of-drinking-too-much/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/blood-tests/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/high-cholesterol/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/high-blood-pressure-hypertension/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://www.nhs.uk/conditions/type-2-diabetes/",
+  "source_name": "NHS"
+ },
+ {
+  "url": "https://medlineplus.gov/cholesterol.html",
+  "source_name": "MedlinePlus"
+ },
+ {
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes",
+  "source_name": "NIDDK (NIH)"
+ },
+ {
+  "url": "https://www.nhlbi.nih.gov/health/high-blood-pressure",
+  "source_name": "NHLBI (NIH)"
+ },
+ {
+  "url": "https://www.who.int/news-room/fact-sheets/detail/diabetes",
+  "source_name": "WHO"
+ }
+]

@@ -11,6 +11,8 @@ import { StatusBadge, TrendLabel } from '../components/LabStatus'
 import { TrendChart } from '../components/TrendChart'
 import { PageHeader } from '../components/ui'
 import { TestInfoPanel } from '../components/TestInfoPanel'
+import { ContextCard } from '../components/ContextCard'
+import { labTags } from '../domain/libraryTags'
 import { supabase } from '../lib/supabase'
 import { loadMedications, todayIn } from '../lib/medications'
 import { useAuth } from '../auth/AuthProvider'
@@ -80,6 +82,7 @@ export function TestHistoryPage() {
             </div>
             {!byNameOnly && <TestInfoPanel test={test} status={measurementStatus(test, latest)} />}
           </section>
+          {!byNameOnly && <ContextCard className="mb-6" topics={labTags(test, measurementStatus(test, latest))} />}
 
           {changes.length > 0 && (
             <section className="mb-4 rounded-2xl border border-line bg-surface p-4">

@@ -9,6 +9,7 @@ import {
 } from '../lib/documents'
 import { CONSENT_VERSION } from '../lib/consent'
 import { PageHeader } from '../components/ui'
+import { track } from '../lib/usage'
 
 type Phase =
   | { kind: 'checking' }
@@ -77,6 +78,7 @@ export function ScanPage() {
   async function onFile(file: File | undefined) {
     if (!file || !profile) return
     setPhase({ kind: 'uploading' })
+    track('report_scanned')
     const outcome = await uploadDocument(profile.id, file)
     if (outcome.kind === 'invalid') return setPhase({ kind: 'failed', message: t(`scan.invalid.${outcome.reason}`) })
     if (outcome.kind === 'error') return setPhase({ kind: 'failed', message: t('scan.uploadError') })

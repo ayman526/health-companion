@@ -14,6 +14,7 @@ import { average, bpAverage, type VitalReading } from '../domain/vitals'
 import type { TestHistory } from '../domain/labs/history'
 import { useScheduleText } from '../components/ScheduleSummary'
 import { PageHeader } from '../components/ui'
+import { track } from '../lib/usage'
 
 interface Data {
   details: ProfileDetails | null
@@ -97,6 +98,7 @@ export function SummaryPage() {
   const text = lines.join('\n')
 
   async function share() {
+    track('summary_shared')
     try {
       if (navigator.share) await navigator.share({ title: t('summary.title'), text })
       else await navigator.clipboard.writeText(text)
@@ -110,7 +112,7 @@ export function SummaryPage() {
       <div className="print:hidden">
         <PageHeader title={t('summary.title')} subtitle={t('summary.subtitle')} />
         <div className="mb-4 flex flex-wrap gap-2">
-          <button type="button" onClick={() => window.print()} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-700 px-4 font-medium text-white">
+          <button type="button" onClick={() => { track('summary_printed'); window.print() }} className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-brand-700 px-4 font-medium text-white">
             <Printer className="size-5" aria-hidden /> {t('summary.print')}
           </button>
           <button type="button" onClick={() => void share()} className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-line bg-surface px-4 font-medium">

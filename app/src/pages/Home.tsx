@@ -11,6 +11,10 @@ import { formatDate } from '../lib/format'
 import { todayIn } from '../lib/medications'
 import { YourDayCard } from '../components/home/YourDayCard'
 import { WeekTiles } from '../components/home/WeekTiles'
+import { InstallPrompt } from '../components/InstallPrompt'
+import { VoiceLog } from '../components/VoiceLog'
+import { ContextCard } from '../components/ContextCard'
+import { loadUserTopics } from '../lib/userTopics'
 
 /**
  * Home, most important first: anything needing attention (only when there is
@@ -25,6 +29,7 @@ export function HomePage() {
   const [insights, setInsights] = useState<Insight[] | null>(null)
   const [suggested, setSuggested] = useState(0)
   const [completeness, setCompleteness] = useState<number | null>(null)
+  const [topics, setTopics] = useState<Map<string, number> | null>(null)
   const bannerKey = `hc.profileBanner.${profile?.id ?? ''}`
   const [bannerHidden, setBannerHidden] = useState(() => { try { return localStorage.getItem(bannerKey) === '1' } catch { return false } })
 
@@ -35,6 +40,7 @@ export function HomePage() {
     void syncInsights(profile.id).then(setInsights)
     void loadSuggestions(todayIn(profile.time_zone)).then((list) => setSuggested(list.length))
     void loadProfileDetails().then(({ profile: p, lists }) => p && setCompleteness(profileCompleteness(p, lists)))
+    void loadUserTopics(todayIn(profile.time_zone)).then(setTopics)
   }, [profile])
 
   if (!profile) return null
@@ -52,7 +58,7 @@ export function HomePage() {
     { to: '/vitals', icon: Plus, label: t('home.actions.log'), primary: true },
     { to: '/records/scan', icon: Camera, label: t('home.actions.scan') },
     { to: '/advisor', icon: MessageCircleHeart, label: t('home.actions.ask') },
-    { to: '/summary', icon: ClipboardList, label: t('home.actions.visit') },
+    { to: '/visits', icon: ClipboardList, label: t('home.actions.visit') },
   ]
 
   return (
@@ -91,6 +97,8 @@ export function HomePage() {
         </section>
       )}
 
+      <InstallPrompt />
+
       <YourDayCard timeZone={profile.time_zone} />
 
       <nav aria-label={t('home.quickActions')} className="grid grid-cols-4 gap-2">
@@ -102,7 +110,11 @@ export function HomePage() {
         ))}
       </nav>
 
+      <VoiceLog />
+
       <WeekTiles profileId={profile.id} />
+
+      {topics && <ContextCard topics={topics} allowGeneral heading={t('library.forYou')} />}
 
       {changes.length > 0 && (
         <Link to="/insights" className="flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-sm">

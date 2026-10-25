@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, Moon, ShieldCheck, UserRound, Users } from 'lucide-react'
 import { setThemePref, useThemePref, type ThemePref } from '../lib/theme'
+import { InstallPrompt } from '../components/InstallPrompt'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
@@ -113,6 +114,7 @@ export function SettingsPage() {
             <div>
               <p className="text-sm font-medium">{t('settings.push')} {notReady(channels?.push)}</p>
               <p className="text-sm text-muted">{push ? t(`settings.pushState.${push}`) : t('auth.loading')}</p>
+              <InstallPrompt variant="inline" />
               {push === 'off' && <button type="button" onClick={async () => setPush(await enablePush(userId))} className="mt-2 min-h-11 rounded-xl bg-brand-700 px-4 text-sm font-medium text-white">{t('settings.enablePush')}</button>}
               {push === 'on' && <button type="button" onClick={async () => setPush(await disablePush(userId))} className="mt-2 min-h-11 rounded-xl border border-line px-4 text-sm font-medium">{t('settings.disablePush')}</button>}
             </div>

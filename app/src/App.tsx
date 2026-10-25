@@ -31,6 +31,8 @@ const PrivacyPage = lazy(() => import('./pages/Privacy').then((m) => ({ default:
 const VitalsPage = lazy(() => import('./pages/Vitals').then((m) => ({ default: m.VitalsPage })))
 const FamilyPage = lazy(() => import('./pages/Family').then((m) => ({ default: m.FamilyPage })))
 const SummaryPage = lazy(() => import('./pages/Summary').then((m) => ({ default: m.SummaryPage })))
+const VisitsPage = lazy(() => import('./pages/Visits').then((m) => ({ default: m.VisitsPage })))
+const VisitPage = lazy(() => import('./pages/Visit').then((m) => ({ default: m.VisitPage })))
 
 // Screens people usually open next, fetched quietly once the app is idle.
 const prefetchLikelyPages = () => {
@@ -89,6 +91,8 @@ function Gate() {
         <Route path="vitals" element={<VitalsPage />} />
         <Route path="family" element={<FamilyPage />} />
         <Route path="summary" element={<SummaryPage />} />
+        <Route path="visits" element={<VisitsPage />} />
+        <Route path="visits/:visitId" element={<VisitPage />} />
         <Route path="lifestyle" element={<LifestylePage />} />
       </Route>
     </Routes>

@@ -22,9 +22,25 @@ export interface SuggestionInput {
   remindedTests: Set<string>
   /** Suggestion keys the user accepted or dismissed. */
   decided: Set<string>
+  /** For age-based screening (all optional). */
+  person?: { age: number | null; sex: string | null; smoking: string | null; bmi: number | null }
+  /** Date of the latest home blood pressure reading. */
+  lastBpReading?: string | null
+  /** Screenings the person said they've had: rule -> { date, months until the next one }. */
+  done?: Map<string, { date: string; months: number | null }>
 }
 
 export type SuggestionRule = 'statin_first_check' | 'statin_routine' | 'a1c_diabetes' | 'kidney_diabetes_egfr' | 'kidney_diabetes_acr' | 'a1c_prediabetes' | 'tsh_dose_check' | 'tsh_routine'
+  | ScreeningRule
+
+export type ScreeningRule = 'screen_bp' | 'screen_lipids' | 'screen_diabetes' | 'screen_hcv' | 'screen_colorectal' | 'screen_breast'
+  | 'screen_cervical' | 'screen_osteoporosis' | 'screen_aaa' | 'screen_lung'
+
+/** Choices for "Already done": which test, and months until the next one (null = once, then as the doctor advises). */
+export const SCREENING_VARIANTS: Partial<Record<ScreeningRule, { variant: string; months: number | null }[]>> = {
+  screen_colorectal: [{ variant: 'stool_test', months: 12 }, { variant: 'colonoscopy', months: 120 }],
+  screen_cervical: [{ variant: 'pap', months: 36 }, { variant: 'hpv', months: 60 }],
+}
 
 export interface CheckupSuggestion {
   key: string
@@ -37,6 +53,8 @@ export interface CheckupSuggestion {
   basis: { kind: 'last_test'; date: string } | { kind: 'medication'; date: string; medication: string } | { kind: 'no_test' }
   interval: string // i18n key under suggestions.intervals
   sources: SourceId[]
+  /** lab: a blood/urine test; measure: a home measurement; screening: a test arranged with the doctor. */
+  kind?: 'lab' | 'measure' | 'screening'
 }
 
 const STATINS = ['atorvastatin', 'rosuvastatin', 'simvastatin', 'pravastatin', 'ezetimibe']
@@ -133,5 +151,55 @@ export function suggestCheckups(input: SuggestionInput): CheckupSuggestion[] {
     }
   }
 
+  screenings(input, out, add, lastOf)
   return out.sort((a, b) => a.due.localeCompare(b.due))
+}
+
+/**
+ * Age- and sex-based screening (USPSTF, ADA, AHA). Shown only when due within
+ * three months or overdue, so long-interval checkups don't clutter the list.
+ * Skipped when the person's condition already has its own follow-up rule.
+ */
+function screenings(
+  input: SuggestionInput,
+  out: CheckupSuggestion[],
+  add: (s: Omit<CheckupSuggestion, 'key' | 'overdue' | 'due'> & { due: string }, basisDate: string) => void,
+  lastOf: (codes: string[]) => { date: string; value: number } | null,
+) {
+  const p = input.person
+  if (!p || p.age == null || p.age < 18) return
+  const { age, sex } = p
+  const { today } = input
+  const horizon = addMonths(today, 3)
+  const soon = addDays(today, 14)
+  const cond = (words: string[]) => input.conditions.some((c) => words.some((w) => c.toLowerCase().includes(w)))
+  const smoker = p.smoking === 'current' || p.smoking === 'former'
+
+  const screen = (rule: ScreeningRule, kind: 'lab' | 'measure' | 'screening', testCodes: string[], months: number | null, interval: string,
+    sources: SourceId[], lastDate: string | null) => {
+    const done = input.done?.get(rule)
+    const last = [lastDate, done?.date].filter((d): d is string => !!d).sort().pop() ?? null
+    const next = done && done.date === last ? done.months : months
+    if (last && next == null) return // a once-only test that's been done
+    const due = last ? addMonths(last, next!) : soon
+    if (due > horizon) return
+    add({ rule, kind, testCodes, due, interval, sources, basis: last ? { kind: 'last_test', date: last } : { kind: 'no_test' } }, last ?? 'none')
+  }
+
+  if (!cond(['hypertension', 'blood pressure', 'ضغط'])) {
+    screen('screen_bp', 'measure', [], age >= 40 ? 12 : 36, age >= 40 ? 'yearly' : 'years3to5', ['uspstf_bp'], input.lastBpReading ?? null)
+  }
+  if (age >= 20 && !out.some((o) => o.testCodes.includes('ldl_c'))) {
+    screen('screen_lipids', 'lab', ['ldl_c'], 60, 'years4to6', ['aha_chol_testing'], lastOf(['ldl_c', 'total_cholesterol', 'non_hdl_c'])?.date ?? null)
+  }
+  if (age >= 35 && !out.some((o) => o.testCodes.includes('hba1c'))) {
+    screen('screen_diabetes', 'lab', ['hba1c'], 36, 'years3', ['ada_screening'], lastOf(['hba1c', 'glucose_fasting'])?.date ?? null)
+  }
+  if (age <= 79) screen('screen_hcv', 'lab', ['hcv_ab'], null, 'once', ['uspstf_hcv'], input.latest.get('hcv_ab')?.date ?? null)
+  if (age >= 45 && age <= 75) screen('screen_colorectal', 'screening', [], 12, 'dependsOnTest', ['uspstf_colorectal'], null)
+  if (sex === 'female' && age >= 40 && age <= 74) screen('screen_breast', 'screening', [], 24, 'years2', ['uspstf_breast'], null)
+  if (sex === 'female' && age >= 21 && age <= 65) screen('screen_cervical', 'screening', [], age >= 30 ? 60 : 36, age >= 30 ? 'years3to5' : 'years3', ['uspstf_cervical'], null)
+  if (sex === 'female' && age >= 65) screen('screen_osteoporosis', 'screening', [], null, 'askDoctor', ['uspstf_osteoporosis'], null)
+  if (sex === 'male' && age >= 65 && age <= 75 && smoker) screen('screen_aaa', 'screening', [], null, 'once', ['uspstf_aaa'], null)
+  if (age >= 50 && age <= 80 && smoker) screen('screen_lung', 'screening', [], 12, 'yearlyIfEligible', ['uspstf_lung'], null)
 }

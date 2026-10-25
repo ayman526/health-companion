@@ -78,11 +78,12 @@ export function assessHeartRate(bpm: number, age: number | null): Assessment | n
   return { category: 'hr_normal', level: 'ok', sources }
 }
 
-/** Blood oxygen from a pulse oximeter (NHS thresholds). */
+/** Blood oxygen from a pulse oximeter (MedlinePlus thresholds). */
 export function assessOxygen(spo2: number): Assessment {
-  const sources: SourceId[] = ['nhs_pulse_oximeter']
-  if (spo2 <= 92) return { category: 'spo2_low', level: 'urgent', sources }
-  if (spo2 <= 94) return { category: 'spo2_borderline', level: 'follow_up', sources }
+  const sources: SourceId[] = ['medlineplus_pulse_ox']
+  if (spo2 <= 88) return { category: 'spo2_very_low', level: 'urgent', sources }
+  if (spo2 <= 92) return { category: 'spo2_low', level: 'follow_up', sources }
+  if (spo2 <= 94) return { category: 'spo2_borderline', level: 'watch', sources }
   return { category: 'spo2_normal', level: 'ok', sources }
 }
 

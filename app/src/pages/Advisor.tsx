@@ -10,6 +10,7 @@ import { detectEmergency } from '../domain/emergency'
 import { AnswerCard } from '../components/AnswerCard'
 import { EmergencyCard } from '../components/EmergencyCard'
 import { PageHeader } from '../components/ui'
+import { track } from '../lib/usage'
 
 const SUGGESTIONS = ['cholesterol', 'liver', 'doctor', 'summary', 'arabic', 'followUps'] as const
 
@@ -45,6 +46,7 @@ export function AdvisorPage() {
 
   async function submit(question: string) {
     const q = question.trim()
+    if (q) track('advisor_asked')
     if (!q || busy || !profile) return
     // The deterministic emergency check runs before anything else, on this device.
     const flagged = detectEmergency(q)

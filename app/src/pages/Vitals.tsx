@@ -17,6 +17,10 @@ import {
 import { TrendChart, type ChartPoint } from '../components/TrendChart'
 import { LEVEL_STYLE, ReadingValue } from '../components/ReadingValue'
 import { EvidenceChips } from '../components/TrustChips'
+import { ContextCard } from '../components/ContextCard'
+import { VoiceLog } from '../components/VoiceLog'
+import { track } from '../lib/usage'
+import { readingTags } from '../domain/libraryTags'
 import { PageHeader } from '../components/ui'
 import { fieldClass } from '../components/ProfileFields'
 
@@ -115,6 +119,7 @@ export function VitalsPage() {
     const ok = await addVital(profile.id, reading, new Date(form.at).toISOString(), form.note, photo.used ? 'photo' : 'user_entered')
     setSaving(false)
     if (!ok) return setError(true)
+    track(photo.used ? 'reading_photo_used' : 'reading_logged')
     setForm({ ...form, a: '', b: '', c: '', note: '', at: nowLocal() })
     setPhoto({ busy: false, used: false, low: false, error: null })
     await load()
@@ -163,6 +168,7 @@ export function VitalsPage() {
         <input type="file" accept="image/*" capture="environment" className="sr-only" disabled={photo.busy}
           onChange={(e) => { void fromPhoto(e.target.files?.[0]); e.target.value = '' }} />
       </label>
+      <VoiceLog className="mb-3" />
       {photo.error && <p role="alert" className="mb-3 rounded-xl bg-status-watch-bg px-4 py-3 text-sm text-status-watch">{t(`vitals.photo.errors.${photo.error}`, t('vitals.photo.errors.ai_unavailable'))}</p>}
 
       <div className="mb-4 grid grid-cols-3 gap-2" role="tablist">
@@ -272,6 +278,7 @@ export function VitalsPage() {
                 </a>
               )}
               <EvidenceChips sources={latestAssessment.sources} />
+              {latestAssessment.level !== 'ok' && <ContextCard className="mt-3" topics={readingTags(latestAssessment.category)} />}
             </>
           ) : kind === 'blood_pressure' && person.age != null && person.age < 18 ? (
             <p className="mt-2 text-sm text-muted">{t('vitals.childNote')}</p>

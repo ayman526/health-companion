@@ -75,10 +75,11 @@ describe('heart rate, oxygen and temperature', () => {
     expect(assessHeartRate(110, 40)?.category).toBe('hr_high')
     expect(assessHeartRate(110, 6)).toBeNull()
   })
-  it('follows NHS pulse oximeter thresholds', () => {
+  it('follows MedlinePlus pulse oximeter thresholds', () => {
     expect(assessOxygen(97)).toMatchObject({ category: 'spo2_normal', level: 'ok' })
-    expect(assessOxygen(94)).toMatchObject({ category: 'spo2_borderline', level: 'follow_up' })
-    expect(assessOxygen(92)).toMatchObject({ category: 'spo2_low', level: 'urgent' })
+    expect(assessOxygen(94)).toMatchObject({ category: 'spo2_borderline', level: 'watch' })
+    expect(assessOxygen(92)).toMatchObject({ category: 'spo2_low', level: 'follow_up' })
+    expect(assessOxygen(88)).toMatchObject({ category: 'spo2_very_low', level: 'urgent' })
   })
   it('flags fever, very high fever, babies and low temperature', () => {
     expect(assessTemperature(37.2, 30).category).toBe('temp_normal')

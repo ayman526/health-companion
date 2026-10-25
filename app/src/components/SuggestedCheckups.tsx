@@ -2,9 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CalendarPlus, Sparkles } from 'lucide-react'
 import { formatDate } from '../lib/format'
-import { acceptSuggestion, dismissSuggestion, loadSuggestions } from '../lib/suggestions'
+import { acceptSuggestion, dismissSuggestion, loadSuggestions, markSuggestionDone } from '../lib/suggestions'
 import { EvidenceChips } from './TrustChips'
-import type { CheckupSuggestion } from '../domain/testSuggestions'
+import { SCREENING_VARIANTS, type CheckupSuggestion, type ScreeningRule } from '../domain/testSuggestions'
+
+// Months until the next one, by interval, when the person marks a checkup as already done.
+const USUAL_MONTHS: Record<string, number> = {
+  yearly: 12, years3to5: 36, years4to6: 60, years3: 36, years2: 24, yearlyIfEligible: 12, months3: 3, months6: 6,
+  months3to12: 6, months6to12: 12, weeks4to12: 3, weeks6to8: 2,
+}
 
 /** Checkups suggested from published guidelines; the user picks the date and accepts or dismisses. */
 export function SuggestedCheckups({ profileId, timeZone, today, onAccepted }: { profileId: string; timeZone: string; today: string; onAccepted?: () => void }) {
@@ -13,6 +19,8 @@ export function SuggestedCheckups({ profileId, timeZone, today, onAccepted }: { 
   const [items, setItems] = useState<CheckupSuggestion[] | null>(null)
   const [dates, setDates] = useState<Record<string, string>>({})
   const [error, setError] = useState(false)
+  const [doneFor, setDoneFor] = useState<string | null>(null)
+  const [doneForm, setDoneForm] = useState({ month: today.slice(0, 7), months: '' })
 
   const load = useCallback(async () => {
     const list = await loadSuggestions(today)
@@ -72,7 +80,41 @@ export function SuggestedCheckups({ profileId, timeZone, today, onAccepted }: { 
               >
                 {t('suggestions.dismiss')}
               </button>
+              <button type="button" onClick={() => { setDoneFor(doneFor === s.key ? null : s.key); setDoneForm({ month: today.slice(0, 7), months: '' }) }} className="min-h-11 px-2 text-sm font-medium text-brand-700">
+                {t('suggestions.alreadyDone')}
+              </button>
             </div>
+            {doneFor === s.key && (() => {
+              const variants = SCREENING_VARIANTS[s.rule as ScreeningRule]
+              return (
+                <div className="mt-3 flex flex-wrap items-end gap-2 rounded-xl border border-line bg-surface p-3">
+                  <label className="flex flex-col gap-1 text-xs font-medium text-muted">{t('suggestions.doneWhen')}
+                    <input type="month" dir="ltr" max={today.slice(0, 7)} className="min-h-11 rounded-lg border border-line bg-surface px-3 text-sm"
+                      value={doneForm.month} onChange={(e) => setDoneForm({ ...doneForm, month: e.target.value })} />
+                  </label>
+                  {variants && (
+                    <label className="flex flex-col gap-1 text-xs font-medium text-muted">{t('suggestions.whichTest')}
+                      <select className="min-h-11 rounded-lg border border-line bg-surface px-3 text-sm" value={doneForm.months} onChange={(e) => setDoneForm({ ...doneForm, months: e.target.value })}>
+                        <option value="">—</option>
+                        {variants.map((v) => <option key={v.variant} value={String(v.months)}>{t(`suggestions.variants.${v.variant}`)}</option>)}
+                      </select>
+                    </label>
+                  )}
+                  <button type="button" disabled={!doneForm.month || (!!variants && !doneForm.months)}
+                    onClick={async () => {
+                      // Interval: the chosen test's, or the rule's usual one (none for once-only checkups).
+                      const months = variants ? Number(doneForm.months) : USUAL_MONTHS[s.interval] ?? null
+                      if (await markSuggestionDone(profileId, s, `${doneForm.month}-01`, months)) {
+                        setItems((list) => list?.filter((x) => x.key !== s.key) ?? null)
+                        setDoneFor(null)
+                      } else setError(true)
+                    }}
+                    className="min-h-11 rounded-xl border border-brand-700 px-4 text-sm font-medium text-brand-700 disabled:opacity-40">
+                    {t('suggestions.saveDone')}
+                  </button>
+                </div>
+              )
+            })()}
             {s.due !== dates[s.key] && <p className="mt-1 text-xs text-muted">{t('suggestions.suggestedDate', { date: formatDate(s.due, lang) })}</p>}
           </li>
         ))}

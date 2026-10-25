@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.read-monitor]
 verify_jwt = false
+
+[functions.library-build]
+verify_jwt = false
+
+[functions.parse-voice]
+verify_jwt = false

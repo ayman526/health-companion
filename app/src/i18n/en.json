@@ -38,7 +38,7 @@
       "log": "Log reading",
       "scan": "Scan",
       "ask": "Ask",
-      "visit": "Visit summary"
+      "visit": "Doctor visit"
     },
     "quickActions": "Quick actions",
     "fastingSugar": "Fasting sugar",
@@ -739,7 +739,9 @@
       "custom": "Other",
       "medication": "Medication",
       "vital_check": "Reading check",
-      "weekly_summary": "Weekly summary"
+      "weekly_summary": "Weekly summary",
+      "visit_prep": "Visit preparation",
+      "visit_followup": "Visit update"
     },
     "repeat": "Repeat",
     "repeats": {
@@ -800,7 +802,7 @@
   },
   "suggestions": {
     "title": "Suggested checkups",
-    "intro": "Based on your results and medicines, following published medical guidelines. Pick a date and add a reminder, or dismiss.",
+    "intro": "Based on your age, results and medicines, following published medical guidelines. Pick a date and add a reminder, mark it done, or dismiss.",
     "rules": {
       "statin_first_check": "Cholesterol test after starting or changing your cholesterol medicine",
       "statin_routine": "Routine cholesterol test",
@@ -809,7 +811,17 @@
       "kidney_diabetes_acr": "Urine albumin test (kidney check)",
       "a1c_prediabetes": "Yearly HbA1c test (prediabetes)",
       "tsh_dose_check": "TSH test after your thyroid dose changed",
-      "tsh_routine": "Routine TSH (thyroid) test"
+      "tsh_routine": "Routine TSH (thyroid) test",
+      "screen_bp": "Blood pressure check",
+      "screen_lipids": "Cholesterol test",
+      "screen_diabetes": "Diabetes test (HbA1c or fasting sugar)",
+      "screen_hcv": "Hepatitis C test (once)",
+      "screen_colorectal": "Bowel cancer screening",
+      "screen_breast": "Mammogram (breast screening)",
+      "screen_cervical": "Cervical screening (Pap or HPV test)",
+      "screen_osteoporosis": "Bone density scan",
+      "screen_aaa": "Abdominal aortic aneurysm ultrasound (once)",
+      "screen_lung": "Lung screening: ask if it's right for you"
     },
     "basis": {
       "lastTest": "Your last result was on {{date}}",
@@ -823,7 +835,15 @@
       "months6": "guidelines suggest at least twice a year when stable",
       "yearly": "guidelines suggest at least once a year",
       "weeks6to8": "guidelines suggest 6–8 weeks after a dose change",
-      "months6to12": "guidelines suggest every 6–12 months when stable"
+      "months6to12": "guidelines suggest every 6–12 months when stable",
+      "years3to5": "guidelines suggest every 3–5 years",
+      "years4to6": "guidelines suggest every 4–6 years",
+      "years3": "guidelines suggest every 3 years",
+      "years2": "guidelines suggest every 2 years",
+      "once": "guidelines suggest once",
+      "dependsOnTest": "how often depends on the test; ask your doctor which is best for you",
+      "askDoctor": "your doctor will advise when to repeat it",
+      "yearlyIfEligible": "yearly for people with a heavy smoking history"
     },
     "overdue": "Due now",
     "date": "Date",
@@ -832,7 +852,17 @@
     "suggestedDate": "Suggested date was {{date}}",
     "disclaimer": "Suggested by the app from published guidelines, not your doctor's order. If your doctor gave you a different schedule, follow theirs.",
     "homeLink_one": "1 suggested checkup",
-    "homeLink_other": "{{count}} suggested checkups"
+    "homeLink_other": "{{count}} suggested checkups",
+    "alreadyDone": "Already done",
+    "doneWhen": "When",
+    "whichTest": "Which test",
+    "saveDone": "Save",
+    "variants": {
+      "stool_test": "Stool test (FIT)",
+      "colonoscopy": "Colonoscopy",
+      "pap": "Pap test",
+      "hpv": "HPV test"
+    }
   },
   "lifestyle": {
     "title": "Life changes",
@@ -1198,7 +1228,8 @@
       "temp_fever": "Fever",
       "temp_very_high": "High fever",
       "temp_fever_baby": "Fever in a baby",
-      "temp_low": "Low"
+      "temp_low": "Low",
+      "spo2_very_low": "Very low"
     },
     "meaning": {
       "bp_normal": "This reading is in the normal range for adults.",
@@ -1224,13 +1255,14 @@
       "hr_low": "Below 60 at rest. This can be normal for fit people or with some medicines. If you feel dizzy, faint or short of breath, contact your doctor.",
       "hr_high": "Above 100 at rest. Rest for a few minutes and measure again. If it stays high or you feel chest pain, dizziness or shortness of breath, contact your doctor; with chest pain or fainting, call emergency services.",
       "spo2_normal": "In the usual range. If your doctor gave you a different target, follow theirs.",
-      "spo2_borderline": "93–94% is lower than usual. Warm your hands, sit still and measure again. If it stays here, get advice from your doctor today. If your doctor gave you a different target, follow theirs.",
-      "spo2_low": "92% or below is low. Measure again with warm hands; if it's still this low, or you're short of breath, get urgent medical help now. Readings can be less accurate on darker skin, cold fingers or with nail polish.",
+      "spo2_borderline": "93–94% is a little lower than usual. Warm your hands, sit still and measure again. If it stays here or you feel unwell, contact your doctor. If your doctor gave you a different target, follow theirs.",
+      "spo2_low": "92% or lower: contact your doctor today. Measure again with warm hands first. Readings can be less accurate on darker skin, cold fingers or with nail polish. If your doctor gave you a different target (e.g. for COPD), follow theirs.",
       "temp_normal": "No fever.",
       "temp_fever": "38°C (100.4°F) or above is a fever. Rest and drink fluids. Contact your doctor if it lasts more than 3 days, or if you feel very unwell.",
       "temp_very_high": "40°C (104°F) or above is a high fever. Contact your doctor today. Get urgent help if there's confusion, a stiff neck, a rash that doesn't fade under a glass, or trouble breathing.",
       "temp_fever_baby": "A baby under 3 months with 38°C (100.4°F) or above needs urgent medical advice now. For older babies, contact their doctor.",
-      "temp_low": "Below 35°C (95°F) can be dangerous (hypothermia). Measure again; if it's still this low, get urgent medical help, especially for older people and babies."
+      "temp_low": "Below 35°C (95°F) can be dangerous (hypothermia). Measure again; if it's still this low, get urgent medical help, especially for older people and babies.",
+      "spo2_very_low": "88% or lower: get immediate medical attention, especially if you're short of breath, confused, or your lips look bluish."
     },
     "heartRate": "Heart rate (beats per minute)",
     "restingHint": "Measure after sitting quietly for 5 minutes.",
@@ -1365,5 +1397,206 @@
     "questionsPlaceholder": "Write what you'd like to ask…",
     "noneRecorded": "None recorded",
     "footer": "Prepared by the person with Health Journal from their own records and home readings. Not a medical document."
+  },
+  "install": {
+    "title": "Add Health Journal to your Home Screen",
+    "whyIos": "On iPhone, medicine reminders only work when the app is on your Home Screen. It takes 10 seconds.",
+    "why": "Open it in one tap, like any app, and get reminders reliably.",
+    "ios1": "In Safari, tap the Share button",
+    "ios2": "Choose \"Add to Home Screen\"",
+    "ios3": "Open Health Journal from your Home Screen and turn on reminders",
+    "shareIcon": "Share",
+    "button": "Install the app",
+    "done": "I've added it",
+    "notNow": "Not now"
+  },
+  "library": {
+    "label": "From a trusted source",
+    "why": "For you because of {{topic}}",
+    "keyPoints_one": "{{count}} key point",
+    "keyPoints_other": "{{count}} key points",
+    "source": "Source:",
+    "helpful": "Helpful",
+    "notRelevant": "Not relevant to me",
+    "translated": "",
+    "forYou": "For you",
+    "tags": {
+      "condition": {
+        "diabetes": "diabetes in your health profile",
+        "prediabetes": "prediabetes in your health profile",
+        "hypertension": "high blood pressure in your health profile",
+        "high_cholesterol": "high cholesterol in your health profile",
+        "thyroid": "a thyroid condition in your health profile",
+        "heart": "a heart condition in your health profile",
+        "kidney": "a kidney condition in your health profile",
+        "liver": "a liver condition in your health profile",
+        "asthma": "asthma in your health profile",
+        "copd": "COPD in your health profile",
+        "anemia": "anaemia in your health profile",
+        "gout": "gout in your health profile",
+        "osteoporosis": "osteoporosis in your health profile",
+        "mental_health": "your mental health",
+        "obesity": "your weight"
+      },
+      "lab": {
+        "lipids_high": "your latest cholesterol result",
+        "glucose_high": "your latest blood sugar result",
+        "kidney_abnormal": "your latest kidney test result",
+        "liver_high": "your latest liver test result",
+        "thyroid_abnormal": "your latest thyroid test result",
+        "anemia": "your latest blood count",
+        "vitamin_d_low": "your latest vitamin D result",
+        "iron_low": "your latest iron result",
+        "uric_acid_high": "your latest uric acid result"
+      },
+      "reading": {
+        "bp_high": "your recent blood pressure readings",
+        "bp_low": "your recent low blood pressure readings",
+        "glucose_high": "your recent blood sugar readings",
+        "glucose_low": "your recent low blood sugar readings",
+        "weight_high": "your recent weight readings",
+        "oxygen_low": "your recent oxygen readings",
+        "fever": "your recent temperature readings",
+        "heart_rate_abnormal": "your recent heart rate readings"
+      },
+      "med": {
+        "statin": "your cholesterol medicine",
+        "metformin": "your metformin",
+        "insulin": "your insulin",
+        "blood_pressure": "your blood pressure medicine",
+        "thyroid": "your thyroid medicine",
+        "anticoagulant": "your blood thinner",
+        "nsaid": "your painkiller"
+      },
+      "goal": {
+        "cholesterol": "your goal: cholesterol",
+        "blood_sugar": "your goal: blood sugar",
+        "blood_pressure": "your goal: blood pressure",
+        "kidneys": "your goal: kidney health",
+        "liver": "your goal: liver health",
+        "thyroid": "your goal: thyroid",
+        "weight": "your goal: weight",
+        "medicines": "your goal: taking medicines on time",
+        "checkups": "your goal: regular checkups"
+      },
+      "lifestyle": {
+        "exercise": "your recent change: exercise",
+        "diet": "your recent change: diet",
+        "smoking": "smoking",
+        "alcohol": "your recent change: alcohol",
+        "sleep": "your recent change: sleep",
+        "stress": "your recent change: stress"
+      },
+      "symptom": {
+        "headache": "headaches in your check-ins",
+        "dizziness": "dizziness in your check-ins",
+        "tiredness": "tiredness in your check-ins",
+        "nausea": "nausea in your check-ins",
+        "pain": "pain in your check-ins",
+        "swelling": "swelling in your check-ins",
+        "chest_pain": "chest pain in your check-ins",
+        "breathless": "shortness of breath in your check-ins"
+      },
+      "family": {
+        "heart": "heart disease in your family",
+        "diabetes": "diabetes in your family",
+        "high_cholesterol": "high cholesterol in your family",
+        "hypertension": "high blood pressure in your family",
+        "kidney": "kidney disease in your family"
+      },
+      "who": {
+        "pregnant": "your pregnancy",
+        "children": "their age",
+        "older_adults": "your age",
+        "everyone": "healthy living for everyone"
+      }
+    }
+  },
+  "visits": {
+    "title": "Doctor visits",
+    "subtitle": "Get a reminder the day before, then note what the doctor changed.",
+    "add": "Add a doctor visit",
+    "addFromReminders": "Add a doctor visit (with reminders before and after)",
+    "what": "What is it for?",
+    "whatPlaceholder": "e.g. Diabetes follow-up",
+    "doctor": "Doctor",
+    "date": "Date",
+    "time": "Time",
+    "place": "Place (optional)",
+    "remindersNote": "We'll remind you the evening before to prepare your visit summary, and a few hours after to note what changed. Notifications never show the doctor or the reason.",
+    "invalid": "Enter what the visit is for and the date.",
+    "save": "Save visit",
+    "empty": "No visits yet.",
+    "upcoming": "Coming up",
+    "past": "Past visits",
+    "updatePending": "Update pending",
+    "reminderPrep": "Prepare for your doctor visit tomorrow",
+    "reminderFollowup": "What did the doctor change?",
+    "prepTitle": "Before your visit",
+    "prep": {
+      "summary": "Open your visit summary: it lists your medicines, recent readings and results.",
+      "questions": "Write the questions you want to ask, at the end of the summary.",
+      "medicines": "Bring your medicine boxes or a photo of them.",
+      "reports": "Bring recent reports the doctor hasn't seen."
+    },
+    "openSummary": "Open visit summary",
+    "followupTitle": "What did the doctor change?",
+    "followupIntro": "Go through your medicines and add anything new, so your records stay right.",
+    "medsTitle": "Your current medicines",
+    "noMeds": "No medicines recorded.",
+    "noChange": "No change",
+    "changed": "Changed",
+    "stopped": "Stopped",
+    "newMedicine": "New medicine",
+    "newTest": "New test or follow-up",
+    "nextVisit": "Next visit",
+    "notes": "Notes from the visit (optional)",
+    "notesPlaceholder": "e.g. Recheck HbA1c in 3 months",
+    "finish": "Save visit update",
+    "followupDone": "Visit update saved",
+    "delete": "Delete this visit",
+    "deleteConfirm": "Delete this visit and its reminders?"
+  },
+  "voice": {
+    "button": "Say it instead of typing",
+    "title": "Say it",
+    "examples": "For example: \"My blood pressure is 130 over 85\", \"I took my metformin\", \"Fasting sugar 110\", \"I started walking every day\", \"I have a headache\".",
+    "listening": "Listening…",
+    "stop": "Stop",
+    "speak": "Speak",
+    "type": "Type instead",
+    "typePlaceholder": "e.g. blood pressure 130 over 85",
+    "go": "Go",
+    "reading": "Understanding…",
+    "confirm": "Is this right? Untick anything that's wrong.",
+    "save": "Save",
+    "again": "Try again",
+    "saved_one": "Saved 1 entry",
+    "saved_other": "Saved {{count}} entries",
+    "noDose": "No dose of {{medicine}} was due today, so it wasn't logged. You can log it from the medicine's page.",
+    "more": "Add more",
+    "close": "Close",
+    "items": {
+      "blood_pressure": "Blood pressure {{value}}",
+      "glucose": "Blood sugar {{value}} · {{context}}",
+      "weight": "Weight {{value}} kg",
+      "heart_rate": "Heart rate {{value}} bpm",
+      "oxygen": "Oxygen {{value}}%",
+      "temperature": "Temperature {{value}} °C",
+      "dose": "Took {{medicine}}",
+      "doseUnknown": "Took a medicine (which one wasn't clear)",
+      "life": "Life change: {{title}}",
+      "symptom": "Symptom: {{symptom}}",
+      "mood": "Feeling: {{mood}}",
+      "unclear": "Not clear, won't be saved"
+    },
+    "errors": {
+      "not_understood": "Sorry, I couldn't find anything to log. Try saying a reading or a medicine, e.g. \"blood pressure 130 over 85\".",
+      "mic_blocked": "The microphone is blocked. Allow it in your browser settings, or type instead.",
+      "unsupported": "This browser can't listen. Type instead.",
+      "consent_required": "Understanding speech needs AI reading turned on. You can turn it on in the Privacy Center.",
+      "quota_exceeded": "You've reached this month's limit. You can still log by hand.",
+      "ai_unavailable": "Couldn't understand that right now. Please try again, or log by hand."
+    }
   }
 }

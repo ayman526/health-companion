@@ -76,3 +76,41 @@ describe('suggested checkups', () => {
     expect(addMonths('2026-08-31', 6)).toBe('2027-02-28')
   })
 })
+
+describe('age-based screening', () => {
+  const person = (age: number, sex: string | null, smoking: string | null = 'never') => ({ age, sex, smoking, bmi: null })
+  const rules = (over: Partial<SuggestionInput>) => suggestCheckups(base(over)).map((s) => s.rule)
+
+  it('suggests nothing without age, or under 18', () => {
+    expect(rules({})).toEqual([])
+    expect(rules({ person: person(16, 'female') })).toEqual([])
+  })
+
+  it('follows age and sex for a 52-year-old woman with no records', () => {
+    const r = rules({ person: person(52, 'female') })
+    expect(r).toEqual(expect.arrayContaining(['screen_bp', 'screen_lipids', 'screen_diabetes', 'screen_hcv', 'screen_colorectal', 'screen_breast', 'screen_cervical']))
+    expect(r).not.toContain('screen_aaa')
+    expect(r).not.toContain('screen_osteoporosis')
+  })
+
+  it('suggests AAA and lung screening only for older men who have smoked', () => {
+    expect(rules({ person: person(68, 'male', 'former') })).toEqual(expect.arrayContaining(['screen_aaa', 'screen_lung']))
+    expect(rules({ person: person(68, 'male', 'never') })).not.toContain('screen_aaa')
+  })
+
+  it('waits until the next one is due after a recent test or a test marked done', () => {
+    const latest = new Map([['ldl_c', { date: '2025-01-10', value: 120 }], ['hcv_ab', { date: '2019-05-01', value: 0 }]])
+    const done = new Map([['screen_colorectal', { date: '2022-06-01', months: 120 }]])
+    const r = rules({ person: person(50, 'male'), latest, done, lastBpReading: '2026-09-01' })
+    expect(r).not.toContain('screen_lipids') // next one in 2030
+    expect(r).not.toContain('screen_hcv') // once is enough
+    expect(r).not.toContain('screen_colorectal') // colonoscopy done in 2022
+    expect(r).not.toContain('screen_bp') // measured last month
+  })
+
+  it("doesn't repeat checkups that a condition's own rule already covers", () => {
+    const r = rules({ person: person(55, 'male'), conditions: ['Type 2 diabetes', 'High blood pressure'] })
+    expect(r.filter((x) => x === 'a1c_diabetes' || x === 'screen_diabetes')).toEqual(['a1c_diabetes'])
+    expect(r).not.toContain('screen_bp')
+  })
+})

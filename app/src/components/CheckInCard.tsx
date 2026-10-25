@@ -6,6 +6,7 @@ import { loadCheckIns, saveCheckIn, type CheckIn } from '../lib/daily'
 import { todayIn } from '../lib/medications'
 import { normalizeNumberInput, parseNumber } from '../domain/numbers'
 import { EMERGENCY_NUMBERS } from '../domain/emergency'
+import { track } from '../lib/usage'
 
 export const SYMPTOMS = ['headache', 'dizziness', 'tiredness', 'nausea', 'pain', 'swelling', 'chest_pain', 'breathless'] as const
 // Symptoms that can be signs of an emergency (heart attack, stroke, severe asthma).
@@ -39,7 +40,10 @@ export function CheckInRow({ onDone }: { onDone?: (done: boolean) => void }) {
   async function save(next: CheckIn) {
     if (!profile) return
     setEntry(next)
-    if (await saveCheckIn(profile.id, next)) onDone?.(!!next.mood)
+    if (await saveCheckIn(profile.id, next)) {
+      onDone?.(!!next.mood)
+      if (next.mood && !entry.mood) track('checkin_saved')
+    }
   }
 
   const toggle = (s: string) => {

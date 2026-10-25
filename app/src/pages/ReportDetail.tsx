@@ -13,6 +13,8 @@ import { liverElevationGrade, measurementStatus, type MeasurementStatus } from '
 import { StatusBadge, TrendLabel } from '../components/LabStatus'
 import { PageHeader } from '../components/ui'
 import { TestInfoPanel } from '../components/TestInfoPanel'
+import { ContextCard } from '../components/ContextCard'
+import { labTags } from '../domain/libraryTags'
 import { normalizeNumberInput, parseNumber } from '../domain/numbers'
 
 /** Qualitative results such as "Positive" / "Reactive" / "إيجابي". */
@@ -220,6 +222,11 @@ export function ReportDetailPage() {
       )}
 
       <p className="mb-4 text-xs text-muted">{t('report.sourceNote')}</p>
+      {/* One reading card for this report's most relevant result outside its range. */}
+      <ContextCard className="mb-4" topics={[...new Set(views.flatMap(({ row, status }) => {
+        const test = row.test_code ? getTest(row.test_code) : undefined
+        return test && status ? labTags(test, status) : []
+      }))]} />
 
       <ul className="flex flex-col gap-3">
         {views.map(({ row, historyKey, byNameOnly, point, status, comparison, liver }) => {

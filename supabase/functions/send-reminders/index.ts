@@ -32,10 +32,12 @@ const TEXT = {
   en: {
     title: 'Health Journal', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.',
     familyDose: 'Medicine time for someone you care for. Open the app to log it.', vital: 'Time to log today\'s reading.', summary: 'Your weekly summary is ready.',
+    visitPrep: 'You have a doctor visit tomorrow. Prepare your visit summary.', visitFollowup: 'How did your visit go? Update what the doctor changed.',
   },
   ar: {
     title: 'سجلك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.',
     familyDose: 'حان موعد دواء لشخص ترعاه. افتح التطبيق لتسجيله.', vital: 'حان وقت تسجيل قراءتك اليوم.', summary: 'ملخصك الأسبوعي جاهز.',
+    visitPrep: 'لديك زيارة للطبيب غدًا. جهّز ملخص الزيارة.', visitFollowup: 'كيف كانت زيارتك؟ سجّل ما غيّره الطبيب.',
   },
 }
 
@@ -100,9 +102,10 @@ async function deliver(admin: SupabaseClient, due: Due[]) {
     const isFamily = new Set((people ?? []).filter((p) => p.relationship !== 'self').map((p) => p.id))
     const reminderIds = items.filter((i) => i.kind === 'reminder').map((i) => i.item_id)
     const { data: kinds } = reminderIds.length
-      ? await admin.from('reminders').select('id, kind').in('id', reminderIds)
-      : { data: [] as { id: string; kind: string }[] }
+      ? await admin.from('reminders').select('id, kind, appointment_id').in('id', reminderIds)
+      : { data: [] as { id: string; kind: string; appointment_id: string | null }[] }
     const kindOf = new Map((kinds ?? []).map((k) => [k.id, k.kind]))
+    const visitOf = new Map((kinds ?? []).map((k) => [k.id, k.appointment_id]))
     let email: string | null = null
 
     for (const item of items) {
@@ -110,8 +113,12 @@ async function deliver(admin: SupabaseClient, due: Due[]) {
       const body = item.kind === 'dose' ? (isFamily.has(item.profile_id) ? TEXT[lang].familyDose : TEXT[lang].dose)
         : rk === 'vital_check' ? TEXT[lang].vital
         : rk === 'weekly_summary' ? TEXT[lang].summary
+        : rk === 'visit_prep' ? TEXT[lang].visitPrep
+        : rk === 'visit_followup' ? TEXT[lang].visitFollowup
         : TEXT[lang].reminder
-      const url = item.kind === 'dose' || rk === 'weekly_summary' ? '/' : rk === 'vital_check' ? '/vitals' : '/reminders'
+      const visit = visitOf.get(item.item_id)
+      const url = item.kind === 'dose' || rk === 'weekly_summary' ? '/' : rk === 'vital_check' ? '/vitals'
+        : (rk === 'visit_prep' || rk === 'visit_followup') && visit ? `/visits/${visit}` : '/reminders'
       const outcomes: Outcome[] = []
       const push = prefs?.push_enabled !== false
         ? await sendPush(admin, ownerId, { title: TEXT[lang].title, body, tag: item.item_id, url })

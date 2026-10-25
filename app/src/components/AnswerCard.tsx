@@ -5,6 +5,9 @@ import { AlertTriangle, FileText, LineChart, Pill, Stethoscope, ThumbsDown, Thum
 import { supabase } from '../lib/supabase'
 import { sendFeedback, type ChatMessage, type Citation } from '../lib/advisor'
 import { SourceChip } from './TrustChips'
+import { ContextCard } from './ContextCard'
+import { labTags, medicationTags } from '../domain/libraryTags'
+import { getTest } from '../domain/labs/catalog'
 
 /** Best-guess category for a life change mentioned in chat; the user can edit it on the Life changes page. */
 function guessLifestyleCategory(text: string): string {
@@ -42,6 +45,17 @@ function CitationChip({ c }: { c: Citation }) {
     </span>
   )
   return to ? <Link to={to}>{body}</Link> : body
+}
+
+/** Topics of the records an answer cites: its tests and medicines. */
+function answerTopics(citations: { kind?: string; target?: string; label?: string }[]): string[] {
+  const out = new Set<string>()
+  for (const c of citations) {
+    const test = c.kind === 'test' && c.target ? getTest(c.target) : undefined
+    if (test) labTags(test, 'high').concat(labTags(test, 'low')).forEach((x) => out.add(x))
+    if (c.kind === 'medication' && c.label) medicationTags([{ name: c.label, ingredient: null, active: true }]).forEach((x) => out.add(x))
+  }
+  return [...out]
 }
 
 export function AnswerCard({ message, profileId }: { message: ChatMessage; profileId: string }) {
@@ -142,6 +156,8 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
           </ul>
         </section>
       )}
+
+      <ContextCard topics={answerTopics(message.citations ?? [])} />
 
       <div className="flex flex-wrap items-center gap-1 border-t border-line pt-2" dir="auto">
         {feedback ? <p className="text-xs text-muted">{t('advisor.thanks')}</p> : (
