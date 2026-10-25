@@ -1,5 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+import { withProfile } from './activeProfile'
 
 const BUCKET = 'medical-documents'
 
@@ -7,11 +8,11 @@ const BUCKET = 'medical-documents'
 // Shared anonymous tables (medicine notes cache, unknown test names) hold no
 // personal data and are not included.
 const PROFILE_TABLES = [
-  'health_profiles', 'medical_documents', 'document_extractions', 'laboratory_reports', 'laboratory_results',
+  'medical_documents', 'document_extractions', 'laboratory_reports', 'laboratory_results',
   'medical_conditions', 'allergies', 'symptoms', 'medications', 'medication_schedules', 'medication_dose_logs',
   'appointments', 'follow_up_plans', 'reminders', 'reminder_deliveries', 'health_events', 'lifestyle_events',
   'suggestion_decisions', 'test_aliases', 'ai_conversations', 'ai_messages', 'ai_feedback', 'ai_insights',
-  'usage_counters', 'audit_events',
+  'usage_counters', 'audit_events', 'vital_readings', 'daily_checkins',
 ] as const
 const ACCOUNT_TABLES = ['user_consents', 'notification_preferences', 'notification_subscriptions'] as const
 
@@ -25,7 +26,7 @@ async function readAll(table: string) {
   }
 }
 
-async function listFiles(prefix: string): Promise<string[]> {
+export async function listFiles(prefix: string): Promise<string[]> {
   const { data, error } = await supabase!.storage.from(BUCKET).list(prefix, { limit: 1000 })
   if (error) throw error
   const out: string[] = []
@@ -39,35 +40,50 @@ async function listFiles(prefix: string): Promise<string[]> {
 
 export interface ExportProgress { stage: 'records' | 'files' | 'zip'; done: number; total: number }
 
-/** Builds a ZIP of all the person's records (JSON) and original files, in the browser. */
-export async function exportMyData(profileId: string, email: string | undefined, onProgress: (p: ExportProgress) => void): Promise<Blob> {
+/** Builds a ZIP of all records (JSON) and original files, for you and every family member, in the browser. */
+export async function exportMyData(email: string | undefined, onProgress: (p: ExportProgress) => void): Promise<Blob> {
   if (!supabase) throw new Error('no_backend')
   const { zipSync, strToU8 } = await import('fflate')
-  const tables: Record<string, unknown[]> = {}
-  const names = [...PROFILE_TABLES, ...ACCOUNT_TABLES]
-  for (const [i, t] of names.entries()) {
-    onProgress({ stage: 'records', done: i, total: names.length })
-    tables[t] = await readAll(t)
-  }
+  const { data: people, error } = await supabase.from('health_profiles').select('*').order('created_at')
+  if (error) throw error
 
+  const account: Record<string, unknown[]> = {}
+  for (const t of ACCOUNT_TABLES) account[t] = await readAll(t)
+
+  const profiles: { profile: unknown; tables: Record<string, unknown[]> }[] = []
   const files: Record<string, Uint8Array> = {}
-  const paths = await listFiles(profileId)
-  for (const [i, path] of paths.entries()) {
-    onProgress({ stage: 'files', done: i, total: paths.length })
-    const { data, error } = await supabase.storage.from(BUCKET).download(path)
-    if (error) throw error
-    files[`files/${path.slice(profileId.length + 1)}`] = new Uint8Array(await data.arrayBuffer())
+  const total = (people ?? []).length * PROFILE_TABLES.length
+  let done = 0
+  for (const person of people ?? []) {
+    // Each person's records are read with that person selected (see lib/activeProfile.ts).
+    const tables: Record<string, unknown[]> = {}
+    await withProfile(person.id, async () => {
+      for (const t of PROFILE_TABLES) {
+        onProgress({ stage: 'records', done: done++, total })
+        tables[t] = await readAll(t)
+      }
+    })
+    profiles.push({ profile: person, tables })
+
+    const paths = await listFiles(person.id)
+    for (const [i, path] of paths.entries()) {
+      onProgress({ stage: 'files', done: i, total: paths.length })
+      const { data, error: e } = await supabase.storage.from(BUCKET).download(path)
+      if (e) throw e
+      files[`files/${path}`] = new Uint8Array(await data.arrayBuffer())
+    }
   }
 
   onProgress({ stage: 'zip', done: 0, total: 1 })
-  const data = { exported_at: new Date().toISOString(), format_version: 1, account: { email: email ?? null }, tables }
+  const data = { exported_at: new Date().toISOString(), format_version: 2, account: { email: email ?? null, ...account }, profiles }
   const readme = [
     'Health Journal: your data',
     '',
-    'data.json  All your records, one list per table, exactly as stored.',
-    'files/     The original documents and photos you uploaded.',
+    'data.json  All records, exactly as stored: your account settings, then one',
+    '           section per person (you and any family members), one list per table.',
+    'files/     The original documents and photos, in one folder per person.',
     '',
-    'Keep this file somewhere safe: it contains your health information.',
+    'Keep this file somewhere safe: it contains health information.',
   ].join('\n')
   const zip = zipSync({
     'README.txt': strToU8(readme),

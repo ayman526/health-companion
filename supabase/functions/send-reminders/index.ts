@@ -29,8 +29,14 @@ const channels = () => ({
 })
 
 const TEXT = {
-  en: { title: 'Health Journal', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.' },
-  ar: { title: 'سجلك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.' },
+  en: {
+    title: 'Health Journal', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.',
+    familyDose: 'Medicine time for someone you care for. Open the app to log it.', vital: 'Time to log today\'s reading.', summary: 'Your weekly summary is ready.',
+  },
+  ar: {
+    title: 'سجلك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.',
+    familyDose: 'حان موعد دواء لشخص ترعاه. افتح التطبيق لتسجيله.', vital: 'حان وقت تسجيل قراءتك اليوم.', summary: 'ملخصك الأسبوعي جاهز.',
+  },
 }
 
 type Due = { kind: 'dose' | 'reminder'; item_id: string; profile_id: string; owner_id: string; due_at: string }
@@ -86,16 +92,29 @@ async function deliver(admin: SupabaseClient, due: Due[]) {
   for (const [ownerId, items] of byOwner) {
     const [{ data: prefs }, { data: profile }] = await Promise.all([
       admin.from('notification_preferences').select('push_enabled, email_enabled, whatsapp_enabled, whatsapp_number').eq('user_id', ownerId).maybeSingle(),
-      admin.from('health_profiles').select('ui_language').eq('owner_id', ownerId).eq('is_demo', false).maybeSingle(),
+      admin.from('health_profiles').select('ui_language').eq('owner_id', ownerId).eq('relationship', 'self').eq('is_demo', false).maybeSingle(),
     ])
     const lang: 'en' | 'ar' = profile?.ui_language === 'ar' ? 'ar' : 'en'
+    // Family members' items get wording that doesn't say "your"; still no health details.
+    const { data: people } = await admin.from('health_profiles').select('id, relationship').eq('owner_id', ownerId)
+    const isFamily = new Set((people ?? []).filter((p) => p.relationship !== 'self').map((p) => p.id))
+    const reminderIds = items.filter((i) => i.kind === 'reminder').map((i) => i.item_id)
+    const { data: kinds } = reminderIds.length
+      ? await admin.from('reminders').select('id, kind').in('id', reminderIds)
+      : { data: [] as { id: string; kind: string }[] }
+    const kindOf = new Map((kinds ?? []).map((k) => [k.id, k.kind]))
     let email: string | null = null
 
     for (const item of items) {
-      const body = item.kind === 'dose' ? TEXT[lang].dose : TEXT[lang].reminder
+      const rk = kindOf.get(item.item_id)
+      const body = item.kind === 'dose' ? (isFamily.has(item.profile_id) ? TEXT[lang].familyDose : TEXT[lang].dose)
+        : rk === 'vital_check' ? TEXT[lang].vital
+        : rk === 'weekly_summary' ? TEXT[lang].summary
+        : TEXT[lang].reminder
+      const url = item.kind === 'dose' || rk === 'weekly_summary' ? '/' : rk === 'vital_check' ? '/vitals' : '/reminders'
       const outcomes: Outcome[] = []
       const push = prefs?.push_enabled !== false
-        ? await sendPush(admin, ownerId, { title: TEXT[lang].title, body, tag: item.item_id, url: item.kind === 'dose' ? '/' : '/reminders' })
+        ? await sendPush(admin, ownerId, { title: TEXT[lang].title, body, tag: item.item_id, url })
         : null
       if (push) outcomes.push(push)
       const pushed = push?.status === 'sent'

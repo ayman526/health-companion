@@ -16,6 +16,10 @@ interface Props {
   refLow: number | null
   refHigh: number | null
   onSelect?: (id: string) => void
+  /** Label for a point's status in the tooltip (defaults to lab wording). */
+  statusLabel?: (status: MeasurementStatus) => string
+  /** Note under the chart explaining the shaded band (defaults to the lab range note). */
+  bandNote?: string
 }
 
 const HEIGHT = 220
@@ -42,7 +46,7 @@ function niceTicks(min: number, max: number, count = 4): number[] {
   return ticks
 }
 
-export function TrendChart({ points, unit, refLow, refHigh, onSelect }: Props) {
+export function TrendChart({ points, unit, refLow, refHigh, onSelect, statusLabel, bandNote }: Props) {
   const { t, i18n } = useTranslation()
   const lang = i18n.language
   const wrap = useRef<HTMLDivElement>(null)
@@ -144,10 +148,10 @@ export function TrendChart({ points, unit, refLow, refHigh, onSelect }: Props) {
         >
           <p className="text-muted">{formatDate(tip.date, lang)}</p>
           <p className="font-semibold text-ink">{formatNumber(tip.value, lang)} {unit}</p>
-          <p className="text-muted">{t(`labs.status.${tip.status}`)}</p>
+          <p className="text-muted">{statusLabel ? statusLabel(tip.status) : t(`labs.status.${tip.status}`)}</p>
         </div>
       )}
-      {showBand && <p className="mt-1 text-xs text-muted" dir={lang === 'ar' ? 'rtl' : 'ltr'}>{t('chart.bandNote')}</p>}
+      {showBand && <p className="mt-1 text-xs text-muted" dir={lang === 'ar' ? 'rtl' : 'ltr'}>{bandNote ?? t('chart.bandNote')}</p>}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, ShieldCheck, UserRound } from 'lucide-react'
+import { Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, ShieldCheck, UserRound, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
@@ -72,6 +72,11 @@ export function SettingsPage() {
         <Link to="/profile" className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-4">
           <UserRound className="size-5 shrink-0 text-brand-700" aria-hidden />
           <span className="flex-1"><span className="block font-semibold">{t('profile.title')}</span><span className="block text-sm text-muted">{t('profile.settingsHint')}</span></span>
+          <ChevronRight className="size-5 text-muted rtl:rotate-180" aria-hidden />
+        </Link>
+        <Link to="/family" className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-4">
+          <Users className="size-5 shrink-0 text-brand-700" aria-hidden />
+          <span className="flex-1"><span className="block font-semibold">{t('family.title')}</span><span className="block text-sm text-muted">{t('family.settingsHint')}</span></span>
           <ChevronRight className="size-5 text-muted rtl:rotate-180" aria-hidden />
         </Link>
         <Section icon={Languages} title={t('settings.language')}>

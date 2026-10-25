@@ -70,6 +70,24 @@ export const SOURCES = {
     url: 'https://medlibrary.org/lib/rx/meds/levothyroxine-sodium/page/2/',
     published: '2024',
   },
+  aha_bp: {
+    short: 'AHA/ACC',
+    title: 'American Heart Association: Understanding blood pressure readings (ACC/AHA adult categories: normal <120/<80, elevated 120–129/<80, stage 1 130–139 or 80–89, stage 2 ≥140 or ≥90; over 180/120 needs prompt attention)',
+    url: 'https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings',
+    published: '2025',
+  },
+  ada_glucose_targets: {
+    short: 'ADA 2025',
+    title: 'ADA Standards of Care in Diabetes—2025, §6 Glycemic Goals: before meals 80–130 mg/dL, 1–2 hours after a meal below 180 mg/dL; low blood sugar below 70 mg/dL (level 1) and below 54 mg/dL (level 2)',
+    url: 'https://pmc.ncbi.nlm.nih.gov/articles/11635037',
+    published: '2024-12',
+  },
+  who_bmi: {
+    short: 'WHO',
+    title: 'World Health Organization: body mass index categories for adults (underweight <18.5, healthy 18.5–24.9, overweight 25–29.9, obesity ≥30)',
+    url: 'https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight',
+    published: '2024',
+  },
   eflm_bv: {
     short: 'EFLM',
     title: 'EFLM Biological Variation Database (2021 + updates), as tabulated in Bio-Rad Q-1680',

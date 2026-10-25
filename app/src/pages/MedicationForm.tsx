@@ -57,7 +57,7 @@ export function MedicationFormPage() {
       // Doctors the user named before, most recent first.
       setDoctors([...list].sort((a, b) => b.created_at.localeCompare(a.created_at)).map((m) => m.prescriber ?? '').filter(Boolean))
     })
-    if (supabase) void supabase.from('health_profiles').select('physician_name').eq('is_demo', false).maybeSingle()
+    if (supabase) void supabase.from('health_profiles').select('physician_name').eq('id', profile?.id ?? '').maybeSingle()
       .then(({ data }) => data?.physician_name && setDoctors((d) => [...d, data.physician_name!]))
   }, [changing])
 

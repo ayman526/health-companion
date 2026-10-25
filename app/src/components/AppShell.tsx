@@ -1,7 +1,8 @@
 import { Suspense } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../auth/AuthProvider'
 import { useTranslation } from 'react-i18next'
-import { Home, FolderHeart, MessageCircleHeart, Pill, CalendarClock, Languages, Bell, Settings, LockKeyhole, Eye, EyeOff } from 'lucide-react'
+import { Home, FolderHeart, MessageCircleHeart, Pill, CalendarClock, Languages, Bell, Settings, LockKeyhole, Eye, EyeOff, Users } from 'lucide-react'
 import { setDiscreet, useDiscreet } from '../lib/discreet'
 import { setLanguage } from '../i18n'
 
@@ -56,13 +57,28 @@ function HeaderLinks({ withLabels }: { withLabels?: boolean }) {
   )
 }
 
+/** Shown on every screen while you're looking at a family member's records. */
+function ViewingBanner() {
+  const { t } = useTranslation()
+  const { profile } = useAuth()
+  if (!profile || profile.relationship === 'self') return null
+  const name = profile.display_name || t(`family.relationships.${profile.relationship}`)
+  return (
+    <Link to="/family" className="flex min-h-10 items-center justify-center gap-2 bg-brand-700 px-4 text-sm font-medium text-white print:hidden">
+      <Users className="size-4" aria-hidden /> {t('family.viewingBanner', { name })}
+      <span className="underline">{t('family.switch')}</span>
+    </Link>
+  )
+}
+
 export function AppShell() {
   const { t } = useTranslation()
+  const { profile } = useAuth()
 
   return (
     <div className="min-h-dvh md:flex">
       {/* Sidebar on tablet and desktop */}
-      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-line bg-surface p-4 md:flex">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-e border-line bg-surface p-4 md:flex print:hidden">
         <div className="mb-8 flex flex-col items-start gap-2 px-3 pt-2">
           <span className="text-lg font-semibold text-brand-700">{t('app.name')}</span>
           <PrivacyBadge />
@@ -92,7 +108,7 @@ export function AppShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile header */}
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface/90 px-4 py-3 backdrop-blur md:hidden">
+        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-surface/90 px-4 py-3 backdrop-blur md:hidden print:hidden">
           <span className="flex min-w-0 items-center gap-2">
             <span className="whitespace-nowrap text-base font-semibold text-brand-700">{t('app.name')}</span>
             <PrivacyBadge />
@@ -102,16 +118,18 @@ export function AppShell() {
           </div>
         </header>
 
+        <ViewingBanner />
         <main className="mx-auto w-full max-w-3xl flex-1 px-4 pt-5 pb-28 md:px-8 md:pt-10 md:pb-10">
           {/* Navigation stays visible while a screen's code downloads. */}
           <Suspense fallback={<p role="status" className="py-10 text-center text-sm text-muted">{t('auth.loading')}</p>}>
-            <Outlet />
+            {/* Remount the screen when switching person, so nothing from the previous person lingers. */}
+            <Outlet key={profile?.id} />
           </Suspense>
         </main>
 
         {/* Bottom navigation on mobile */}
         <nav
-          className="fixed inset-x-0 bottom-0 z-10 grid grid-cols-5 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
+          className="fixed inset-x-0 bottom-0 z-10 grid grid-cols-5 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden print:hidden"
           aria-label="Primary"
         >
           {NAV.map(({ to, key, icon: Icon }) => (

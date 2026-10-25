@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { activeProfileId } from './activeProfile'
 
 export interface ProfileDetails {
   id: string
@@ -30,7 +31,7 @@ export async function loadProfileDetails(): Promise<{ profile: ProfileDetails | 
   const empty = { conditions: [], allergies: [], family: [] }
   if (!supabase) return { profile: null, lists: empty }
   const [{ data: profile }, { data: conditions }, { data: allergies }] = await Promise.all([
-    supabase.from('health_profiles').select(PROFILE_SELECT).eq('is_demo', false).maybeSingle(),
+    supabase.from('health_profiles').select(PROFILE_SELECT).eq('id', activeProfileId() ?? '').maybeSingle(),
     supabase.from('medical_conditions').select('name, is_family_history').eq('status', 'confirmed'),
     supabase.from('allergies').select('substance').eq('status', 'confirmed'),
   ])

@@ -39,6 +39,9 @@ export interface AdvisorInput {
   followUps: { text: string; due: string | null }[]
   reports: { id: string; date: string; lab: string | null }[]
   lifeChanges?: { category: string; title: string; started_on: string; ended_on: string | null }[]
+  /** Home readings and check-ins, already summarised by the app (numbers are app-calculated). */
+  homeReadings?: Record<string, unknown> | null
+  checkIns?: Record<string, unknown> | null
 }
 
 export type RefKind = 'test' | 'report' | 'medication'
@@ -142,6 +145,8 @@ export function buildAdvisorContext(input: AdvisorInput) {
     follow_ups: input.followUps,
     life_changes: (input.lifeChanges ?? []).map((l) => ({ category: l.category, change: l.title, from: l.started_on, to: l.ended_on })),
     reports: input.reports.map((r) => ({ id: reportId.get(r.id)!, date: r.date, lab: r.lab })),
+    ...(input.homeReadings ? { home_readings: input.homeReadings } : {}),
+    ...(input.checkIns ? { daily_check_ins: input.checkIns } : {}),
   }
   return { context, refs }
 }

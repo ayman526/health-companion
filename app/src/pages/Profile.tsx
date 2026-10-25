@@ -80,7 +80,7 @@ export function ProfilePage() {
   if (!loaded) return <p className="text-sm text-muted">{t('auth.loading')}</p>
   return (
     <>
-      <PageHeader title={t('profile.title')} subtitle={t('profile.subtitle')} />
+      <PageHeader title={profile && profile.relationship !== 'self' ? t('family.profileOf', { name: profile.display_name || t(`family.relationships.${profile.relationship}`) }) : t('profile.title')} subtitle={t('profile.subtitle')} />
       <div className="flex flex-col gap-4">
         <Section title={t('onboarding.profileTitle')}>
           <AboutFields value={about} onChange={setAbout} />

@@ -524,7 +524,9 @@ Deno.serve(async (req) => {
   const { data: consented } = await admin.rpc('has_consent', { p_user_id: auth.user.id, p_type: 'ai_processing' })
   if (!consented) return json(403, { error: 'consent_required' })
 
-  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: doc.profile_id, p_kind: 'extractions', p_limit: MONTHLY_EXTRACTION_LIMIT })
+  // Limits are per account, not per family member.
+  const { data: selfProfile } = await admin.from('health_profiles').select('id').eq('owner_id', auth.user.id).eq('relationship', 'self').eq('is_demo', false).maybeSingle()
+  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: selfProfile?.id ?? doc.profile_id, p_kind: 'extractions', p_limit: MONTHLY_EXTRACTION_LIMIT })
   if (!allowed) return json(429, { error: 'quota_exceeded' })
 
   await admin.from('medical_documents').update({ status: 'processing', failure_reason: null }).eq('id', doc.id)

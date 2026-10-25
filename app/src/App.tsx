@@ -28,6 +28,9 @@ const LifestylePage = lazy(() => import('./pages/Lifestyle').then((m) => ({ defa
 const MedicationEditPage = lazy(() => import('./pages/MedicationEdit').then((m) => ({ default: m.MedicationEditPage })))
 const ProfilePage = lazy(() => import('./pages/Profile').then((m) => ({ default: m.ProfilePage })))
 const PrivacyPage = lazy(() => import('./pages/Privacy').then((m) => ({ default: m.PrivacyPage })))
+const VitalsPage = lazy(() => import('./pages/Vitals').then((m) => ({ default: m.VitalsPage })))
+const FamilyPage = lazy(() => import('./pages/Family').then((m) => ({ default: m.FamilyPage })))
+const SummaryPage = lazy(() => import('./pages/Summary').then((m) => ({ default: m.SummaryPage })))
 
 // Screens people usually open next, fetched quietly once the app is idle.
 const prefetchLikelyPages = () => {
@@ -46,8 +49,9 @@ function Loading() {
 }
 
 function Gate() {
-  const { loading, session, profile } = useAuth()
-  const ready = !!profile?.onboarding_completed_at
+  const { loading, session, self } = useAuth()
+  // Onboarding is about the account holder; family members are added later.
+  const ready = !!self?.onboarding_completed_at
 
   useEffect(() => {
     if (!ready) return
@@ -82,6 +86,9 @@ function Gate() {
         <Route path="settings" element={<SettingsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="vitals" element={<VitalsPage />} />
+        <Route path="family" element={<FamilyPage />} />
+        <Route path="summary" element={<SummaryPage />} />
         <Route path="lifestyle" element={<LifestylePage />} />
       </Route>
     </Routes>

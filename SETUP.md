@@ -21,6 +21,7 @@ Run every file in [`supabase/migrations/`](supabase/migrations/) **once each, in
 9. `20261024080000_lifestyle_and_suggestions.sql`: life changes log, suggested-checkup decisions
 10. `20261024090000_profile_details.sql`: optional profile details from sign-up (height, weight, pregnancy, smoking, onboarding progress)
 11. `20261024100000_account_deletion.sql`: lets "Delete my account" remove everything (fixes the change log blocking it)
+12. `20261025000000_daily_health_and_family.sql`: home readings, daily check-ins, family profiles (each person's records kept separate)
 
 Pick one way:
 

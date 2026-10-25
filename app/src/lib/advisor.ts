@@ -1,6 +1,9 @@
 import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+import { activeProfileId } from './activeProfile'
 import { bmi } from '../domain/profileOptions'
+import { loadCheckIns, loadVitals } from './daily'
+import { assessReading, average, bpAverage, type VitalReading } from '../domain/vitals'
 import { loadConfirmedResults } from './labData'
 import { loadMedications } from './medications'
 import { groupHistories } from '../domain/labs/history'
@@ -42,10 +45,55 @@ const freqText = (s: { frequency: string; every_n_days: number | null; days_of_w
   : s.frequency === 'every_n_days' ? `every ${s.every_n_days} days`
   : `${s.times_of_day.length} time(s) a day`
 
+/** Home readings for the advisor: averages, the latest of each with its guideline category, last 90 days. */
+function summariseReadings(vitals: VitalReading[], person: { age: number | null; heightCm: number | null; hasDiabetes: boolean }) {
+  if (vitals.length === 0) return null
+  const latest = (kind: VitalReading['kind']) => vitals.find((r) => r.kind === kind)
+  const describe = (r: VitalReading | undefined) => r && {
+    date: r.measured_at.slice(0, 10),
+    value: r.kind === 'blood_pressure' ? `${r.systolic}/${r.diastolic} mmHg` : r.kind === 'glucose' ? `${r.glucose_mg_dl} mg/dL (${r.glucose_context})` : `${r.weight_kg} kg`,
+    category: assessReading(r, person)?.category ?? null,
+  }
+  const bp7 = bpAverage(vitals, 7)
+  const bp30 = bpAverage(vitals, 30)
+  const bpPrev30 = bpAverage(vitals, 30, Date.now(), 30)
+  const fasting = vitals.filter((r) => r.glucose_context === 'fasting')
+  const f30 = average(fasting, (r) => r.glucose_mg_dl, 30)
+  const weights = vitals.filter((r) => r.kind === 'weight')
+  return {
+    note: 'home readings entered by the person; categories from AHA/ACC (blood pressure) and ADA (glucose); averages calculated by the app',
+    latest_blood_pressure: describe(latest('blood_pressure')),
+    blood_pressure_average_7_days: bp7 && `${bp7.systolic}/${bp7.diastolic} mmHg (${bp7.count} readings)`,
+    blood_pressure_average_30_days: bp30 && `${bp30.systolic}/${bp30.diastolic} mmHg (${bp30.count} readings)`,
+    blood_pressure_average_previous_30_days: bpPrev30 && `${bpPrev30.systolic}/${bpPrev30.diastolic} mmHg (${bpPrev30.count} readings)`,
+    latest_glucose: describe(latest('glucose')),
+    fasting_glucose_average_30_days: f30 && `${f30.value} mg/dL (${f30.count} readings)`,
+    latest_weight: describe(weights[0]),
+    weight_90_days_ago: weights.length > 1 ? `${weights[weights.length - 1].weight_kg} kg on ${weights[weights.length - 1].measured_at.slice(0, 10)}` : null,
+  }
+}
+
+/** Daily check-ins for the advisor: how often each symptom came up, sleep and mood, last 30 days. */
+function summariseCheckIns(checkIns: { day: string; mood: number | null; sleep_hours: number | null; symptoms: string[] }[]) {
+  if (checkIns.length === 0) return null
+  const counts: Record<string, number> = {}
+  for (const c of checkIns) for (const s of c.symptoms) counts[s] = (counts[s] ?? 0) + 1
+  const sleeps = checkIns.map((c) => c.sleep_hours).filter((h): h is number => h != null)
+  const moods = checkIns.map((c) => c.mood).filter((m): m is number => m != null)
+  const avg = (xs: number[]) => (xs.length ? Math.round((xs.reduce((a, b) => a + b, 0) / xs.length) * 10) / 10 : null)
+  return {
+    days_checked_in: checkIns.length,
+    symptom_days: counts,
+    average_sleep_hours: avg(sleeps),
+    average_mood_1_to_5: avg(moods),
+    recent: checkIns.slice(0, 7).map((c) => ({ day: c.day, mood: c.mood, sleep_hours: c.sleep_hours, symptoms: c.symptoms })),
+  }
+}
+
 /** Loads the user's records and extracts what this question needs. */
 export async function contextFor(question: string, profileId: string, today: string) {
   if (!supabase) throw new Error('no_backend')
-  const [rows, meds, profile, conditions, allergies, followUps, life] = await Promise.all([
+  const [rows, meds, profile, conditions, allergies, followUps, life, vitals, checkIns] = await Promise.all([
     loadConfirmedResults(),
     loadMedications(),
     supabase.from('health_profiles').select('date_of_birth, sex, country, pregnancy_status, smoking_status, height_cm, weight_kg, health_goals, no_known_conditions, no_known_allergies').eq('id', profileId).maybeSingle(),
@@ -53,6 +101,8 @@ export async function contextFor(question: string, profileId: string, today: str
     supabase.from('allergies').select('substance, reaction').eq('status', 'confirmed'),
     supabase.from('follow_up_plans').select('description, due_date').eq('status', 'confirmed').is('completed_at', null),
     supabase.from('lifestyle_events').select('category, title, started_on, ended_on').order('started_on'),
+    loadVitals(90),
+    loadCheckIns(30),
   ])
   const reports = new Map<string, { id: string; date: string; lab: string | null }>()
   for (const r of rows) {
@@ -83,6 +133,11 @@ export async function contextFor(question: string, profileId: string, today: str
     followUps: (followUps.data ?? []).map((f) => ({ text: f.description, due: f.due_date })),
     reports: [...reports.values()].sort((a, b) => a.date.localeCompare(b.date)),
     lifeChanges: life.data ?? [],
+    homeReadings: summariseReadings(vitals, {
+      age: ageFrom(p?.date_of_birth ?? null, today), heightCm: p?.height_cm ?? null,
+      hasDiabetes: (conditions.data ?? []).some((c) => !c.is_family_history && /diabet|سكري/i.test(c.name) && !/pre/i.test(c.name)),
+    }),
+    checkIns: summariseCheckIns(checkIns),
   })
 }
 
@@ -93,7 +148,7 @@ export type AskResult =
 export async function ask(question: string, conversationId: string | null, profileId: string, today: string): Promise<AskResult> {
   if (!supabase) return { ok: false, error: 'no_backend', conversationId, emergency: [] }
   const { context, refs } = await contextFor(question, profileId, today)
-  const { data, error } = await supabase.functions.invoke('advisor', { body: { conversation_id: conversationId, question, context, refs } })
+  const { data, error } = await supabase.functions.invoke('advisor', { body: { profile_id: activeProfileId(), conversation_id: conversationId, question, context, refs } })
   if (error) {
     let body: { error?: string; conversation_id?: string; emergency?: string[] } = {}
     if (error instanceof FunctionsHttpError) {

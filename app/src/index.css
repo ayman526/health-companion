@@ -53,6 +53,11 @@ html[data-discreet] .sensitive:not(.revealed) {
   user-select: none;
   cursor: pointer;
 }
+/* Printouts (the visit summary) are always readable. */
+@media print {
+  html[data-discreet] .sensitive:not(.revealed) { filter: none; }
+  body { background: #fff; }
+}
 
 /* Keep medical values (numbers, units) left-to-right inside Arabic text. */
 .ltr-value {

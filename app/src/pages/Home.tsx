@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../lib/supabase'
-import { Camera, MessageCircleHeart, BellRing, TrendingUp, FileText, ChevronRight, Sparkles, Footprints, UserRound } from 'lucide-react'
+import { Camera, MessageCircleHeart, BellRing, TrendingUp, FileText, ChevronRight, Sparkles, Footprints, UserRound, HeartPulse, ClipboardList, Users } from 'lucide-react'
+import { CheckInCard } from '../components/CheckInCard'
+import { WeeklyCard } from '../components/WeeklyCard'
+import { LatestReadingsCard } from '../components/LatestReadingsCard'
 import { loadProfileDetails, profileCompleteness } from '../lib/profile'
 import { useAuth } from '../auth/AuthProvider'
 import { setInsightStatus, syncInsights, type Insight } from '../lib/insights'
@@ -16,7 +19,7 @@ const HOME_LIMIT = 3
 
 export function HomePage() {
   const { t } = useTranslation()
-  const { profile } = useAuth()
+  const { profile, profiles } = useAuth()
   const [toReview, setToReview] = useState(0)
   const [insights, setInsights] = useState<Insight[] | null>(null)
   const [suggested, setSuggested] = useState(0)
@@ -42,20 +45,30 @@ export function HomePage() {
   const attention = visible.filter((i) => i.kind === 'attention')
   const changes = visible.filter((i) => i.kind === 'change')
   const country = profile?.country ?? 'EG'
-  const greeting = profile?.display_name ? t('home.greetingName', { name: profile.display_name }) : t('home.greeting')
+  const forFamily = profile && profile.relationship !== 'self'
+  const greeting = forFamily
+    ? t('family.healthOf', { name: profile.display_name || t(`family.relationships.${profile.relationship}`) })
+    : profile?.display_name ? t('home.greetingName', { name: profile.display_name }) : t('home.greeting')
 
   return (
     <>
       <PageHeader title={greeting} subtitle={t('home.subtitle')} />
-      <div className="mb-6 grid gap-3 sm:grid-cols-2">
+      <Link to="/family" className="-mt-3 mb-4 inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-4 text-sm font-medium">
+        <Users className="size-4 text-brand-700" aria-hidden />
+        {profiles.length > 1 ? t('family.switchPerson') : t('family.addSomeone')}
+      </Link>
+      <div className="mb-6 grid grid-cols-2 gap-3">
         <Link to="/records/scan" className="flex min-h-14 w-full items-center gap-3 rounded-2xl bg-brand-700 px-4 font-medium text-white">
           <Camera className="size-5 shrink-0" aria-hidden /> {t('actions.scan')}
         </Link>
         <Link to="/advisor" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium">
           <MessageCircleHeart className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('actions.ask')}
         </Link>
-        <Link to="/lifestyle" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium sm:col-span-2">
-          <Footprints className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('lifestyle.homeLink')}
+        <Link to="/vitals" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium">
+          <HeartPulse className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('vitals.logReading')}
+        </Link>
+        <Link to="/lifestyle" className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 font-medium">
+          <Footprints className="size-5 shrink-0 text-brand-700" aria-hidden /> {t('lifestyle.homeShort')}
         </Link>
       </div>
       <div className="grid gap-4">
@@ -73,6 +86,14 @@ export function HomePage() {
           </Link>
         )}
         <TodayCard timeZone={profile?.time_zone ?? 'Africa/Cairo'} />
+        <LatestReadingsCard />
+        <CheckInCard />
+        <WeeklyCard />
+        <Link to="/summary" className="flex min-h-14 items-center gap-3 rounded-2xl border border-brand-100 bg-brand-50 px-4 font-medium text-brand-700">
+          <ClipboardList className="size-5 shrink-0" aria-hidden />
+          <span className="flex-1">{t('summary.homeLink')}</span>
+          <ChevronRight className="size-5 rtl:rotate-180" aria-hidden />
+        </Link>
         <Card title={t('home.attention')}>
           <div className="flex flex-col gap-3">
             {suggested > 0 && (

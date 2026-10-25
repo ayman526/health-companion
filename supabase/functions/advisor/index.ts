@@ -82,6 +82,7 @@ Rules:
 - <records>.person holds what the person chose to share about themselves (age, sex, pregnancy, smoking, height, weight, BMI calculated by the app, goals). Use it only where it matters to the question, e.g. pregnancy for medicine questions or BMI for weight questions, and never comment on anything they left out. Keep their goals in mind when suggesting next steps.
 - If <safety_screen> reports a possible emergency, start direct_answer by telling the person to get emergency care now and give the emergency number, then keep the rest brief.
 - Use "" for empty text fields and [] for empty lists. Keep the whole answer concise.
+- <records>.home_readings and <records>.daily_check_ins are the person's own home measurements and daily check-ins, summarised by the app. One reading never diagnoses anything: prefer the averages, and say so when there are only a few readings. You may point out possible patterns (e.g. headaches on days with higher readings, or readings changing after a medicine or life change started), never causes.
 - Identity: you are the Health Journal assistant. Never name the AI model, company or technology behind you; if asked, say you are the app's AI assistant.
 - Language: answer in the language the person writes in, or in Arabic if they ask for Arabic. Use clear Modern Standard Arabic with common Egyptian medical terms where helpful. Always write numbers with Western digits (0-9) and keep units and test abbreviations (LDL, HbA1c, mg/dL) as in <records>. Set "language" to the language you used.`
 
@@ -139,7 +140,7 @@ Deno.serve(async (req) => {
   const userId = auth?.user?.id
   if (!userId) return json(401, { error: 'unauthorized' })
 
-  let body: { conversation_id?: string | null; question?: string; context?: unknown; refs?: Record<string, { kind: string; target: string; label: string }> }
+  let body: { profile_id?: string | null; conversation_id?: string | null; question?: string; context?: unknown; refs?: Record<string, { kind: string; target: string; label: string }> }
   try {
     body = await req.json()
   } catch {
@@ -149,8 +150,11 @@ Deno.serve(async (req) => {
   const contextJson = JSON.stringify(body.context ?? {})
   if (!question || question.length > MAX_QUESTION || contextJson.length > MAX_CONTEXT) return json(400, { error: 'bad_request' })
 
-  const { data: profile } = await admin.from('health_profiles').select('id, country').eq('owner_id', userId).eq('is_demo', false).maybeSingle()
-  if (!profile) return json(404, { error: 'no_profile' })
+  // The person the question is about: yourself or a family member you keep records for.
+  const { data: people } = await admin.from('health_profiles').select('id, country, relationship').eq('owner_id', userId).eq('is_demo', false)
+  const self = (people ?? []).find((p) => p.relationship === 'self')
+  const profile = (people ?? []).find((p) => p.id === body.profile_id) ?? self
+  if (!profile || !self) return json(404, { error: 'no_profile' })
 
   const { data: consented } = await admin.rpc('has_consent', { p_user_id: userId, p_type: 'ai_processing' })
   if (!consented) return json(403, { error: 'consent_required' })
@@ -163,7 +167,7 @@ Deno.serve(async (req) => {
   }
 
   const emergency = detectEmergency(question)
-  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: profile.id, p_kind: 'advisor_messages', p_limit: MONTHLY_MESSAGE_LIMIT })
+  const { data: allowed } = await admin.rpc('consume_quota', { p_profile_id: self.id, p_kind: 'advisor_messages', p_limit: MONTHLY_MESSAGE_LIMIT })
   if (!allowed) return json(429, { error: 'quota_exceeded' })
 
   if (!conversationId) {

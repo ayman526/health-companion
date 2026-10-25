@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
 import { CONSENT_VERSION } from '../lib/consent'
+import { setActiveProfileId } from '../lib/activeProfile'
 import { loadProfileDetails, saveAllergies, saveConditions, saveFamilyHistory, saveProfileFields } from '../lib/profile'
 import { enablePush, pushState, type PushState } from '../lib/push'
 import { todayIn } from '../lib/medications'
@@ -108,11 +109,14 @@ export function OnboardingPage() {
     )
     if (e1) return false
     const lang = i18n.language === 'ar' ? 'ar' : 'en'
-    const { data, error: e2 } = await supabase.from('health_profiles').upsert(
-      { owner_id: session.user.id, is_demo: false, country: about.country, ui_language: lang, explanation_language: lang, time_zone: timeZone, onboarding_step: 2 },
-      { onConflict: 'owner_id,is_demo' },
-    ).select('id').single()
+    const fields = { country: about.country, ui_language: lang, explanation_language: lang, time_zone: timeZone, onboarding_step: 2 }
+    // Your own profile: reuse it if consent is given again (e.g. after going back), otherwise create it.
+    const { data: existing } = await supabase.from('health_profiles').select('id').eq('relationship', 'self').eq('is_demo', false).maybeSingle()
+    const { data, error: e2 } = existing
+      ? await supabase.from('health_profiles').update(fields).eq('id', existing.id).select('id').single()
+      : await supabase.from('health_profiles').insert({ owner_id: session.user.id, relationship: 'self', ...fields }).select('id').single()
     if (e2) return false
+    setActiveProfileId(data.id)
     setProfileId(data.id)
     return true
   }

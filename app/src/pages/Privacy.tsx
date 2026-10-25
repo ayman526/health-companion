@@ -65,7 +65,7 @@ export function PrivacyPage() {
     if (!profile) return
     setExportError(false)
     try {
-      const blob = await exportMyData(profile.id, session?.user.email, setProgress)
+      const blob = await exportMyData(session?.user.email, setProgress)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
