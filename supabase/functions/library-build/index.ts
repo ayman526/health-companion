@@ -123,7 +123,13 @@ Deno.serve(async (req) => {
   if (!secret || req.headers.get('x-admin-secret') !== secret) return json(401, { error: 'unauthorized' })
   if (req.method !== 'POST') return json(405, { error: 'method_not_allowed' })
 
-  const { url, source_name, extra_urls, store } = await req.json().catch(() => ({}))
+  const { url, source_name, extra_urls, store, action } = await req.json().catch(() => ({}))
+  if (action === 'list') {
+    // For the team to review the library: every card, newest first.
+    const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, { auth: { persistSession: false } })
+    const { data } = await admin.from('library_items').select('*').order('created_at', { ascending: false })
+    return json(200, data ?? [])
+  }
   if (typeof url !== 'string' || !/^https:\/\//.test(url) || typeof source_name !== 'string') return json(400, { error: 'bad_request' })
 
   const main = await fetchHtml(url)
