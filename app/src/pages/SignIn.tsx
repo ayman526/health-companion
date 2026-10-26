@@ -11,7 +11,8 @@ const RESEND_AFTER_S = 60
 /**
  * Sign in with a code sent by email (typed into the app). A code works in the
  * Home Screen app on iPhone, where an email link would open Safari instead.
- * The email also keeps a link, so either works.
+ * The email also keeps a link, so either works. Supabase's built-in emails
+ * only carry the link (editing them needs custom SMTP), so the screen offers both.
  */
 export function SignInPage() {
   const { t, i18n } = useTranslation()
@@ -88,6 +89,7 @@ export function SignInPage() {
             <p className="mt-1 text-sm text-muted">
               {t('auth.sentTo')} <span className="ltr-value font-medium text-ink">{state.email}</span>
             </p>
+            <p className="mt-3 text-sm text-muted">{t('auth.codeHint')}</p>
             <label htmlFor="code" className="sr-only">{t('auth.code')}</label>
             <input
               id="code"
@@ -105,7 +107,6 @@ export function SignInPage() {
             <button type="submit" disabled={verifying || code.length < 6} className="mt-3 min-h-12 w-full rounded-xl bg-brand-700 font-medium text-white disabled:opacity-60">
               {verifying ? t('auth.verifying') : t('auth.verify')}
             </button>
-            <p className="mt-3 text-xs text-muted">{t('auth.codeHint')}</p>
             <div className="mt-2 flex flex-wrap justify-between gap-2">
               <button type="button" disabled={wait > 0} onClick={() => void send(state.email)} className="min-h-11 text-sm font-medium text-brand-700 disabled:text-muted">
                 {wait > 0 ? t('auth.resendIn', { s: wait }) : t('auth.resend')}

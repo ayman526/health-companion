@@ -200,8 +200,8 @@
     "email": "Email address",
     "sendLink": "Email me a sign-in code",
     "sending": "Sending…",
-    "checkEmail": "Enter the code from your email",
-    "sentTo": "We sent a sign-in code to",
+    "checkEmail": "Check your email",
+    "sentTo": "We sent a sign-in email to",
     "useDifferentEmail": "Use a different email",
     "error": "We couldn't send the code. Please try again.",
     "notConfigured": "Sign-in isn't available yet: the app isn't connected to its secure backend.",
@@ -221,7 +221,7 @@
     "badCode": "That code didn't work. Check it, or send a new one.",
     "resend": "Send a new code",
     "resendIn": "Send a new code in {{s}}s",
-    "codeHint": "It can take a minute to arrive. Check your spam folder too."
+    "codeHint": "Tap the sign-in link in the email, or type the code here if the email shows one. It can take a minute; check spam too."
   },
   "onboarding": {
     "step": "Step {{n}} of {{total}}",
