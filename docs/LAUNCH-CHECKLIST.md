@@ -12,6 +12,9 @@ Tick items off as you go. **A** must be done before anyone else uses the app. **
   3. Use a sender like `no-reply@yourdomain.com`.
 
   This also unlocks the email reminder fallback.
+  3. Then edit the **Magic Link** and **Confirm signup** templates (Authentication → Emails): paste
+     `docs/email-templates/sign-in-code.html` and set the subject to `Your Health Journal code: {{ .Token }} | رمز الدخول`.
+     Until then the emails carry only the link; the sign-in screen accepts either. Check Email OTP length is 6.
 - [x] **Download my data + Delete my account**: built in the Privacy Center (needs migration 11). Test delete once with a spare email account before launch.
 - [ ] **Rotate `CRON_SECRET`**, because it appeared in a screenshot:
   1. Set a new secret in Supabase Edge Function secrets.
