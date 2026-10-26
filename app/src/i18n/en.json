@@ -242,7 +242,15 @@
     "badCode": "That code didn't work. Check it, or send a new one.",
     "resend": "Send a new code",
     "resendIn": "Send a new code in {{s}}s",
-    "codeHint": "Tap the sign-in link in the email, or type the code here if the email shows one. It can take a minute; check spam too."
+    "codeHint": "Tap the sign-in link in the email, or type the code here if the email shows one. It can take a minute; check spam too.",
+    "promise": "Your health memory in one place",
+    "promiseLine": "Your full medical and treatment history, from the first test to the latest prescription.",
+    "seeExample": "See an example first",
+    "trustLine": "No password · Encrypted · Delete anytime",
+    "signoff": "Stay well",
+    "cardTitle": "HbA1c",
+    "cardMed": "Started Glucophage",
+    "cardExample": "Example"
   },
   "onboarding": {
     "step": "Step {{n}} of {{total}}",
@@ -1867,5 +1875,29 @@
         "cta": "Learn more"
       }
     }
+  },
+  "example": {
+    "banner": "Example, not real data",
+    "close": "Close the example",
+    "next": "Next",
+    "back": "Back",
+    "start": "Start with your records",
+    "nothingSaved": "Nothing in this example is saved.",
+    "stepOf": "Step {{n}} of {{total}}",
+    "captions": {
+      "1": "Every report you photograph becomes organised results.",
+      "2": "See how each test changes, and what changed in your treatment.",
+      "3": "Your medicines and doses, kept with their dates.",
+      "4": "And a reminder at each dose time, every day."
+    },
+    "reportsKept_one": "{{count}} report kept",
+    "reportsKept_other": "{{count}} reports kept",
+    "improved": "Improved from {{from}} to {{to}}",
+    "walking": "Started walking daily",
+    "schedule_one": "1 tablet · once a day at {{times}}",
+    "schedule_other": "1 tablet · {{count}} times a day at {{times}}",
+    "medsNote": "Dose changes are kept too, so you and your doctor can see your full treatment history.",
+    "remindersNote": "Reminders also work for family members you look after.",
+    "bandNote": "Shaded area: the normal range printed on the report."
   }
 }

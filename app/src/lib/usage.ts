@@ -19,3 +19,10 @@ export function track(event: UsageEvent) {
   // Fire and forget: counting must never slow down or break the app.
   void supabase?.rpc('track_event', { p_event: event }).then(() => undefined, () => undefined)
 }
+
+export type PublicEvent = 'example_opened' | 'example_step_2' | 'example_step_3' | 'example_step_4' | 'example_start_clicked' | 'signin_code_requested'
+
+/** Counts from signed-out screens (sign-in and the example). Same rules: counts only. */
+export function trackPublic(event: PublicEvent) {
+  void supabase?.rpc('track_public_event', { p_event: event }).then(() => undefined, () => undefined)
+}

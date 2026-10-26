@@ -22,6 +22,11 @@ interface Dashboard {
 }
 
 const GROUPS: { title: string; events: [string, string][] }[] = [
+  { title: 'Before sign-in', events: [
+    ['example_opened', 'Example opened'], ['example_step_2', 'Example: reached test history'], ['example_step_3', 'Example: reached medicines'],
+    ['example_step_4', 'Example: reached your day'], ['example_start_clicked', '"Start with your records" from the example'],
+    ['signin_code_requested', 'Sign-in emails requested'],
+  ] },
   { title: 'First action after sign-up', events: [
     ['first_action_report', 'Scan a lab report'], ['first_action_prescription', 'Scan a prescription or box'],
     ['first_action_medicine', 'Add a medicine'], ['first_action_reading', 'Log a reading'], ['first_action_explore', 'Look around first'],
