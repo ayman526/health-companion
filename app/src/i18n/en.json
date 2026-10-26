@@ -466,7 +466,9 @@
       "learned": "remembered from your earlier reports",
       "catalog": "recognized",
       "ai_suggested": "suggested by AI",
-      "manual": "chosen by you"
+      "manual": "chosen by you",
+      "shared": "known name, confirmed by other users",
+      "close": "close spelling, check it"
     },
     "labMarked": "Lab marked: {{flag}}",
     "aiMatchUnit": "Looks like {{test}}, but the unit doesn't fit. Pick the test if you're sure.",

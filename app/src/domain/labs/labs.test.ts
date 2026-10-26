@@ -317,3 +317,46 @@ describe('significance and safety rules', () => {
     expect(guidelineFindings(test('glucose'), point('glucose', 50, 'mg/dL'))[0].level).toBe('urgent')
   })
 })
+
+describe('matching printed names', () => {
+  it('ignores list numbering and bullets in front of a name', () => {
+    expect(matchTest('3. S. Creatinine')?.code).toBe('creatinine')
+    expect(matchTest('• Triglycerides')?.code).toBe('triglycerides')
+  })
+
+  it('accepts a one-letter typo only when the unit fits, and flags it as close', () => {
+    expect(matchTest('Creatinin', null, undefined, { unit: 'mg/dL' })).toEqual({ code: 'creatinine', source: 'close' })
+    expect(matchTest('Creatinin', null, undefined, { unit: 'U/L' })).toBeNull()
+    expect(matchTest('Creatinin')).toBeNull() // no unit, no guess
+  })
+
+  it('never guesses short codes from a typo', () => {
+    expect(matchTest('TGG', null, undefined, { unit: 'mg/dL' })).toBeNull()
+  })
+
+  it('uses names shared by other users after its own list', () => {
+    const shared = new Map([['s uric acid level', 'uric_acid'], ['lipid x', 'not_a_test']])
+    expect(matchTest('S Uric Acid Level', null, undefined, { shared })?.code).toBe('uric_acid')
+    expect(matchTest('Lipid X', null, undefined, { shared })).toBeNull() // unknown codes are ignored
+  })
+})
+
+describe('catalog kept in step with the reading service', () => {
+  it('offers the AI exactly the tests the app knows', async () => {
+    const { readFileSync } = await import('node:fs')
+    const { resolve } = await import('node:path')
+    const server = readFileSync(resolve(__dirname, '../../../../supabase/functions/extract-document/index.ts'), 'utf8')
+    const list = server.slice(server.indexOf('const CATALOG'), server.indexOf('const CATALOG_CODES'))
+    const codes = [...list.matchAll(/\['([a-z0-9_]+)',/g)].map((m) => m[1]).sort()
+    expect(codes).toEqual(LAB_TESTS.map((t) => t.code).sort())
+  })
+})
+
+describe('section headings', () => {
+  it('reads RBCs, pus cells and pH under a urine heading as urine values', () => {
+    expect(matchTest('RBCs', null, undefined, { section: 'Urine Analysis', unit: '/HPF' })?.code).toBe('urine_rbc')
+    expect(matchTest('RBCs', null, undefined, { section: 'Complete Blood Count' })?.code).toBe('rbc')
+    expect(matchTest('pH', null, undefined, { section: 'تحليل البول' })?.code).toBe('urine_ph')
+    expect(matchTest('Pus cells', null, undefined, { section: 'Urine Analysis' })?.code).toBe('urine_pus')
+  })
+})

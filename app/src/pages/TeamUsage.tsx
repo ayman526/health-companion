@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { PageHeader } from '../components/ui'
+import { LAB_TESTS } from '../domain/labs/catalog'
 
 // Team-only usage dashboard (English only: it is for the team, not users).
 // Data comes from usage_dashboard(), which returns counts and percentages
@@ -90,6 +91,10 @@ export function TeamUsagePage() {
   const [data, setData] = useState<Dashboard | null>(null)
   const [denied, setDenied] = useState(false)
   const [interest, setInterest] = useState<{ plan: string; country: string; people: number }[]>([])
+  const [match, setMatch] = useState<{ total: number; matched: number; prev_total: number; prev_matched: number; shared_names: number } | null>(null)
+  const [unknown, setUnknown] = useState<{ name: string; seen: number }[]>([])
+  const [picks, setPicks] = useState<Record<string, string>>({})
+  const loadUnknown = () => supabase?.rpc('unrecognized_names_top', { p_limit: 30 }).then(({ data: d }) => setUnknown((d as typeof unknown | null) ?? []))
 
   useEffect(() => {
     if (!supabase) return
@@ -99,6 +104,8 @@ export function TeamUsagePage() {
       else setData(d as Dashboard)
     })
     void supabase.rpc('plan_interest_counts').then(({ data: d }) => setInterest((d as typeof interest | null) ?? []))
+    void supabase.rpc('match_rate', { p_days: days }).then(({ data: d }) => setMatch(d as typeof match))
+    void loadUnknown()
   }, [days])
 
   if (denied) return <p className="rounded-2xl border border-line bg-surface p-4 text-sm">This page is for the Health Journal team.</p>
@@ -159,6 +166,37 @@ export function TeamUsagePage() {
               </section>
             )
           })}
+
+          <section className="rounded-2xl border border-line bg-surface p-4">
+            <h2 className="mb-1 font-semibold">Test names: matching</h2>
+            <p className="mb-3 text-xs text-muted">Confirmed lab results matched to a known test. Unmatched ones still get a history, but no ranges or comparisons.</p>
+            {match && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <Tile label="Matched automatically" value={pct(match.matched, match.total)} note={`${match.matched} of ${match.total} results`} />
+                <Tile label="Previous period" value={pct(match.prev_matched, match.prev_total)} note={`${match.prev_matched} of ${match.prev_total}`} />
+                <Tile label="Shared names" value={match.shared_names} note="from users (3+) or the team" />
+              </div>
+            )}
+            <h3 className="mb-1 mt-4 text-sm font-semibold">Unmatched names, most frequent first</h3>
+            <p className="mb-2 text-xs text-muted">Pick the test and add it: everyone's next reports will match it. Names only, never values or people.</p>
+            {unknown.length === 0 ? <p className="text-sm text-muted">Nothing unmatched right now.</p> : (
+              <ul className="flex flex-col divide-y divide-line">
+                {unknown.map((u) => (
+                  <li key={u.name} className="flex flex-wrap items-center gap-2 py-2 text-sm">
+                    <span className="min-w-0 flex-1 truncate font-medium">{u.name} <span className="font-normal text-muted">· {u.seen}×</span></span>
+                    <select className="min-h-10 max-w-[12rem] rounded-lg border border-line bg-surface px-2 text-sm" value={picks[u.name] ?? ''} onChange={(e) => setPicks({ ...picks, [u.name]: e.target.value })}>
+                      <option value="">Choose test…</option>
+                      {[...LAB_TESTS].sort((a, b) => a.name.en.localeCompare(b.name.en)).map((t) => <option key={t.code} value={t.code}>{t.name.en}</option>)}
+                    </select>
+                    <button type="button" disabled={!picks[u.name]} onClick={async () => { await supabase?.rpc('team_add_alias', { p_name: u.name, p_test_code: picks[u.name] }); void loadUnknown() }}
+                      className="min-h-10 rounded-lg bg-brand-700 px-3 text-sm font-medium text-white disabled:opacity-40">Add</button>
+                    <button type="button" onClick={async () => { await supabase?.rpc('team_dismiss_unrecognized', { p_name: u.name }); void loadUnknown() }}
+                      className="min-h-10 rounded-lg border border-line px-3 text-sm">Not a test</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
           <section className="rounded-2xl border border-line bg-surface p-4">
             <h2 className="mb-2 font-semibold">Early-access list (all time)</h2>

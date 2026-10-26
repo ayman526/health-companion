@@ -20,7 +20,7 @@ declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void }
 // values - typically handwriting), the document is read again by Opus.
 // The ai_settings table ('scan' row) can change both models and the limit.
 const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: 'claude-opus-5-5', monthlyLimit: 15, enabled: true }
-const PROMPT_VERSION = 'extract-2026-10-24.5'
+const PROMPT_VERSION = 'extract-2026-10-28.1'
 const MAX_PDF_PAGES = 20
 // The API accepts images up to 5 MB; the app uploads a downsized reading copy for larger photos.
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -131,6 +131,26 @@ const CATALOG: [string, string][] = [
   ['folate', 'Folate (folic acid)'],
   ['hcv_ab', 'Hepatitis C antibody'],
   ['hbsag', 'Hepatitis B surface antigen'],
+  ['fsh', 'FSH (follicle-stimulating hormone)'],
+  ['lh', 'LH (luteinizing hormone)'],
+  ['estradiol', 'Estradiol (E2)'],
+  ['progesterone', 'Progesterone'],
+  ['amh', 'AMH (anti-Mullerian hormone)'],
+  ['afp', 'AFP (alpha-fetoprotein)'],
+  ['cea', 'CEA (carcinoembryonic antigen)'],
+  ['ca125', 'CA-125'],
+  ['ca199', 'CA 19-9'],
+  ['troponin_hs', 'High-sensitivity troponin I'],
+  ['d_dimer', 'D-dimer'],
+  ['hcv_rna', 'Hepatitis C RNA / PCR (viral load)'],
+  ['hbv_dna', 'Hepatitis B DNA / PCR (viral load)'],
+  ['hiv', 'HIV 1/2 antigen/antibody (qualitative)'],
+  ['mpv', 'MPV (mean platelet volume)'],
+  ['pdw', 'PDW (platelet distribution width)'],
+  ['urine_pus', 'Urine pus cells / WBC per HPF (urine microscopy)'],
+  ['urine_rbc', 'Urine red blood cells per HPF (urine microscopy)'],
+  ['urine_sg', 'Urine specific gravity'],
+  ['urine_ph', 'Urine pH'],
 ]
 const CATALOG_CODES = [...CATALOG.map(([code]) => code), 'unknown']
 
@@ -252,6 +272,8 @@ Rules:
 - Use an empty string "" for any text or number field that is not on the document. Use "none" for value_comparator and lab_flag when they don't apply.
 - value_as_printed is the result exactly as shown, including symbols. value_number is the same number written with digits 0-9, "." as the decimal point and no thousands separators (e.g. "4.5", "1250"), or "" for non-numeric results such as "Negative". For "<5" use value_number "5" and value_comparator "<".
 - A reference range printed as "3.5 - 5.1" gives ref_low "3.5" and ref_high "5.1"; "< 200" gives ref_high "200" and ref_low "". Same number format as value_number. Put the range exactly as printed in ref_text.
+- section: the heading the result is printed under, exactly as printed (for example "Lipid Profile", "Complete Blood Count", "Urine Analysis", "وظائف الكبد"), or "".
+- Use the section to read short or ambiguous names: "TG" under a lipid heading is triglycerides; "RBCs", "WBCs"/"Pus cells" or "pH" under a urine heading are urine microscopy/urine values, not the blood count; "HB" under a blood count is hemoglobin.
 - catalog_code: the code from the catalog below that is the same test (same analyte AND same kind of measurement), or "unknown". Do not pick a code for a related but different test: fasting vs random glucose, direct vs total bilirubin, free vs total T4, a ratio vs its components, urine vs blood. When unsure, use "unknown".
 - Reference ranges printed in several levels (for example lipids: "Desirable < 200, Borderline 200-239, High >= 240"): use the desirable/normal level for ref_low and ref_high, put the full printed text in ref_text, and add "ref_low" and "ref_high" to uncertain_fields if it is not clear which level is the normal one. Ranges given only for another sex or age group than stated on the report: leave ref_low/ref_high empty and keep ref_text.
 - lab_flag only when the document marks the result (H, L, *, "High", "Critical", bold or coloured flags). Do not set flags yourself by comparing with the range.

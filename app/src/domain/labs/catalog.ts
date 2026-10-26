@@ -673,6 +673,132 @@ export const LAB_TESTS: LabTest[] = [
     aliases: ['hbsag', 'hbs ag', 'hepatitis b surface antigen', 'australia antigen', 'فيروس بي'],
     canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
   },
+  // ---------------------------------------------------------------- fertility and hormones
+  {
+    code: 'fsh', loinc: ['15067-2'], category: 'hormones',
+    name: { en: 'FSH', ar: 'هرمون FSH' },
+    aliases: ['fsh', 'follicle stimulating hormone', 'follicle-stimulating hormone', 's fsh', 'هرمون منشط الحويصلة'],
+    canonicalUnit: 'mIU/mL', units: { 'miu/ml': same, 'iu/l': same, 'mu/ml': same }, direction: 'in_range',
+  },
+  {
+    code: 'lh', loinc: ['10501-5'], category: 'hormones',
+    name: { en: 'LH', ar: 'هرمون LH' },
+    aliases: ['lh', 'luteinizing hormone', 'luteinising hormone', 's lh', 'الهرمون المنشط للجسم الأصفر'],
+    canonicalUnit: 'mIU/mL', units: { 'miu/ml': same, 'iu/l': same, 'mu/ml': same }, direction: 'in_range',
+  },
+  {
+    code: 'estradiol', loinc: ['2243-4'], category: 'hormones',
+    name: { en: 'Estradiol (E2)', ar: 'هرمون الإستراديول' },
+    aliases: ['estradiol', 'e2', 'oestradiol', 'estradiol e2', 'الاستراديول'],
+    canonicalUnit: 'pg/mL', units: { 'pg/ml': same, 'ng/l': same, 'pmol/l': { scale: 0.2724 } }, direction: 'in_range',
+  },
+  {
+    code: 'progesterone', loinc: ['2839-9'], category: 'hormones',
+    name: { en: 'Progesterone', ar: 'هرمون البروجسترون' },
+    aliases: ['progesterone', 'prog', 'البروجسترون', 'بروجسترون'],
+    canonicalUnit: 'ng/mL', units: { 'ng/ml': same, 'ug/l': same, 'nmol/l': { scale: 0.3145 } }, direction: 'in_range',
+  },
+  {
+    code: 'amh', loinc: ['38476-3'], category: 'hormones',
+    name: { en: 'AMH', ar: 'هرمون AMH (مخزون المبيض)' },
+    aliases: ['amh', 'anti mullerian hormone', 'anti-mullerian hormone', 'anti müllerian hormone', 'مخزون المبيض'],
+    canonicalUnit: 'ng/mL', units: { 'ng/ml': same, 'ug/l': same, 'pmol/l': { scale: 0.14 } }, direction: 'in_range',
+  },
+  // ---------------------------------------------------------------- tumor markers
+  {
+    code: 'afp', loinc: ['1834-1'], category: 'other',
+    name: { en: 'AFP (alpha-fetoprotein)', ar: 'دلالة الأورام AFP' },
+    aliases: ['afp', 'alpha fetoprotein', 'alpha-fetoprotein', 'a fetoprotein', 'alfa fetoprotein'],
+    canonicalUnit: 'ng/mL', units: { 'ng/ml': same, 'ug/l': same }, direction: 'lower_better',
+  },
+  {
+    code: 'cea', loinc: ['2039-6'], category: 'other',
+    name: { en: 'CEA', ar: 'دلالة الأورام CEA' },
+    aliases: ['cea', 'carcinoembryonic antigen', 'carcino embryonic antigen'],
+    canonicalUnit: 'ng/mL', units: { 'ng/ml': same, 'ug/l': same }, direction: 'lower_better',
+  },
+  {
+    code: 'ca125', loinc: ['10334-1'], category: 'other',
+    name: { en: 'CA-125', ar: 'دلالة الأورام CA-125' },
+    aliases: ['ca 125', 'ca125', 'ca-125', 'cancer antigen 125'],
+    canonicalUnit: 'U/mL', units: { 'u/ml': same, 'ku/l': same }, direction: 'lower_better',
+  },
+  {
+    code: 'ca199', loinc: ['24108-3'], category: 'other',
+    name: { en: 'CA 19-9', ar: 'دلالة الأورام CA 19-9' },
+    aliases: ['ca 19 9', 'ca19 9', 'ca 199', 'ca19-9', 'ca 19-9', 'cancer antigen 19 9'],
+    canonicalUnit: 'U/mL', units: { 'u/ml': same, 'ku/l': same }, direction: 'lower_better',
+  },
+  // ---------------------------------------------------------------- heart and clotting
+  {
+    code: 'troponin_hs', loinc: ['89579-7'], category: 'muscle',
+    name: { en: 'High-sensitivity troponin I', ar: 'التروبونين عالي الحساسية' },
+    aliases: ['hs troponin', 'hs troponin i', 'high sensitivity troponin', 'high sensitive troponin i', 'troponin i hs', 'hs ctni', 'troponin i', 'troponin', 'التروبونين'],
+    canonicalUnit: 'ng/L', units: { 'ng/l': same, 'pg/ml': same, 'ng/ml': { scale: 1000 } }, direction: 'lower_better',
+  },
+  {
+    code: 'd_dimer', loinc: ['48065-7'], category: 'coagulation',
+    name: { en: 'D-dimer', ar: 'دي دايمر' },
+    aliases: ['d dimer', 'd-dimer', 'ddimer', 'دي دايمر'],
+    canonicalUnit: 'ug/mL FEU', units: { 'ug/ml': same, 'mg/l': same, 'ugfeu/ml': same, 'ug/mlfeu': same, 'mg/lfeu': same, 'ng/ml': { scale: 0.001 }, 'ng/mlfeu': { scale: 0.001 } }, direction: 'lower_better',
+  },
+  // ---------------------------------------------------------------- viral tests
+  {
+    code: 'hcv_rna', loinc: ['11011-4'], category: 'infection',
+    name: { en: 'Hepatitis C PCR (viral load)', ar: 'تحليل فيروس سي PCR' },
+    aliases: ['hcv rna', 'hcv pcr', 'hcv quantitative pcr', 'hcv viral load', 'hcv rna quantitative', 'pcr فيروس سي', 'تحليل pcr لفيروس سي'],
+    canonicalUnit: 'IU/mL', units: { 'iu/ml': same }, direction: 'lower_better',
+  },
+  {
+    code: 'hbv_dna', loinc: ['29615-2'], category: 'infection',
+    name: { en: 'Hepatitis B DNA (viral load)', ar: 'تحليل فيروس بي PCR' },
+    aliases: ['hbv dna', 'hbv pcr', 'hbv viral load', 'hbv dna quantitative', 'pcr فيروس بي'],
+    canonicalUnit: 'IU/mL', units: { 'iu/ml': same }, direction: 'lower_better',
+  },
+  {
+    code: 'hiv', loinc: ['56888-1'], category: 'infection',
+    name: { en: 'HIV test', ar: 'تحليل HIV' },
+    aliases: ['hiv', 'hiv 1 2', 'hiv i ii', 'hiv ag ab', 'hiv 1/2 ag/ab', 'hiv antibody', 'anti hiv', 'hiv combo', 'الإيدز'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  // ---------------------------------------------------------------- more blood count
+  {
+    code: 'mpv', loinc: ['32623-1'], category: 'cbc',
+    name: { en: 'MPV (mean platelet volume)', ar: 'متوسط حجم الصفائح' },
+    aliases: ['mpv', 'mean platelet volume', 'متوسط حجم الصفائح الدموية'],
+    canonicalUnit: 'fL', units: { 'fl': same }, direction: 'in_range',
+  },
+  {
+    code: 'pdw', loinc: ['32207-3'], category: 'cbc',
+    name: { en: 'PDW (platelet distribution width)', ar: 'توزيع حجم الصفائح' },
+    aliases: ['pdw', 'platelet distribution width'],
+    canonicalUnit: 'fL', units: { 'fl': same }, direction: 'in_range',
+  },
+  // ---------------------------------------------------------------- urine analysis
+  {
+    code: 'urine_pus', loinc: ['5821-4'], category: 'urine',
+    name: { en: 'Urine pus cells (WBC)', ar: 'خلايا الصديد في البول' },
+    aliases: ['pus cells', 'pus', 'urine pus cells', 'urine wbc', 'leucocytes urine', 'wbcs urine', 'pus cells hpf', 'صديد', 'خلايا صديد', 'خلايا الصديد'],
+    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+  },
+  {
+    code: 'urine_rbc', loinc: ['13945-1'], category: 'urine',
+    name: { en: 'Urine red blood cells', ar: 'كرات الدم الحمراء في البول' },
+    aliases: ['urine rbcs', 'urine rbc', 'rbcs urine', 'red cells urine', 'كرات دم حمراء في البول'],
+    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+  },
+  {
+    code: 'urine_sg', loinc: ['5811-5'], category: 'urine',
+    name: { en: 'Urine specific gravity', ar: 'كثافة البول' },
+    aliases: ['specific gravity', 'sp gravity', 'sp gr', 'urine specific gravity', 'الكثافة النوعية', 'كثافة البول'],
+    canonicalUnit: '', units: { '': same }, direction: 'in_range',
+  },
+  {
+    code: 'urine_ph', loinc: ['5803-2'], category: 'urine',
+    name: { en: 'Urine pH', ar: 'حموضة البول' },
+    aliases: ['urine ph', 'ph urine', 'reaction ph', 'حموضة البول'],
+    canonicalUnit: '', units: { '': same }, direction: 'in_range',
+  },
 ]
 
 const BY_CODE = new Map(LAB_TESTS.map((t) => [t.code, t]))
@@ -711,6 +837,7 @@ export function normalizeName(name: string): string {
     .replace(/[أإآ]/g, 'ا')
     .replace(/ة/g, 'ه')
     .replace(/ى/g, 'ي')
+    .replace(/^\s*(\d{1,2}\s*[-.)]|[•▪●◦*-])\s+/, '') // list numbering or bullets in front of the name
     .replace(/\./g, '')
     .replace(/#/g, ' absolute ') // "Neutrophils #" is the absolute count, not the percentage
     .replace(/[-_/:,;*]+/g, ' ')
@@ -744,16 +871,69 @@ for (const t of LAB_TESTS) {
 const LOINC_INDEX = new Map<string, string>()
 for (const t of LAB_TESTS) for (const l of t.loinc) LOINC_INDEX.set(l, t.code)
 
-export type MatchSource = 'learned' | 'catalog' | 'ai_suggested'
+// learned: the person's own earlier matches · catalog: the built-in list · shared: a name
+// several people confirmed, or the team added · close: one letter off a known name (always
+// shown for a check) · ai_suggested: what the reading model proposed · manual: chosen by hand.
+export type MatchSource = 'learned' | 'catalog' | 'shared' | 'close' | 'ai_suggested'
+
+/** Edit distance, stopping early once it's over `max`. */
+function withinEdits(a: string, b: string, max: number): boolean {
+  if (Math.abs(a.length - b.length) > max) return false
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j)
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i]
+    let best = i
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+      best = Math.min(best, cur[j])
+    }
+    if (best > max) return false
+    prev = cur
+  }
+  return prev[b.length] <= max
+}
+
+/** A known name one letter away (typo or OCR slip), only if exactly one test is that close. */
+function closeMatch(keys: string[]): string | null {
+  const found = new Set<string>()
+  for (const k of keys) {
+    if (k.length < 6) continue // short codes (TG, HB) are too easy to confuse
+    for (const [alias, code] of ALIAS_INDEX) if (alias.length >= 6 && withinEdits(k, alias, 1)) found.add(code)
+  }
+  return found.size === 1 ? [...found][0] : null
+}
 
 /**
  * Deterministic match: the user's own learned names first, then LOINC, then
- * catalog names. Returns null rather than guessing.
+ * catalog names, then names shared by other users or the team, then a
+ * one-letter-off spelling, but only when the result's unit fits that test.
+ * Returns null rather than guessing.
  */
 export function matchTest(
   reportedName: string,
   loinc?: string | null,
   learned?: ReadonlyMap<string, string>,
+  opts: { shared?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean; section?: string | null } = {},
+): { code: string; source: MatchSource } | null {
+  const found = matchByName(reportedName, loinc, learned, opts)
+  // Under a urine heading, "RBCs", "WBCs" and "pH" are the urine values, not the blood count.
+  if (opts.section && URINE_SECTION.test(normalizeName(opts.section))) {
+    const keys = nameKeys(reportedName)
+    const urine = (found && IN_URINE[found.code]) ?? keys.map((k) => IN_URINE_BY_NAME[k]).find(Boolean)
+    if (urine) return { code: urine, source: found?.source ?? 'catalog' }
+  }
+  return found
+}
+
+const URINE_SECTION = /urine|urinalysis|بول/
+const IN_URINE: Record<string, string> = { rbc: 'urine_rbc', wbc: 'urine_pus' }
+const IN_URINE_BY_NAME: Record<string, string> = { ph: 'urine_ph', 'reaction': 'urine_ph', sg: 'urine_sg' }
+
+function matchByName(
+  reportedName: string,
+  loinc: string | null | undefined,
+  learned: ReadonlyMap<string, string> | undefined,
+  opts: { shared?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean },
 ): { code: string; source: MatchSource } | null {
   const keys = nameKeys(reportedName)
   if (learned) {
@@ -761,6 +941,15 @@ export function matchTest(
   }
   if (loinc && LOINC_INDEX.has(loinc)) return { code: LOINC_INDEX.get(loinc)!, source: 'catalog' }
   for (const k of keys) if (ALIAS_INDEX.has(k)) return { code: ALIAS_INDEX.get(k)!, source: 'catalog' }
+  if (opts.shared) {
+    for (const k of keys) if (opts.shared.has(k) && BY_CODE.has(opts.shared.get(k)!)) return { code: opts.shared.get(k)!, source: 'shared' }
+  }
+  const close = closeMatch(keys)
+  if (close) {
+    const test = BY_CODE.get(close)!
+    const fits = opts.numeric === false ? !!test.qualitative : opts.unit != null && opts.unit !== '' && unitFits(test, opts.unit)
+    if (fits) return { code: close, source: 'close' }
+  }
   return null
 }
 

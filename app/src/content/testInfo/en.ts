@@ -538,4 +538,130 @@ export const TEST_INFO_EN: Record<string, TestInfo> = {
     positive: 'A positive result means a current hepatitis B infection. Your doctor will arrange further tests and follow-up.',
     helps: 'A negative result with no vaccination history may be a reason to ask about the hepatitis B vaccine.',
   },
+
+  // ---------------------------------------------------------------- fertility and hormones
+  fsh: {
+    about: 'FSH is a hormone from the pituitary gland that helps control periods, egg development and sperm production.',
+    high: 'In women, high FSH can be a sign that the ovaries are slowing down, as happens near menopause. In men, it can point to a testicle problem. The meaning depends on age and the day of your cycle.',
+    low: 'Low FSH can mean the pituitary gland is sending fewer signals. Your doctor will read it together with LH and other hormones.',
+    helps: 'Note the day of your cycle when the sample was taken; your doctor needs it to read the result.',
+  },
+  lh: {
+    about: 'LH is a pituitary hormone that triggers ovulation in women and testosterone production in men.',
+    high: 'High LH can be normal around ovulation or after menopause. Outside those times it can be linked to conditions like PCOS or a testicle problem.',
+    low: 'Low LH can mean the pituitary gland is sending fewer signals.',
+    helps: 'Note the day of your cycle. Your doctor usually reads LH together with FSH.',
+  },
+  estradiol: {
+    about: 'Estradiol is the main form of estrogen. Its level changes a lot during the menstrual cycle.',
+    high: 'Higher levels are normal at some points of the cycle and in pregnancy. Otherwise your doctor may look for a cause.',
+    low: 'Low levels are normal after menopause. Earlier in life they can affect periods and bone health.',
+    helps: 'Your doctor will read the result with the day of your cycle and your symptoms.',
+  },
+  progesterone: {
+    about: 'Progesterone prepares the womb for pregnancy and rises after ovulation.',
+    high: 'High levels are normal after ovulation and in pregnancy.',
+    low: 'A low level in the second half of the cycle can mean ovulation didn’t happen that month. In pregnancy, your doctor will follow it closely.',
+    helps: 'The day of your cycle matters a lot for this test. Tell your doctor when the sample was taken.',
+  },
+  amh: {
+    about: 'AMH reflects how many eggs remain in the ovaries (ovarian reserve).',
+    high: 'High AMH is common with PCOS.',
+    low: 'Low AMH means a smaller egg reserve. It doesn’t mean pregnancy is impossible; a fertility doctor can explain what it means for you.',
+    helps: 'AMH naturally falls with age. Your doctor will read it together with your age and other tests.',
+  },
+  // ---------------------------------------------------------------- tumor markers
+  afp: {
+    about: 'AFP is a protein made by the liver (and by a baby during pregnancy). It is used to follow some liver conditions.',
+    high: 'High AFP can be linked to liver disease, pregnancy or, less often, some tumors. One result is never a diagnosis on its own.',
+    low: 'A low result is normal.',
+    helps: 'If it’s high, your doctor will decide on follow-up tests or imaging.',
+  },
+  cea: {
+    about: 'CEA is a protein used mainly to follow some cancers that are already known, especially of the bowel.',
+    high: 'CEA can be raised by smoking, inflammation and liver disease as well as cancer. It isn’t used on its own to diagnose anything.',
+    low: 'A low result is normal.',
+    helps: 'Your doctor looks at how CEA changes over time more than at a single value.',
+  },
+  ca125: {
+    about: 'CA-125 is a protein used mainly to follow ovarian conditions that are already known.',
+    high: 'It can rise with periods, endometriosis, fibroids, pregnancy and inflammation, not only cancer. One result isn’t a diagnosis.',
+    low: 'A low result is normal.',
+    helps: 'Your doctor will read it with your symptoms and imaging, and often repeat it.',
+  },
+  ca199: {
+    about: 'CA 19-9 is a protein used mainly to follow some cancers of the pancreas and bile ducts that are already known.',
+    high: 'It can also rise with bile-duct blockage, pancreatitis and other non-cancer conditions.',
+    low: 'A low result is normal.',
+    helps: 'Your doctor looks at the trend over time and other tests, not one value.',
+  },
+  // ---------------------------------------------------------------- heart and clotting
+  troponin_hs: {
+    about: 'Troponin is released when heart muscle is injured. It is used to check for heart attack.',
+    high: 'A raised troponin needs medical attention. With chest pain, shortness of breath or sweating, call emergency services now.',
+    low: 'A low result is normal.',
+    helps: 'Troponin is usually tested in hospital, often twice a few hours apart.',
+  },
+  d_dimer: {
+    about: 'D-dimer is a fragment released when a blood clot breaks down.',
+    high: 'A raised D-dimer can mean a clot somewhere in the body, but it also rises with age, pregnancy, infection and after surgery. Your doctor decides if more tests are needed.',
+    low: 'A normal result makes a recent clot unlikely.',
+    helps: 'With leg swelling, chest pain or shortness of breath, get medical care right away.',
+  },
+  // ---------------------------------------------------------------- viral tests
+  hcv_rna: {
+    about: 'This test measures the amount of hepatitis C virus in the blood (viral load). It shows whether the infection is active.',
+    high: 'Detectable virus means an active infection. Hepatitis C is curable with modern treatment.',
+    low: 'An undetectable result after treatment usually means the treatment worked.',
+    helps: 'Your doctor uses this test before, during and after treatment.',
+  },
+  hbv_dna: {
+    about: 'This test measures the amount of hepatitis B virus in the blood (viral load).',
+    high: 'A higher viral load can mean the virus is more active. Your doctor uses it to decide on treatment.',
+    low: 'A low or undetectable level is the goal of treatment.',
+    helps: 'Regular follow-up with your doctor matters, even when you feel well.',
+  },
+  hiv: {
+    about: 'This test looks for HIV antibodies and antigen in the blood.',
+    positive: 'A positive screening result always needs a confirmatory test. HIV is a manageable long-term condition with modern treatment.',
+    helps: 'Talk to your doctor about the confirmatory test and support. Your results are private.',
+  },
+  // ---------------------------------------------------------------- more blood count
+  mpv: {
+    about: 'MPV is the average size of your platelets, the cells that help blood clot.',
+    high: 'Larger platelets are often younger ones, which can happen when the body is making more of them.',
+    low: 'Smaller platelets can be seen with some bone-marrow conditions. Your doctor reads it with your platelet count.',
+    helps: 'MPV on its own rarely matters; your doctor looks at the whole blood count.',
+  },
+  pdw: {
+    about: 'PDW shows how much your platelets vary in size.',
+    high: 'More variation can be seen when the body is making many new platelets.',
+    low: 'A low value is usually not a concern.',
+    helps: 'PDW is read together with the platelet count and MPV.',
+  },
+  // ---------------------------------------------------------------- urine analysis
+  urine_pus: {
+    about: 'Pus cells are white blood cells seen in urine under the microscope.',
+    high: 'More pus cells can be a sign of a urinary tract infection or inflammation, especially with burning or frequent urination.',
+    low: 'A few pus cells are normal.',
+    helps: 'Drink enough water. If you have symptoms, your doctor may ask for a urine culture before treatment.',
+  },
+  urine_rbc: {
+    about: 'This counts red blood cells seen in urine under the microscope.',
+    high: 'Blood in the urine can come from infection, stones, exercise or a period. It should be checked by your doctor if it doesn’t clear.',
+    low: 'A few red cells are normal.',
+    helps: 'Avoid testing during a period or after heavy exercise; your doctor may repeat it.',
+  },
+  urine_sg: {
+    about: 'Specific gravity shows how concentrated your urine is.',
+    high: 'Concentrated urine is common when you haven’t drunk much water.',
+    low: 'Very diluted urine is common after drinking a lot. Persistently low values can be linked to kidney or hormone conditions.',
+    helps: 'It changes through the day with how much you drink.',
+  },
+  urine_ph: {
+    about: 'Urine pH shows how acidic or alkaline your urine is.',
+    high: 'More alkaline urine can come from diet, some infections or some medications.',
+    low: 'More acidic urine can come from diet, dehydration or some conditions such as diabetes that isn’t well controlled.',
+    helps: 'Diet affects urine pH a lot. Your doctor reads it with the rest of the urine test.',
+  },
 }

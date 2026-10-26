@@ -155,3 +155,36 @@ describe('hand-over', () => {
     await expect(as(OTHER, null, () => q('select share_respond($1, true)', [t.id]))).rejects.toThrow(/already has records/)
   })
 })
+
+describe('shared test names', () => {
+  it('a name becomes known for everyone once 3 different accounts match it the same way', async () => {
+    const vote = (user: string, profile: string) =>
+      as(user, profile, () => q(`insert into test_aliases (profile_id, alias_key, test_code) values ($1, 's uric acid level', 'uric_acid')`, [profile]))
+    await q(`insert into unrecognized_test_names (name_key, seen_count) values ('s uric acid level', 4)`)
+    await vote(MOM, MOM_P)
+    await vote(SON, SON_P)
+    expect(await as(SON, null, () => q('select * from global_test_aliases'))).toEqual([])
+    await vote(OTHER, OTHER_P)
+    expect(await as(SON, null, () => q('select alias_key, test_code, source from global_test_aliases'))).toEqual([
+      { alias_key: 's uric acid level', test_code: 'uric_acid', source: 'community' },
+    ])
+    expect(await q(`select * from unrecognized_test_names where name_key = 's uric acid level'`)).toEqual([])
+    // Nobody can see who voted.
+    await expect(as(SON, null, () => q('select * from alias_votes'))).rejects.toThrow(/permission denied/)
+  })
+
+  it('only the team can see unmatched names, add them, and read the match rate', async () => {
+    await q(`insert into unrecognized_test_names (name_key) values ('hb electrophoresis')`)
+    await expect(as(SON, null, () => q('select unrecognized_names_top(10)'))).rejects.toThrow(/not allowed/)
+    await expect(as(SON, null, () => q(`select team_add_alias('x', 'alt')`))).rejects.toThrow(/not allowed/)
+    await q('insert into team_members (user_id) values ($1)', [SON])
+    const top = (await as(SON, null, () => q('select unrecognized_names_top(10) as t')))[0].t as { name: string }[]
+    expect(top.map((r) => r.name)).toContain('hb electrophoresis')
+    await as(SON, null, () => q(`select team_add_alias('hb electrophoresis', 'hemoglobin')`))
+    expect((await q(`select source from global_test_aliases where alias_key = 'hb electrophoresis'`))[0]).toEqual({ source: 'team' })
+    const rate = (await as(SON, null, () => q('select match_rate(30) as r')))[0].r as Record<string, number>
+    expect(rate).toHaveProperty('total')
+    expect(rate.shared_names).toBeGreaterThanOrEqual(2)
+    await q('delete from team_members')
+  })
+})

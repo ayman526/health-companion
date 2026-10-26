@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle, CheckCircle2, ChevronDown, ExternalLink, Plus, Trash2 } from 'lucide-react'
@@ -67,7 +67,7 @@ function unitProblem(r: DraftResult) {
 /** A row the user doesn't need to look at: read clearly, matched, valid. */
 function isClear(r: DraftResult) {
   return (
-    r.needs_confirmation.length === 0 && !!r.test_code && !unitProblem(r) &&
+    r.needs_confirmation.length === 0 && !!r.test_code && r.source !== 'close' && !unitProblem(r) &&
     !isBadNumber(r.value) && !isBadNumber(r.ref_low) && !isBadNumber(r.ref_high) &&
     (r.value.trim() !== '' || r.value_text.trim() !== '') && r.reported_name.trim() !== ''
   )
@@ -82,6 +82,8 @@ export function ReviewPage() {
   const lang = i18n.language === 'ar' ? 'ar' : 'en'
 
   const [loading, setLoading] = useState(true)
+  // Names known for matching while the person edits: their own and the shared list.
+  const names = useRef<{ learned: ReadonlyMap<string, string>; shared: ReadonlyMap<string, string> }>({ learned: new Map(), shared: new Map() })
   const [report, setReport] = useState<ReportRow | null>(null)
   const [docUrl, setDocUrl] = useState<{ url: string; isImage: boolean } | null>(null)
   const [labName, setLabName] = useState('')
@@ -110,17 +112,20 @@ export function ReviewPage() {
       const [{ data: res }, { data: aliases }] = await Promise.all([
         supabase
           .from('laboratory_results')
-          .select('id, test_code, reported_name, value_numeric, value_comparator, value_text, unit, ref_low, ref_high, ref_text, lab_flag, needs_confirmation')
+          .select('id, test_code, reported_name, value_numeric, value_comparator, value_text, unit, ref_low, ref_high, ref_text, lab_flag, needs_confirmation, note')
           .eq('report_id', reportId)
           .eq('status', 'draft')
           .order('created_at'),
         supabase.from('test_aliases').select('alias_key, test_code'),
       ])
+      const { data: sharedRows } = await supabase.from('global_test_aliases').select('alias_key, test_code')
       const learned = new Map((aliases ?? []).map((a) => [a.alias_key, a.test_code]))
+      const shared = new Map((sharedRows ?? []).map((a) => [a.alias_key, a.test_code]))
+      names.current = { learned, shared }
 
       const loaded = (res ?? []).map((r): DraftResult => {
         // Deterministic match first (learned names, catalog); then the AI suggestion if its unit fits.
-        const det = matchTest(r.reported_name, null, learned)
+        const det = matchTest(r.reported_name, null, learned, { shared, unit: r.unit, numeric: r.value_numeric != null, section: r.note })
         const suggested = r.test_code ? getTest(r.test_code) : undefined
         const suggestionFits = !!suggested && (r.value_numeric == null || unitFits(suggested, r.unit))
         const code = det?.code ?? (suggestionFits ? suggested.code : '')
@@ -290,7 +295,7 @@ export function ReviewPage() {
               className={field('reported_name')}
               value={r.reported_name}
               onChange={(e) => {
-                const det = r.source === 'manual' ? null : matchTest(e.target.value)
+                const det = r.source === 'manual' ? null : matchTest(e.target.value, null, names.current.learned, { shared: names.current.shared, unit: r.unit, numeric: r.value.trim() !== '' })
                 update(r.key, det ? { reported_name: e.target.value, test_code: det.code, source: det.source } : { reported_name: e.target.value })
               }}
             />
