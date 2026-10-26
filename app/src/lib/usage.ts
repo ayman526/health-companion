@@ -9,6 +9,7 @@ export type UsageEvent =
   | 'visit_added' | 'visit_prep_opened' | 'visit_followup_done'
   | 'summary_printed' | 'summary_shared' | 'checkup_accepted' | 'checkup_done'
   | 'reading_logged' | 'reading_photo_used' | 'checkin_saved' | 'advisor_asked' | 'report_scanned'
+  | 'push_prompt_shown' | 'push_prompt_enabled' | 'push_prompt_dismissed' | 'push_test_sent'
 
 export function track(event: UsageEvent) {
   // Fire and forget: counting must never slow down or break the app.

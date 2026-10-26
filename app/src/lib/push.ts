@@ -72,3 +72,28 @@ export async function deliveryChannels(): Promise<{ push: boolean; email: boolea
   const { data, error } = await supabase.functions.invoke('send-reminders', { method: 'GET' })
   return error ? null : (data as { push: boolean; email: boolean; whatsapp: boolean })
 }
+
+/** Sends a test notification to this account's devices. */
+export async function sendTestPush(): Promise<boolean> {
+  if (!supabase) return false
+  const { data, error } = await supabase.functions.invoke('send-reminders', { body: { action: 'test' } })
+  return !error && !!(data as { sent?: boolean } | null)?.sent
+}
+
+const PROMPT_KEY = 'hc.pushPromptDismissedAt'
+const PROMPT_SNOOZE_DAYS = 7
+export function pushPromptSnoozed() {
+  try {
+    const at = Number(localStorage.getItem(PROMPT_KEY))
+    return !!at && Date.now() - at < PROMPT_SNOOZE_DAYS * 86_400_000
+  } catch {
+    return false
+  }
+}
+export function snoozePushPrompt() {
+  try {
+    localStorage.setItem(PROMPT_KEY, String(Date.now()))
+  } catch {
+    // private mode: the card simply shows again next time
+  }
+}

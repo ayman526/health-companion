@@ -816,7 +816,12 @@
       "light": "Light",
       "dark": "Dark"
     },
-    "themeSystemHint": "Follows your phone's light or dark setting."
+    "themeSystemHint": "Follows your phone's light or dark setting.",
+    "testPush": "Send a test notification",
+    "testSent": "Sent. It should appear in a few seconds.",
+    "testFailed": "Couldn't send. Turn notifications off and on again on this device.",
+    "followup": "Remind me once more if I haven't logged a dose",
+    "followupHint": "30 minutes after the reminder, by phone notification only."
   },
   "suggestions": {
     "title": "Suggested checkups",
@@ -1617,5 +1622,11 @@
       "ai_unavailable": "Couldn't understand that right now. Please try again, or log by hand."
     },
     "privacy": "Your browser's speech service (Google on Android, Apple on iPhone) turns your voice into text. Prefer not to? Type instead."
+  },
+  "pushPrompt": {
+    "title": "Get reminded on your phone",
+    "body": "Turn on notifications so medicine times reach you even when the app is closed. They never show medicine names.",
+    "enable": "Turn on",
+    "notNow": "Not now"
   }
 }

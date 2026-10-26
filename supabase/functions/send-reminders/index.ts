@@ -1,6 +1,11 @@
 // send-reminders: delivers due medication doses and reminders (SPEC.md §9).
 //
-// POST (from pg_cron, header x-cron-secret): sends what is due.
+// POST (from pg_cron, header x-cron-secret): sends what is due, then one
+//   follow-up for doses still not logged 30 minutes after their notification.
+// POST { action: 'dose', dose, status, exp, sig }: a "Taken" / "In 30 min" button
+//   on a notification. No user token there, so the notification carries a
+//   signature over the dose id and an expiry, made with a server-only key.
+// POST { action: 'test' } with the user's JWT: a test notification to their devices.
 // GET: which channels are configured, as booleans (no secrets), for the settings screen.
 //
 // Order per item: web push → WhatsApp → email (email for reminders only, not every dose).
@@ -33,16 +38,75 @@ const TEXT = {
     title: 'Health Journal', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.',
     familyDose: 'Medicine time for someone you care for. Open the app to log it.', vital: 'Time to log today\'s reading.', summary: 'Your weekly summary is ready.',
     visitPrep: 'You have a doctor visit tomorrow. Prepare your visit summary.', visitFollowup: 'How did your visit go? Update what the doctor changed.',
+    followup: 'Did you take your medicine? Tap to log it.', familyFollowup: 'Was the medicine taken for someone you care for? Tap to log it.',
+    taken: 'Taken', snooze: 'In 30 min', loggedTaken: 'Logged as taken ✓', loggedSnoozed: 'We\'ll remind you again in 30 minutes.',
+    test: 'Notifications are working. Your reminders will appear like this.',
   },
   ar: {
     title: 'سجلك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.',
     familyDose: 'حان موعد دواء لشخص ترعاه. افتح التطبيق لتسجيله.', vital: 'حان وقت تسجيل قراءتك اليوم.', summary: 'ملخصك الأسبوعي جاهز.',
     visitPrep: 'لديك زيارة للطبيب غدًا. جهّز ملخص الزيارة.', visitFollowup: 'كيف كانت زيارتك؟ سجّل ما غيّره الطبيب.',
+    followup: 'هل أخذت دواءك؟ اضغط لتسجيله.', familyFollowup: 'هل أُخذ الدواء لمن ترعاه؟ اضغط لتسجيله.',
+    taken: 'أخذته', snooze: 'بعد 30 دقيقة', loggedTaken: 'تم التسجيل ✓', loggedSnoozed: 'سنذكّرك مرة أخرى بعد 30 دقيقة.',
+    test: 'الإشعارات تعمل. ستصلك التذكيرات بهذا الشكل.',
   },
 }
 
 type Due = { kind: 'dose' | 'reminder'; item_id: string; profile_id: string; owner_id: string; due_at: string }
 type Outcome = { channel: 'push' | 'email' | 'whatsapp' | 'in_app'; status: 'sent' | 'failed'; error?: string }
+
+// ---------------------------------------------------------------- notification buttons
+const ACTION_TTL_S = 12 * 3600
+const b64url = (bytes: ArrayBuffer) => btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+async function sign(doseId: string, exp: number) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(`dose-action:${env('SUPABASE_SERVICE_ROLE_KEY')}`), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  return b64url(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${doseId}.${exp}`)))
+}
+function sameString(a: string, b: string) {
+  if (a.length !== b.length) return false
+  let diff = 0
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  return diff === 0
+}
+/** Buttons for a dose notification; the service worker posts the signed action back here. */
+async function doseButtons(doseId: string, lang: 'en' | 'ar') {
+  const exp = Math.floor(Date.now() / 1000) + ACTION_TTL_S
+  return {
+    actions: [{ action: 'taken', title: TEXT[lang].taken }, { action: 'snooze', title: TEXT[lang].snooze }],
+    action_request: { url: `${env('SUPABASE_URL')}/functions/v1/send-reminders`, dose: doseId, exp, sig: await sign(doseId, exp) },
+    done: { taken: TEXT[lang].loggedTaken, snooze: TEXT[lang].loggedSnoozed },
+  }
+}
+
+async function handleDoseAction(admin: SupabaseClient, body: Record<string, unknown>) {
+  const dose = String(body.dose ?? '')
+  const exp = Number(body.exp)
+  const status = body.status === 'taken' ? 'taken' : body.status === 'snooze' ? 'snoozed' : null
+  if (!/^[0-9a-f-]{36}$/.test(dose) || !Number.isFinite(exp) || !status) return json(400, { error: 'bad_request' })
+  if (exp < Date.now() / 1000) return json(410, { error: 'expired' })
+  if (!sameString(String(body.sig ?? ''), await sign(dose, exp))) return json(401, { error: 'unauthorized' })
+  // Same fields as log_dose(); only a dose still waiting can be changed from a notification.
+  const { data, error } = await admin.from('medication_dose_logs').update({
+    status, recorded_at: new Date().toISOString(), self_reported: true,
+    snoozed_until: status === 'snoozed' ? new Date(Date.now() + 30 * 60_000).toISOString() : null,
+    ...(status === 'snoozed' ? { notified_at: null } : {}),
+  }).eq('id', dose).in('status', ['pending', 'snoozed']).select('id')
+  if (error) return json(500, { error: 'save_failed' })
+  if (data?.length) await admin.rpc('track_server_event', { p_event: status === 'taken' ? 'push_action_taken' : 'push_action_snoozed' })
+  console.log(JSON.stringify({ event: 'dose_action', status, changed: !!data?.length }))
+  return json(200, { ok: true, changed: !!data?.length })
+}
+
+async function handleTest(admin: SupabaseClient, req: Request) {
+  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
+  const { data: auth } = await admin.auth.getUser(token)
+  if (!auth?.user) return json(401, { error: 'unauthorized' })
+  const { data: profile } = await admin.from('health_profiles').select('ui_language').eq('owner_id', auth.user.id).eq('relationship', 'self').eq('is_demo', false).maybeSingle()
+  const lang: 'en' | 'ar' = profile?.ui_language === 'ar' ? 'ar' : 'en'
+  const result = await sendPush(admin, auth.user.id, { title: TEXT[lang].title, body: TEXT[lang].test, tag: 'test', url: '/settings' })
+  console.log(JSON.stringify({ event: 'push_test', status: result?.status ?? 'no_device' }))
+  return json(200, { sent: result?.status === 'sent', reason: result ? result.error ?? null : 'no_device' })
+}
 
 async function sendPush(admin: SupabaseClient, ownerId: string, payload: object): Promise<Outcome | null> {
   if (!channels().push) return null
@@ -121,7 +185,7 @@ async function deliver(admin: SupabaseClient, due: Due[]) {
         : (rk === 'visit_prep' || rk === 'visit_followup') && visit ? `/visits/${visit}` : '/reminders'
       const outcomes: Outcome[] = []
       const push = prefs?.push_enabled !== false
-        ? await sendPush(admin, ownerId, { title: TEXT[lang].title, body, tag: item.item_id, url })
+        ? await sendPush(admin, ownerId, { title: TEXT[lang].title, body, tag: item.item_id, url, ...(item.kind === 'dose' ? await doseButtons(item.item_id, lang) : {}) })
         : null
       if (push) outcomes.push(push)
       const pushed = push?.status === 'sent'
@@ -150,22 +214,52 @@ async function deliver(admin: SupabaseClient, due: Due[]) {
   return sentCount
 }
 
+/** One gentle follow-up (phone notification only) for doses still not logged. */
+async function sendFollowups(admin: SupabaseClient) {
+  const { data } = await admin.rpc('due_followups', { p_limit: 200 })
+  let sent = 0
+  for (const d of (data ?? []) as { item_id: string; profile_id: string; owner_id: string }[]) {
+    // Mark first so a slow run can never send it twice.
+    const { data: claimed } = await admin.from('medication_dose_logs').update({ followup_sent_at: new Date().toISOString() })
+      .eq('id', d.item_id).is('followup_sent_at', null).eq('status', 'pending').select('id')
+    if (!claimed?.length) continue
+    const [{ data: profile }, { data: person }] = await Promise.all([
+      admin.from('health_profiles').select('ui_language').eq('owner_id', d.owner_id).eq('relationship', 'self').eq('is_demo', false).maybeSingle(),
+      admin.from('health_profiles').select('relationship').eq('id', d.profile_id).maybeSingle(),
+    ])
+    const lang: 'en' | 'ar' = profile?.ui_language === 'ar' ? 'ar' : 'en'
+    const body = person?.relationship && person.relationship !== 'self' ? TEXT[lang].familyFollowup : TEXT[lang].followup
+    const o = await sendPush(admin, d.owner_id, { title: TEXT[lang].title, body, tag: d.item_id, url: '/', ...(await doseButtons(d.item_id, lang)) })
+    if (!o) continue
+    await admin.from('reminder_deliveries').insert({ profile_id: d.profile_id, dose_log_id: d.item_id, channel: o.channel, status: o.status, error: o.error ?? null })
+    if (o.status === 'sent') {
+      sent++
+      await admin.rpc('track_server_event', { p_event: 'push_followup_sent' })
+    }
+  }
+  return sent
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method === 'GET') return json(200, channels())
   if (req.method !== 'POST') return json(405, { error: 'method_not_allowed' })
 
-  const secret = env('CRON_SECRET')
-  if (!secret || req.headers.get('x-cron-secret') !== secret) return json(401, { error: 'unauthorized' })
-
   if (channels().push) webpush.setVapidDetails(env('VAPID_SUBJECT') || 'mailto:support@example.com', env('VAPID_PUBLIC_KEY'), env('VAPID_PRIVATE_KEY'))
   const admin = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } })
+  const body = await req.json().catch(() => ({})) as Record<string, unknown>
+  if (body.action === 'dose') return handleDoseAction(admin, body)
+  if (body.action === 'test') return handleTest(admin, req)
+
+  const secret = env('CRON_SECRET')
+  if (!secret || req.headers.get('x-cron-secret') !== secret) return json(401, { error: 'unauthorized' })
   const { data, error } = await admin.rpc('due_notifications', { p_limit: 200 })
   if (error) {
     console.error(JSON.stringify({ event: 'due_query_failed', code: error.code }))
     return json(500, { error: 'due_query_failed' })
   }
   const sent = await deliver(admin, (data ?? []) as Due[])
-  console.log(JSON.stringify({ event: 'reminders_run', due: (data ?? []).length, sent }))
-  return json(200, { due: (data ?? []).length, sent })
+  const followups = channels().push ? await sendFollowups(admin) : 0
+  console.log(JSON.stringify({ event: 'reminders_run', due: (data ?? []).length, sent, followups }))
+  return json(200, { due: (data ?? []).length, sent, followups })
 })

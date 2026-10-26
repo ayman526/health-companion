@@ -9,6 +9,7 @@ import { photoUrls } from '../lib/medicationPhotos'
 import { currentSchedule, loadMedications, type MedicationRow } from '../lib/medications'
 import { useScheduleText } from '../components/ScheduleSummary'
 import { EmptyState, PageHeader } from '../components/ui'
+import { PushPrompt } from '../components/PushPrompt'
 
 export function MedicationsPage() {
   const { t, i18n } = useTranslation()
@@ -42,6 +43,7 @@ export function MedicationsPage() {
   return (
     <>
       <PageHeader title={t('medications.title')} />
+      <PushPrompt className="mb-4" />
       <div className="mb-4 grid gap-3 sm:grid-cols-2">
         <Link to="/medications/new" className="flex min-h-14 items-center gap-3 rounded-2xl bg-brand-700 px-4 font-medium text-white">
           <Plus className="size-5" aria-hidden /> {t('actions.addMedication')}

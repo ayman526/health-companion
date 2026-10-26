@@ -7,7 +7,8 @@ import { InstallPrompt } from '../components/InstallPrompt'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
-import { deliveryChannels, disablePush, enablePush, pushState, type PushState } from '../lib/push'
+import { deliveryChannels, disablePush, enablePush, pushState, sendTestPush, type PushState } from '../lib/push'
+import { track } from '../lib/usage'
 import { CONSENT_VERSION } from '../lib/consent'
 import { findRepeatingReminder, setRepeatingReminder } from '../lib/daily'
 import { PageHeader } from '../components/ui'
@@ -39,6 +40,8 @@ export function SettingsPage() {
   const [prefs, setPrefs] = useState<Prefs>({ email_enabled: true, whatsapp_enabled: false, whatsapp_number: '' })
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState(false)
+  const [test, setTest] = useState<'sending' | 'sent' | 'failed' | null>(null)
+  const [followup, setFollowup] = useState(true)
 
   useEffect(() => {
     void pushState().then(setPush)
@@ -47,8 +50,28 @@ export function SettingsPage() {
     if (supabase) {
       void supabase.from('notification_preferences').select('email_enabled, whatsapp_enabled, whatsapp_number').maybeSingle()
         .then(({ data }) => data && setPrefs({ ...data, whatsapp_number: data.whatsapp_number ?? '' }))
+      // Separate read: the column arrives with migration 16.
+      void supabase.from('notification_preferences').select('dose_followup').maybeSingle()
+        .then(({ data }) => data && setFollowup(data.dose_followup !== false))
     }
   }, [])
+
+  async function sendTest() {
+    setTest('sending')
+    const ok = await sendTestPush()
+    setTest(ok ? 'sent' : 'failed')
+    if (ok) track('push_test_sent')
+  }
+
+  async function saveFollowup(on: boolean) {
+    if (!supabase) return
+    setFollowup(on)
+    const { error: e } = await supabase.from('notification_preferences').upsert({ user_id: userId, dose_followup: on, updated_at: new Date().toISOString() })
+    if (e) {
+      setFollowup(!on)
+      setError(true)
+    }
+  }
 
   async function savePrefs(next: Prefs) {
     if (!supabase) return
@@ -116,8 +139,21 @@ export function SettingsPage() {
               <p className="text-sm text-muted">{push ? t(`settings.pushState.${push}`) : t('auth.loading')}</p>
               <InstallPrompt variant="inline" />
               {push === 'off' && <button type="button" onClick={async () => setPush(await enablePush(userId))} className="mt-2 min-h-11 rounded-xl bg-brand-700 px-4 text-sm font-medium text-white">{t('settings.enablePush')}</button>}
-              {push === 'on' && <button type="button" onClick={async () => setPush(await disablePush(userId))} className="mt-2 min-h-11 rounded-xl border border-line px-4 text-sm font-medium">{t('settings.disablePush')}</button>}
+              {push === 'on' && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button type="button" disabled={test === 'sending'} onClick={() => void sendTest()} className="min-h-11 rounded-xl bg-brand-700 px-4 text-sm font-medium text-white disabled:opacity-60">{t('settings.testPush')}</button>
+                  <button type="button" onClick={async () => setPush(await disablePush(userId))} className="min-h-11 rounded-xl border border-line px-4 text-sm font-medium">{t('settings.disablePush')}</button>
+                </div>
+              )}
+              {test === 'sent' && <p role="status" className="mt-2 text-sm text-status-ok">{t('settings.testSent')}</p>}
+              {test === 'failed' && <p role="alert" className="mt-2 text-sm text-status-urgent">{t('settings.testFailed')}</p>}
             </div>
+            {push === 'on' && (
+              <label className="flex items-start gap-2 text-sm">
+                <input type="checkbox" className="mt-0.5 size-5 accent-brand-700" checked={followup} onChange={(e) => void saveFollowup(e.target.checked)} />
+                <span><span className="font-medium">{t('settings.followup')}</span><span className="block text-muted">{t('settings.followupHint')}</span></span>
+              </label>
+            )}
             <label className="flex items-start gap-2 text-sm">
               <input type="checkbox" className="mt-0.5 size-5 accent-brand-700" checked={prefs.email_enabled} onChange={(e) => void savePrefs({ ...prefs, email_enabled: e.target.checked })} />
               <span><span className="flex items-center gap-1 font-medium"><Mail className="size-4" aria-hidden /> {t('settings.email')} {notReady(channels?.email)}</span><span className="text-muted">{t('settings.emailHint')}</span></span>

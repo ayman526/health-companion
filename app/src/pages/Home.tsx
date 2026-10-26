@@ -11,6 +11,7 @@ import { YourDayCard } from '../components/home/YourDayCard'
 import { WeekTiles } from '../components/home/WeekTiles'
 import { AddButton } from '../components/home/AddButton'
 import { InstallPrompt } from '../components/InstallPrompt'
+import { PushPrompt } from '../components/PushPrompt'
 import { ContextCard } from '../components/ContextCard'
 import { Sheet } from '../components/Sheet'
 import { loadUserTopics } from '../lib/userTopics'
@@ -90,6 +91,7 @@ export function HomePage() {
         )
       )}
 
+      <PushPrompt />
       <InstallPrompt />
 
       <YourDayCard timeZone={profile.time_zone} />

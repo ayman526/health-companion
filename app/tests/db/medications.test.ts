@@ -208,3 +208,36 @@ describe('reminders', () => {
     expect(rows.find((r) => r.id === monthly)).toMatchObject({ status: 'active', due: '2026-12-01 08:00' })
   })
 })
+
+describe('dose follow-ups', () => {
+  it('lists a dose once, 30+ minutes after its notification, only while still pending and with notifications on', async () => {
+    await as(USER_A, () => db.query('select save_medication($1, $2, $3, $4)',
+      [PROFILE_A, { brand_name: 'Followmox' }, { dose_amount: 1, frequency: 'daily', times_of_day: ['08:00'], time_zone: 'Africa/Cairo', reminders_enabled: true }, today()]))
+    const dose = (await db.query<{ id: string }>(
+      `insert into medication_dose_logs (profile_id, schedule_id, scheduled_for, status, notified_at)
+       select $1, s.id, now() - interval '1 hour', 'pending', now() - interval '40 minutes'
+       from medication_schedules s join medications m on m.id = s.medication_id
+       where m.brand_name = 'Followmox' and s.valid_to is null
+       returning id`, [PROFILE_A])).rows[0].id
+    const due = async () => (await db.query<{ item_id: string }>('select item_id from due_followups(50)')).rows.map((r) => r.item_id)
+
+    await db.query(`insert into notification_preferences (user_id, push_enabled) values ($1, false)
+                    on conflict (user_id) do update set push_enabled = false`, [USER_A])
+    expect(await due()).not.toContain(dose)
+
+    await db.query('update notification_preferences set push_enabled = true where user_id = $1', [USER_A])
+    expect(await due()).toContain(dose)
+
+    await db.query('update notification_preferences set dose_followup = false where user_id = $1', [USER_A])
+    expect(await due()).not.toContain(dose)
+    await db.query('update notification_preferences set dose_followup = true where user_id = $1', [USER_A])
+
+    await db.query(`update medication_dose_logs set followup_sent_at = now() where id = $1`, [dose])
+    expect(await due()).not.toContain(dose)
+
+    await db.query(`update medication_dose_logs set followup_sent_at = null, status = 'taken' where id = $1`, [dose])
+    expect(await due()).not.toContain(dose)
+
+    await expect(as(USER_A, () => db.query('select * from due_followups(10)'))).rejects.toThrow(/permission denied/)
+  })
+})
