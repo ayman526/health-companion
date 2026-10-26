@@ -9,6 +9,7 @@ import { formatDose } from '../../domain/medications'
 import { CheckInRow } from '../CheckInCard'
 import { Sheet } from '../Sheet'
 import { useAuth } from '../../auth/AuthProvider'
+import { OfferCard } from '../OfferCard'
 
 /**
  * Today's checklist, showing only what's left: medicines due, today's
@@ -24,7 +25,10 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
   const [showDone, setShowDone] = useState(false)
   const [checkInOpen, setCheckInOpen] = useState(false)
   // Records shared with you as "view only": the list shows, nothing can be ticked.
-  const readOnly = useAuth().profile?.access === 'view'
+  const { profile: person } = useAuth()
+  const readOnly = person?.access === 'view'
+  // A dose not logged for someone you look after is when missed-dose alerts matter.
+  const forSomeoneElse = !!person && person.relationship !== 'self'
 
   const load = useCallback(async () => {
     if (!supabase) return
@@ -137,6 +141,8 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
           <HeartPulse className="size-4" aria-hidden />
         </Link>
       )}
+
+      {forSomeoneElse && finished.some((d) => d.status === 'not_recorded') && <OfferCard moment="missed_dose" className="mt-3" />}
 
       <Sheet open={checkInOpen} onClose={() => { setCheckInOpen(false); void load() }} title={t('checkin.title')}>
         <CheckInRow />

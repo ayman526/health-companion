@@ -37,6 +37,15 @@ const GROUPS: { title: string; events: [string, string][] }[] = [
     ['push_test_sent', 'Test notifications'], ['push_action_taken', '"Taken" tapped on a notification'],
     ['push_action_snoozed', '"In 30 min" tapped'], ['push_followup_sent', 'Follow-ups sent'],
   ] },
+  { title: 'Family Care test', events: [
+    ['family_care_viewed', 'Family Care page viewed'], ['family_care_join_annual', 'Joined: yearly'], ['family_care_join_monthly', 'Joined: monthly'],
+    ['scan_pack_interest', 'Asked for a scan pack'],
+    ['offer_shown_second_person', 'Offer shown: 2nd person'], ['offer_opened_second_person', 'Offer opened: 2nd person'],
+    ['offer_shown_scans', 'Offer shown: out of scans'], ['offer_opened_scans', 'Offer opened: out of scans'],
+    ['offer_shown_missed_dose', 'Offer shown: missed dose'], ['offer_opened_missed_dose', 'Offer opened: missed dose'],
+    ['offer_shown_visit', 'Offer shown: before a visit'], ['offer_opened_visit', 'Offer opened: before a visit'],
+    ['offer_dismissed', 'Offers dismissed'],
+  ] },
   { title: 'Reading cards', events: [
     ['card_shown', 'Cards shown'], ['card_source_opened', 'Source opened'], ['card_helpful', 'Helpful'], ['card_not_relevant', 'Not relevant'],
   ] },
@@ -75,6 +84,7 @@ export function TeamUsagePage() {
   const [days, setDays] = useState(30)
   const [data, setData] = useState<Dashboard | null>(null)
   const [denied, setDenied] = useState(false)
+  const [interest, setInterest] = useState<{ plan: string; country: string; people: number }[]>([])
 
   useEffect(() => {
     if (!supabase) return
@@ -83,6 +93,7 @@ export function TeamUsagePage() {
       if (error) setDenied(true)
       else setData(d as Dashboard)
     })
+    void supabase.rpc('plan_interest_counts').then(({ data: d }) => setInterest((d as typeof interest | null) ?? []))
   }, [days])
 
   if (denied) return <p className="rounded-2xl border border-line bg-surface p-4 text-sm">This page is for the Health Journal team.</p>
@@ -143,6 +154,13 @@ export function TeamUsagePage() {
               </section>
             )
           })}
+
+          <section className="rounded-2xl border border-line bg-surface p-4">
+            <h2 className="mb-2 font-semibold">Early-access list (all time)</h2>
+            {interest.length === 0 ? <p className="text-sm text-muted">Nobody yet.</p> : (
+              <ul>{interest.map((r) => <Bar key={`${r.plan}-${r.country}`} label={`${{ family_annual: 'Family Care yearly', family_monthly: 'Family Care monthly', scan_pack: 'Scan pack' }[r.plan] ?? r.plan} · ${r.country}`} value={r.people} max={Math.max(...interest.map((x) => x.people))} />)}</ul>
+            )}
+          </section>
 
           <section className="rounded-2xl border border-line bg-surface p-4">
             <h2 className="mb-2 font-semibold">Reading cards people reacted to</h2>

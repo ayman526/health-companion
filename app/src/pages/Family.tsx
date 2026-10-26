@@ -8,6 +8,7 @@ import { useAuth, type Relationship } from '../auth/AuthProvider'
 import { ageOn } from '../domain/profileOptions'
 import { PageHeader } from '../components/ui'
 import { fieldClass } from '../components/ProfileFields'
+import { OfferCard } from '../components/OfferCard'
 
 const RELATIONSHIPS: Exclude<Relationship, 'self' | 'shared'>[] = ['parent', 'spouse', 'child', 'sibling', 'grandparent', 'other']
 
@@ -78,6 +79,7 @@ export function FamilyPage() {
   return (
     <>
       <PageHeader title={t('family.title')} subtitle={t('family.subtitle')} />
+      {profiles.filter((x) => x.access === 'owner').length >= 2 && <OfferCard moment="second_person" className="mb-4" />}
       <Link to="/sharing" className="mb-4 flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-sm font-medium">
         <ArrowRightLeft className="size-5 shrink-0 text-brand-700" aria-hidden /> <span className="flex-1">{t('sharing.familyLink')}</span>
       </Link>

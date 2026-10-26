@@ -1807,5 +1807,65 @@
     "viewOnlyAction": "View only: ask them to allow helping if you need to add things.",
     "yourRecords": "your records",
     "showActivityMine": "Show recent activity on your records"
+  },
+  "familyCare": {
+    "title": "Care for the people you love",
+    "subtitle": "Parents, children or anyone you look after, from anywhere.",
+    "benefits": {
+      "alerts": {
+        "title": "Alerts when a dose is missed",
+        "body": "Know straight away if a medicine wasn't logged."
+      },
+      "whatsapp": {
+        "title": "WhatsApp reminders for them",
+        "body": "On the phone of the person you care for, even if they don't use the app."
+      },
+      "summary": {
+        "title": "A weekly family summary",
+        "body": "Blood pressure, sugar and medicines in one calm message."
+      },
+      "people": {
+        "title": "Up to 5 people",
+        "body": "Unlimited report scans and advisor questions."
+      }
+    },
+    "choosePlan": "Choose a plan",
+    "annual": "Yearly",
+    "monthly": "Monthly",
+    "save": "4 months free",
+    "perMonth": "about {{price}} a month",
+    "cancelAnytime": "Cancel anytime",
+    "join": "Join early access",
+    "noCharge": "You won't be charged now. We'll tell you when Family Care opens.",
+    "alwaysFree": "Your own records, reading your results and emergency guidance stay free, always.",
+    "thanksTitle": "You're on the list",
+    "thanksBody": "Thank you. We'll let you know in the app when Family Care opens, with an early-access price.",
+    "thanksCta": "Back to family",
+    "notNow": "Not now",
+    "packButton": "10 scans · {{price}}",
+    "packThanks": "Thanks, we've noted your interest in scan packs.",
+    "settingsLink": "Family Care (early access)",
+    "offers": {
+      "second_person": {
+        "title": "Looking after more than one person?",
+        "body": "Family Care adds missed-dose alerts and WhatsApp reminders for each of them.",
+        "cta": "Learn more"
+      },
+      "scans": {
+        "title": "Need more scans?",
+        "body": "Get a small scan pack, or unlimited scans for the whole family with Family Care.",
+        "cta": "Family Care"
+      },
+      "missed_dose": {
+        "title": "A dose wasn't logged today",
+        "body": "With Family Care, you get an alert on your phone the moment it happens.",
+        "cta": "Turn on alerts"
+      },
+      "visit": {
+        "title": "Visit summary on both phones",
+        "body": "Family Care sends the summary to you and the person you care for, automatically.",
+        "cta": "Learn more"
+      }
+    }
   }
 }

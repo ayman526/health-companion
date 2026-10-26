@@ -12,6 +12,8 @@ export type UsageEvent =
   | 'push_prompt_shown' | 'push_prompt_enabled' | 'push_prompt_dismissed' | 'push_test_sent'
   | 'onboarding_done' | 'first_action_report' | 'first_action_prescription' | 'first_action_medicine' | 'first_action_reading' | 'first_action_explore'
   | 'profile_nudge_shown' | 'profile_nudge_opened' | 'profile_nudge_dismissed'
+  | 'family_care_viewed' | 'family_care_join_annual' | 'family_care_join_monthly' | 'scan_pack_interest' | 'offer_dismissed'
+  | `offer_shown_${'second_person' | 'scans' | 'missed_dose' | 'visit'}` | `offer_opened_${'second_person' | 'scans' | 'missed_dose' | 'visit'}`
 
 export function track(event: UsageEvent) {
   // Fire and forget: counting must never slow down or break the app.

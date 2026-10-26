@@ -10,6 +10,8 @@ import {
 import { CONSENT_VERSION } from '../lib/consent'
 import { PageHeader } from '../components/ui'
 import { track } from '../lib/usage'
+import { OfferCard } from '../components/OfferCard'
+import { joinInterest, price } from '../lib/familyCare'
 
 type Phase =
   | { kind: 'checking' }
@@ -19,15 +21,16 @@ type Phase =
   | { kind: 'reading'; documentId: string }
   | { kind: 'saved_other'; documentId: string }
   | { kind: 'duplicate'; documentId: string }
-  | { kind: 'failed'; message: string; documentId?: string }
+  | { kind: 'failed'; message: string; documentId?: string; quota?: boolean }
 
 const POLL_MS = 3000
 const POLL_LIMIT_MS = 6 * 60 * 1000
 
 export function ScanPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { profile, session } = useAuth()
+  const [packNoted, setPackNoted] = useState(false)
   const [phase, setPhase] = useState<Phase>({ kind: 'checking' })
   const cameraInput = useRef<HTMLInputElement>(null)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -72,7 +75,7 @@ export function ScanPage() {
   async function extract(documentId: string) {
     const outcome = await startExtraction(documentId)
     if (outcome === 'processing') setPhase({ kind: 'reading', documentId })
-    else setPhase({ kind: 'failed', message: t(`scan.start.${outcome}`), documentId })
+    else setPhase({ kind: 'failed', message: t(`scan.start.${outcome}`), documentId, quota: outcome === 'quota_exceeded' })
   }
 
   async function onFile(file: File | undefined) {
@@ -166,12 +169,20 @@ export function ScanPage() {
         {phase.kind === 'failed' && (
           <div role="alert" className="rounded-2xl bg-status-watch-bg p-4 text-sm text-status-watch">
             <p>{phase.message}</p>
-            {phase.documentId && (
+            {phase.documentId && !phase.quota && (
               <button type="button" onClick={() => void extract(phase.documentId!)} className="mt-3 min-h-11 font-medium underline">
                 {t('scan.retry')}
               </button>
             )}
           </div>
+        )}
+        {phase.kind === 'failed' && phase.quota && (
+          <OfferCard moment="scans" className="mt-3" extra={packNoted ? <p className="text-sm">{t('familyCare.packThanks')}</p> : (
+            <button type="button" onClick={async () => session && setPackNoted(await joinInterest(session.user.id, 'scan_pack', 'scans', profile?.country ?? 'EG'))}
+              className="min-h-11 rounded-xl border border-brand-700 px-4 text-sm font-medium">
+              {t('familyCare.packButton', { price: price(profile?.country ?? 'EG', i18n.language, 'pack') })}
+            </button>
+          )} />
         )}
       </div>
 

@@ -9,6 +9,7 @@ import { formatDate } from '../lib/format'
 import { localTime } from '../lib/medications'
 import { track } from '../lib/usage'
 import { PageHeader } from '../components/ui'
+import { OfferCard } from '../components/OfferCard'
 
 /**
  * One doctor visit. Before it: what to prepare. After it: "What did the doctor
@@ -49,6 +50,7 @@ export function VisitPage() {
     <>
       <PageHeader title={visit.title} subtitle={`${formatDate(visit.starts_at, lang, tz)} · ${localTime(visit.starts_at, tz, lang)}${visit.clinician ? ` · ${visit.clinician}` : ''}${visit.location ? ` · ${visit.location}` : ''}`} sensitive />
 
+      {before && Date.parse(visit.starts_at) - Date.now() < 3 * 86_400_000 && <OfferCard moment="visit" className="mb-4" />}
       {before ? (
         <section className="rounded-2xl border border-line bg-surface p-4">
           <h2 className="font-semibold">{t('visits.prepTitle')}</h2>

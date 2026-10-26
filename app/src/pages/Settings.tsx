@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { BarChart3, Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, Moon, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { BarChart3, Bell, HeartHandshake, ChevronRight, Languages, LogOut, Mail, MessageCircle, Moon, ShieldCheck, UserRound, Users } from 'lucide-react'
 import { setThemePref, useThemePref, type ThemePref } from '../lib/theme'
 import { InstallPrompt } from '../components/InstallPrompt'
 import { supabase } from '../lib/supabase'
@@ -186,6 +186,11 @@ export function SettingsPage() {
           </div>
         </Section>
 
+        <Link to="/family-care?from=settings" className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-4">
+          <HeartHandshake className="size-5 shrink-0 text-brand-700" aria-hidden />
+          <span className="flex-1 font-medium">{t('familyCare.settingsLink')}</span>
+          <ChevronRight className="size-4 text-muted rtl:rotate-180" aria-hidden />
+        </Link>
         {team && (
           <Link to="/team/usage" dir="ltr" className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-4">
             <BarChart3 className="size-5 shrink-0 text-brand-700" aria-hidden />
