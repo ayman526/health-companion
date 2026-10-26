@@ -189,13 +189,11 @@ function PromiseCard() {
         <polyline points="10,12 55,16 100,34 145,46 190,60" fill="none" stroke="var(--color-brand-700)" strokeWidth="2" />
         {[[10, 12], [55, 16], [100, 34], [145, 46], [190, 60]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3" fill="var(--color-brand-700)" />)}
       </svg>
-      {/* Years read left to right, like the chart. */}
-      <div dir="ltr" className="relative h-6 text-xs text-muted">
-        <span className="absolute left-0 top-0.5">2024</span>
-        {/* Under the marker line (x = 55 of 200). */}
-        <span dir="auto" className="absolute left-[27.5%] top-0 -translate-x-1/2 whitespace-nowrap rounded-full bg-status-watch-bg px-2 py-0.5 text-status-watch">{t('auth.cardMed')}</span>
-        <span className="absolute right-0 top-0.5">2026</span>
+      {/* Under the marker line (x = 55 of 200); the years read left to right, like the chart. */}
+      <div dir="ltr" className="relative h-6">
+        <span dir="auto" className="absolute left-[27.5%] top-0 -translate-x-1/2 whitespace-nowrap rounded-full bg-status-watch-bg px-2 py-0.5 text-xs text-status-watch">{t('auth.cardMed')}</span>
       </div>
+      <div dir="ltr" className="flex justify-between text-xs text-muted"><span>2024</span><span>2026</span></div>
       <p className="mt-1 text-center text-[11px] text-muted">{t('auth.cardExample')}</p>
     </div>
   )
