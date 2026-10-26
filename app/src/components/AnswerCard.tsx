@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, FileText, LineChart, Pill, Stethoscope, ThumbsDown, ThumbsUp } from 'lucide-react'
+import { AlertTriangle, ChevronDown, FileText, LineChart, MoreHorizontal, Pill, Stethoscope, ThumbsDown, ThumbsUp } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { sendFeedback, type ChatMessage, type Citation } from '../lib/advisor'
 import { SourceChip } from './TrustChips'
@@ -63,6 +63,7 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
   const navigate = useNavigate()
   const [feedback, setFeedback] = useState<string | null>(null)
   const [factsDone, setFactsDone] = useState<Set<number>>(new Set())
+  const [moreOpen, setMoreOpen] = useState(false)
   const a = message.answer
   if (!a) return <p className="sensitive text-sm">{message.text}</p>
   const byId = new Map((message.citations ?? []).map((c) => [c.id, c]))
@@ -99,30 +100,21 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
 
   const section = (title: string, text: string) => text && (
     <section>
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">{title}</h4>
+      <h4 className="text-xs font-semibold text-muted">{title}</h4>
       <p className="sensitive mt-0.5 whitespace-pre-line text-sm">{text}</p>
     </section>
   )
+  // Every record the answer relies on, once, as links under the short answer.
+  const cited = [...new Set(a.record_points.flatMap((p) => p.refs))].map((r) => byId.get(r) ?? { id: r })
+  const hasDetails = a.record_points.length > 0 || !!(a.changes || a.explanation || a.uncertainties || a.next_steps)
 
+  // Short first: the direct answer, its sources, and anything safety-related
+  // stay visible; the longer explanation folds into "Details and next steps".
   return (
-    <article dir={dir} className="space-y-3 rounded-2xl border border-line bg-surface p-4">
-      <p className="sensitive font-medium whitespace-pre-line">{a.direct_answer}</p>
+    <article dir={dir} className="space-y-3 rounded-2xl rounded-ss-md border border-line bg-surface p-4">
+      <p className="sensitive whitespace-pre-line font-semibold leading-relaxed">{a.direct_answer}</p>
 
-      {a.record_points.length > 0 && (
-        <ul className="space-y-2">
-          {a.record_points.map((p, i) => (
-            <li key={i} className="rounded-xl bg-canvas px-3 py-2 text-sm">
-              <p className="sensitive">{p.text}</p>
-              {p.refs.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1.5">{p.refs.map((r) => <CitationChip key={r} c={byId.get(r) ?? { id: r }} />)}</div>}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {section(t('advisor.sections.changes'), a.changes)}
-      {section(t('advisor.sections.explanation'), a.explanation)}
-      {section(t('advisor.sections.uncertainties'), a.uncertainties)}
-      {section(t('advisor.sections.nextSteps'), a.next_steps)}
+      {cited.length > 0 && <div className="flex flex-wrap gap-1.5">{cited.map((c) => <CitationChip key={c.id} c={c} />)}</div>}
 
       {a.warning_signs && (
         <section className="rounded-xl bg-status-watch-bg px-3 py-2 text-sm text-status-watch">
@@ -131,9 +123,11 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
         </section>
       )}
 
-      <p className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${SEE_DOCTOR_STYLE[a.see_doctor]}`}>
-        <Stethoscope className="size-3.5" aria-hidden /> {t(`advisor.seeDoctor.${a.see_doctor}`)}
-      </p>
+      {a.see_doctor !== 'not_needed' && (
+        <p className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ${SEE_DOCTOR_STYLE[a.see_doctor]}`}>
+          <Stethoscope className="size-3.5" aria-hidden /> {t(`advisor.seeDoctor.${a.see_doctor}`)}
+        </p>
+      )}
 
       {flags.includes('unverified_numbers') && <p className="text-xs text-status-watch">{t('advisor.unverifiedNumbers')}</p>}
       {flags.some((f) => f.startsWith('blocked:')) && <p className="text-xs text-muted">{t('advisor.blockedNote')}</p>}
@@ -157,15 +151,47 @@ export function AnswerCard({ message, profileId }: { message: ChatMessage; profi
         </section>
       )}
 
-      <ContextCard topics={answerTopics(message.citations ?? [])} />
+      {hasDetails && (
+        <details className="group border-t border-line pt-2">
+          <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 text-sm font-medium text-muted">
+            {t('advisor.details')}
+            <ChevronDown className="size-4 transition group-open:rotate-180" aria-hidden />
+          </summary>
+          <div className="mt-2 space-y-3">
+            {section(t('advisor.sections.explanation'), a.explanation)}
+            {a.record_points.length > 0 && (
+              <section>
+                <h4 className="text-xs font-semibold text-muted">{t('advisor.sections.fromRecords')}</h4>
+                <ul className="mt-1 space-y-2">
+                  {a.record_points.map((p, i) => (
+                    <li key={i} className="rounded-xl bg-canvas px-3 py-2 text-sm">
+                      <p className="sensitive">{p.text}</p>
+                      {p.refs.length > 0 && <div className="mt-1.5 flex flex-wrap gap-1.5">{p.refs.map((r) => <CitationChip key={r} c={byId.get(r) ?? { id: r }} />)}</div>}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {section(t('advisor.sections.changes'), a.changes)}
+            {section(t('advisor.sections.uncertainties'), a.uncertainties)}
+            {section(t('advisor.sections.nextSteps'), a.next_steps)}
+            <ContextCard topics={answerTopics(message.citations ?? [])} />
+          </div>
+        </details>
+      )}
 
-      <div className="flex flex-wrap items-center gap-1 border-t border-line pt-2" dir="auto">
+      <div className="flex flex-wrap items-center gap-1" dir="auto">
         {feedback ? <p className="text-xs text-muted">{t('advisor.thanks')}</p> : (
           <>
-            <button type="button" aria-label={t('advisor.helpful')} onClick={() => void rate('helpful')} className="grid min-h-11 min-w-11 place-items-center rounded-full text-muted hover:bg-canvas"><ThumbsUp className="size-4" aria-hidden /></button>
-            <button type="button" aria-label={t('advisor.notHelpful')} onClick={() => void rate('not_helpful')} className="grid min-h-11 min-w-11 place-items-center rounded-full text-muted hover:bg-canvas"><ThumbsDown className="size-4" aria-hidden /></button>
-            <button type="button" onClick={() => void rate('inaccurate')} className="min-h-11 rounded-full px-3 text-xs text-muted hover:bg-canvas">{t('advisor.reportInaccurate')}</button>
-            <button type="button" onClick={() => void rate('unsafe')} className="min-h-11 rounded-full px-3 text-xs text-muted hover:bg-canvas">{t('advisor.reportUnsafe')}</button>
+            <button type="button" aria-label={t('advisor.helpful')} onClick={() => void rate('helpful')} className="grid min-h-10 min-w-10 place-items-center rounded-full text-muted hover:bg-canvas"><ThumbsUp className="size-4" aria-hidden /></button>
+            <button type="button" aria-label={t('advisor.notHelpful')} onClick={() => void rate('not_helpful')} className="grid min-h-10 min-w-10 place-items-center rounded-full text-muted hover:bg-canvas"><ThumbsDown className="size-4" aria-hidden /></button>
+            <button type="button" aria-label={t('advisor.reportProblem')} aria-expanded={moreOpen} onClick={() => setMoreOpen((v) => !v)} className="ms-auto grid min-h-10 min-w-10 place-items-center rounded-full text-muted hover:bg-canvas"><MoreHorizontal className="size-4" aria-hidden /></button>
+            {moreOpen && (
+              <div className="flex w-full justify-end gap-2">
+                <button type="button" onClick={() => void rate('inaccurate')} className="min-h-10 rounded-full border border-line px-3 text-xs text-muted">{t('advisor.reportInaccurate')}</button>
+                <button type="button" onClick={() => void rate('unsafe')} className="min-h-10 rounded-full border border-line px-3 text-xs text-muted">{t('advisor.reportUnsafe')}</button>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -14,6 +14,8 @@ export interface AdvisorAnswer {
   conversation_title: string
   conversation_summary: string
   language: 'en' | 'ar'
+  /** Short questions to offer next (absent on answers saved before they existed). */
+  follow_ups?: string[]
 }
 
 const EASTERN = '٠١٢٣٤٥٦٧٨٩'

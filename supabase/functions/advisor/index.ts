@@ -11,7 +11,7 @@ import Anthropic from 'npm:@anthropic-ai/sdk@1.3.0'
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.50.0'
 import { aiSetting, fallbackOptions, type AiSetting, type Model } from '../_shared/aiSettings.ts'
 import { detectEmergency, EMERGENCY_NUMBERS } from './emergency.ts'
-import { cleanCitations, isAnswerShape, safetyIssues, unverifiedNumbers, type AdvisorAnswer, type SafetyIssue } from './validate.ts'
+import { cleanCitations, isAnswerShape, safetyIssues, unverifiedNumbers, westernDigits, type AdvisorAnswer, type SafetyIssue } from './validate.ts'
 
 // Model and monthly limit can be changed in the ai_settings table ('advisor' row).
 const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: null, monthlyLimit: 100, enabled: true }
@@ -31,7 +31,7 @@ const ANSWER_SCHEMA = {
   type: 'object',
   additionalProperties: false,
   required: ['direct_answer', 'explanation', 'record_points', 'changes', 'uncertainties', 'next_steps', 'see_doctor',
-    'warning_signs', 'proposed_facts', 'conversation_title', 'conversation_summary', 'language'],
+    'warning_signs', 'proposed_facts', 'conversation_title', 'conversation_summary', 'language', 'follow_ups'],
   properties: {
     direct_answer: STR,
     explanation: STR,
@@ -54,6 +54,7 @@ const ANSWER_SCHEMA = {
     conversation_title: STR,
     conversation_summary: STR,
     language: { type: 'string', enum: ['en', 'ar'] },
+    follow_ups: { type: 'array', items: STR },
   },
 }
 
@@ -73,6 +74,7 @@ How to answer:
 - see_doctor: not_needed, routine (next visit), soon (days–weeks), urgent (today). Use urgent for critical values or emergency symptoms.
 - warning_signs: symptoms that should prompt urgent care, only when relevant; otherwise "".
 - proposed_facts: health facts the person states in this message that are not in <records> (e.g. "I started metformin in June", an allergy, a symptom, or a life change such as "I started going to the gym" or "I quit smoking" as kind "lifestyle"). Use date YYYY-MM-DD or "". They will be offered to the person to add; never treat them as confirmed.
+- follow_ups: 2 or 3 short questions (at most 8 words each) the person could ask next about their own records, in the answer's language, e.g. "What should I ask my doctor?". No numbers, no requests to change medicines, no requests for a diagnosis.
 - conversation_title: 2–6 words. conversation_summary: one or two sentences of what was discussed, for future reference, without numbers that aren't in <records>.
 
 Rules:
@@ -236,6 +238,13 @@ Deno.serve(async (req) => {
     answer = cleaned.answer
     if (cleaned.dropped.length) flags.push('dropped_citations')
     if (emergency.length) answer = { ...answer, see_doctor: 'urgent' }
+    // Follow-up suggestions: short, no numbers (they aren't checked against the records), none in an emergency.
+    answer = {
+      ...answer,
+      follow_ups: emergency.length ? [] : (answer.follow_ups ?? [])
+        .filter((q) => typeof q === 'string' && q.trim().length > 0 && q.length <= 90 && !/\d/.test(westernDigits(q)))
+        .map((q) => q.trim()).slice(0, 3),
+    }
   } catch (e) {
     let code = e instanceof AdvisorError ? e.code : 'ai_unavailable'
     if (e instanceof Anthropic.RateLimitError) code = 'ai_busy'

@@ -128,7 +128,8 @@
       "explanation": "In plain words",
       "uncertainties": "What we don't know",
       "nextSteps": "Next steps",
-      "warningSigns": "Get urgent care if"
+      "warningSigns": "Get urgent care if",
+      "fromRecords": "From your records"
     },
     "seeDoctor": {
       "not_needed": "No doctor visit needed for this",
@@ -159,6 +160,26 @@
       "crisisBody": "If you're thinking about ending your life or hurting yourself, please reach out now. You don't have to go through this alone.",
       "call": "Call {{number}}",
       "crisisCall": "Crisis line {{number}}"
+    },
+    "shortTitle": "Advisor",
+    "hello": "Ask me about your results and medicines",
+    "trustLine": "Uses only your confirmed records · private to you",
+    "startersTitle": "Suggested from your records",
+    "placeholderShort": "Type your question…",
+    "placeholderFollowUp": "Ask a follow-up…",
+    "speak": "Ask by voice",
+    "stopListening": "Stop listening",
+    "followUps": "Suggested follow-up questions",
+    "details": "Details and next steps",
+    "reportProblem": "Report a problem",
+    "starters": {
+      "test": "Why is my {{test}} outside the normal range?",
+      "report": "Explain my latest report ({{date}})",
+      "medicine": "What is {{name}} for?",
+      "visit": "What should I ask at my visit on {{date}}?",
+      "doctor": "What should I discuss with my doctor?",
+      "summary": "Summarize my health over the last six months",
+      "help": "What can you help me with?"
     }
   },
   "medications": {
