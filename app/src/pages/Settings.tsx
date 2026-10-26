@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, Moon, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { BarChart3, Bell, ChevronRight, Languages, LogOut, Mail, MessageCircle, Moon, ShieldCheck, UserRound, Users } from 'lucide-react'
 import { setThemePref, useThemePref, type ThemePref } from '../lib/theme'
 import { InstallPrompt } from '../components/InstallPrompt'
 import { supabase } from '../lib/supabase'
@@ -42,10 +42,12 @@ export function SettingsPage() {
   const [error, setError] = useState(false)
   const [test, setTest] = useState<'sending' | 'sent' | 'failed' | null>(null)
   const [followup, setFollowup] = useState(true)
+  const [team, setTeam] = useState(false)
 
   useEffect(() => {
     void pushState().then(setPush)
     void deliveryChannels().then(setChannels)
+    void supabase?.rpc('is_team_member').then(({ data }) => setTeam(data === true))
     void findRepeatingReminder('weekly_summary').then((r) => setSunday(!!r))
     if (supabase) {
       void supabase.from('notification_preferences').select('email_enabled, whatsapp_enabled, whatsapp_number').maybeSingle()
@@ -184,6 +186,13 @@ export function SettingsPage() {
           </div>
         </Section>
 
+        {team && (
+          <Link to="/team/usage" dir="ltr" className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-4">
+            <BarChart3 className="size-5 shrink-0 text-brand-700" aria-hidden />
+            <span className="flex-1 font-medium">Usage dashboard (team)</span>
+            <ChevronRight className="size-4 text-muted" aria-hidden />
+          </Link>
+        )}
         <Link to="/privacy" className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface p-4">
           <ShieldCheck className="size-5 shrink-0 text-brand-700" aria-hidden />
           <span className="flex-1"><span className="block font-semibold">{t('privacy.title')}</span><span className="block text-sm text-muted">{t('privacy.settingsHint')}</span></span>

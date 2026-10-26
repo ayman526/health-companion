@@ -241,3 +241,22 @@ describe('dose follow-ups', () => {
     await expect(as(USER_A, () => db.query('select * from due_followups(10)'))).rejects.toThrow(/permission denied/)
   })
 })
+
+describe('team usage dashboard', () => {
+  it('is only for team members and returns counts only', async () => {
+    await db.exec(`alter table auth.users add column if not exists created_at timestamptz not null default now()`)
+    await expect(as(USER_A, () => db.query('select usage_dashboard(30)'))).rejects.toThrow(/not allowed/)
+    await expect(as(USER_A, () => db.query('select * from team_members'))).rejects.toThrow(/permission denied/)
+    expect((await as(USER_A, () => db.query<{ t: boolean }>('select is_team_member() as t'))).rows[0].t).toBe(false)
+
+    await db.query('insert into team_members (user_id) values ($1)', [USER_A])
+    await db.query(`select track_event('advisor_asked')`)
+    const d = (await as(USER_A, () => db.query<{ d: Record<string, unknown> }>('select usage_dashboard(30) as d'))).rows[0].d
+    expect(d.started).toBeGreaterThanOrEqual(2)
+    expect(d.signed_in).toBe(2)
+    expect(d.first_record_any).toBeGreaterThanOrEqual(1) // user A has medicines from the tests above
+    expect(d.events).toEqual(expect.arrayContaining([{ event: 'advisor_asked', total: 1 }]))
+    expect(JSON.stringify(d)).not.toContain(USER_A)
+    await db.query('delete from team_members')
+  })
+})

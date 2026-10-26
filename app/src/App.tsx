@@ -24,6 +24,7 @@ const MedicationDetailPage = lazy(() => import('./pages/MedicationDetail').then(
 const DocumentReviewPage = lazy(() => import('./pages/DocumentReview').then((m) => ({ default: m.DocumentReviewPage })))
 const RemindersPage = lazy(() => import('./pages/Reminders').then((m) => ({ default: m.RemindersPage })))
 const SettingsPage = lazy(() => import('./pages/Settings').then((m) => ({ default: m.SettingsPage })))
+const TeamUsagePage = lazy(() => import('./pages/TeamUsage').then((m) => ({ default: m.TeamUsagePage })))
 const LifestylePage = lazy(() => import('./pages/Lifestyle').then((m) => ({ default: m.LifestylePage })))
 const MedicationEditPage = lazy(() => import('./pages/MedicationEdit').then((m) => ({ default: m.MedicationEditPage })))
 const ProfilePage = lazy(() => import('./pages/Profile').then((m) => ({ default: m.ProfilePage })))
@@ -86,6 +87,7 @@ function Gate() {
         <Route path="timeline" element={<TimelinePage />} />
         <Route path="reminders" element={<RemindersPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="team/usage" element={<TeamUsagePage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="privacy" element={<PrivacyPage />} />
         <Route path="vitals" element={<VitalsPage />} />
