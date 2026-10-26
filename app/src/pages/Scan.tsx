@@ -98,6 +98,7 @@ export function ScanPage() {
   return (
     <>
       <PageHeader title={t('scan.title')} subtitle={t('scan.subtitle')} />
+      {profile?.access === 'view' && <p className="mb-4 rounded-xl bg-canvas px-4 py-3 text-sm text-muted">{t('sharing.viewOnlyAction')}</p>}
 
       {phase.kind === 'needs_consent' && (
         <div className="mb-4 rounded-2xl border border-line bg-surface p-4">

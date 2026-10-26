@@ -156,8 +156,10 @@ Deno.serve(async (req) => {
   // The person the question is about: yourself or a family member you keep records for.
   const { data: people } = await admin.from('health_profiles').select('id, country, relationship').eq('owner_id', userId).eq('is_demo', false)
   const self = (people ?? []).find((p) => p.relationship === 'self')
-  const profile = (people ?? []).find((p) => p.id === body.profile_id) ?? self
-  if (!profile || !self) return json(404, { error: 'no_profile' })
+  const profile = body.profile_id ? (people ?? []).find((p) => p.id === body.profile_id) : self
+  if (!self) return json(404, { error: 'no_profile' })
+  // Records shared with you by another account stay out of the advisor.
+  if (!profile) return json(403, { error: 'not_allowed' })
 
   const { data: consented } = await admin.rpc('has_consent', { p_user_id: userId, p_type: 'ai_processing' })
   if (!consented) return json(403, { error: 'consent_required' })

@@ -531,14 +531,23 @@ Deno.serve(async (req) => {
   }
   if (typeof documentId !== 'string') return json(400, { error: 'bad_request' })
 
-  // Ownership is checked explicitly: the document's profile must belong to this user.
+  // Access is checked explicitly: the document's profile must belong to this user,
+  // or be shared with them for helping (and its owner must also allow AI reading).
   const { data: doc } = await admin
     .from('medical_documents')
     .select('id, profile_id, storage_path, mime_type, status, health_profiles!inner(owner_id)')
     .eq('id', documentId)
-    .eq('health_profiles.owner_id', auth.user.id)
     .maybeSingle()
   if (!doc) return json(404, { error: 'not_found' })
+  const ownerId = (doc.health_profiles as unknown as { owner_id: string }).owner_id
+  if (ownerId !== auth.user.id) {
+    const { data: share } = await admin.from('profile_shares').select('expires_at')
+      .eq('profile_id', doc.profile_id).eq('grantee_id', auth.user.id).eq('status', 'active').eq('access', 'help').neq('kind', 'transfer')
+      .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`).limit(1).maybeSingle()
+    if (!share) return json(404, { error: 'not_found' })
+    const { data: ownerConsented } = await admin.rpc('has_consent', { p_user_id: ownerId, p_type: 'ai_processing' })
+    if (!ownerConsented) return json(403, { error: 'consent_required' })
+  }
   if (!['uploaded', 'failed'].includes(doc.status)) return json(409, { error: 'already_processed' })
 
   const { data: consented } = await admin.rpc('has_consent', { p_user_id: auth.user.id, p_type: 'ai_processing' })

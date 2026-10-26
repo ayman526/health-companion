@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronRight, FileText, Sparkles, TrendingUp, UserRound } from 'lucide-react'
+import { ChevronRight, FileText, Sparkles, TrendingUp, UserRound, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { renderInsight, syncInsights, type Insight } from '../lib/insights'
@@ -16,6 +16,7 @@ import { ContextCard } from '../components/ContextCard'
 import { Sheet } from '../components/Sheet'
 import { loadUserTopics } from '../lib/userTopics'
 import { ProfileAsk } from '../components/ProfileAsk'
+import { loadShares, pendingForMe } from '../lib/sharing'
 
 interface Notice { key: string; to: string; text: string; icon: typeof FileText; urgent?: boolean; info?: boolean }
 
@@ -33,6 +34,7 @@ export function HomePage() {
   const [suggested, setSuggested] = useState(0)
   const [topics, setTopics] = useState<Map<string, number> | null>(null)
   const [noticesOpen, setNoticesOpen] = useState(false)
+  const [sharingWaiting, setSharingWaiting] = useState(0)
 
   useEffect(() => {
     if (!supabase || !profile) return
@@ -41,6 +43,7 @@ export function HomePage() {
     void syncInsights(profile.id).then(setInsights)
     void loadSuggestions(todayIn(profile.time_zone)).then((list) => setSuggested(list.length))
     void loadUserTopics(todayIn(profile.time_zone)).then(setTopics)
+    void loadShares().then((s) => setSharingWaiting(pendingForMe(s).length))
   }, [profile])
 
   if (!profile) return null
@@ -56,6 +59,7 @@ export function HomePage() {
     ...visible.filter((i) => i.kind === 'attention').map((i) => ({
       key: i.id, to: `/records/tests/${encodeURIComponent(i.testKey)}`, text: renderInsight(i, lang, profile.country).title, icon: TrendingUp, urgent: i.level === 'urgent',
     })),
+    ...(sharingWaiting > 0 ? [{ key: 'sharing', to: '/sharing', text: t('sharing.homeLine', { count: sharingWaiting }), icon: Users }] : []),
     ...(toReview > 0 ? [{ key: 'review', to: '/records', text: t('home.reviewsPending', { count: toReview }), icon: FileText }] : []),
     ...(suggested > 0 ? [{ key: 'suggested', to: '/reminders', text: t('suggestions.homeLink', { count: suggested }), icon: Sparkles }] : []),
     ...(changes.length > 0 ? [{ key: 'changes', to: '/insights', text: t('home.changesLine', { count: changes.length }), icon: TrendingUp, info: true }] : []),
@@ -103,7 +107,7 @@ export function HomePage() {
 
       {topics && <ContextCard topics={topics} allowGeneral heading={t('library.forYou')} teaser />}
 
-      <AddButton />
+      {profile.access !== 'view' && <AddButton />}
 
       <Sheet open={noticesOpen} onClose={() => setNoticesOpen(false)} title={t('home.attention')}>
         <ul className="flex flex-col">

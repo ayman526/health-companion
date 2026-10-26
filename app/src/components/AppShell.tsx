@@ -63,9 +63,11 @@ function ViewingBanner() {
   const { profile } = useAuth()
   if (!profile || profile.relationship === 'self') return null
   const name = profile.display_name || t(`family.relationships.${profile.relationship}`)
+  const shared = profile.access !== 'owner'
   return (
-    <Link to="/family" className="flex min-h-10 items-center justify-center gap-2 bg-brand-700 px-4 text-sm font-medium text-white print:hidden">
+    <Link to="/family" className="flex min-h-10 flex-wrap items-center justify-center gap-x-2 bg-brand-700 px-4 py-1 text-sm font-medium text-white print:hidden">
       <Users className="size-4" aria-hidden /> {t('family.viewingBanner', { name })}
+      {shared && <span className="text-xs font-normal opacity-90">({t(profile.access === 'view' ? 'sharing.viewOnlyBanner' : 'sharing.helpBanner', { email: profile.shared_by ?? '' })})</span>}
       <span className="underline">{t('family.switch')}</span>
     </Link>
   )

@@ -2,8 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { activeProfileId, setActiveProfileId } from '../lib/activeProfile'
+import { loadShares, logSharedView } from '../lib/sharing'
 
-export type Relationship = 'self' | 'parent' | 'spouse' | 'child' | 'sibling' | 'grandparent' | 'other'
+// 'shared': someone else's own records that they shared with you (shown with their name).
+export type Relationship = 'self' | 'parent' | 'spouse' | 'child' | 'sibling' | 'grandparent' | 'other' | 'shared'
 
 export interface HealthProfile {
   id: string
@@ -16,6 +18,11 @@ export interface HealthProfile {
   time_zone: string
   onboarding_completed_at: string | null
   onboarding_step: number
+  owner_id: string
+  /** 'owner' for your own records and people you keep records for; otherwise what they allowed. */
+  access: 'owner' | 'view' | 'help'
+  /** For shared records: who shared them. */
+  shared_by?: string | null
 }
 
 interface AuthState {
@@ -25,7 +32,7 @@ interface AuthState {
   profile: HealthProfile | null
   /** Your own profile (the account holder). */
   self: HealthProfile | null
-  /** Everyone this account keeps records for, yourself first. */
+  /** Everyone this account keeps records for, yourself first, then records shared with you. */
   profiles: HealthProfile[]
   profileError: string | null
   switchProfile: (id: string) => void
@@ -35,7 +42,7 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState | null>(null)
 
-const SELECT = 'id, relationship, display_name, date_of_birth, country, ui_language, explanation_language, time_zone, onboarding_completed_at, onboarding_step'
+const SELECT = 'id, owner_id, relationship, display_name, date_of_birth, country, ui_language, explanation_language, time_zone, onboarding_completed_at, onboarding_step'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
@@ -55,7 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('is_demo', false)
       .order('created_at')
     setProfileError(error ? error.message : null)
-    const list = ((data ?? []) as HealthProfile[]).sort((a, b) => Number(b.relationship === 'self') - Number(a.relationship === 'self'))
+    const rows = (data ?? []) as Omit<HealthProfile, 'access'>[]
+    // Records shared with you come back too (the database allows reading them): mark them as such.
+    const shares = rows.some((p) => p.owner_id !== s.user.id) ? await loadShares() : []
+    const rank = (p: HealthProfile) => (p.relationship === 'self' ? 0 : p.access === 'owner' ? 1 : 2)
+    const list: HealthProfile[] = rows.map((p) => {
+      if (p.owner_id === s.user.id) return { ...p, access: 'owner' as const }
+      const share = shares.find((x) => x.status === 'active' && x.direction === 'received' && x.profile_id === p.id)
+      return { ...p, relationship: 'shared' as const, access: share?.access ?? 'view', shared_by: share?.owner_email ?? null }
+    }).sort((a, b) => rank(a) - rank(b))
     // Keep the selected person if they still exist; otherwise show your own records.
     const stored = activeProfileId()
     const next = list.find((p) => p.id === stored)?.id ?? list.find((p) => p.relationship === 'self')?.id ?? null
@@ -92,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     switchProfile: (id) => {
       setActiveProfileId(id)
       setActiveId(id)
+      if (profiles.find((p) => p.id === id)?.access !== 'owner') logSharedView(id)
     },
     refreshProfile: () => loadProfile(session),
     signOut: async () => {

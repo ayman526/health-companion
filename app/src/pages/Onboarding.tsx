@@ -89,7 +89,7 @@ export function OnboardingPage() {
     const lang = i18n.language === 'ar' ? 'ar' : 'en'
     const fields = { country: about.country, ui_language: lang, explanation_language: lang, time_zone: timeZone, onboarding_step: 1 }
     // Your own profile: reuse it if consent is given again, otherwise create it.
-    const { data: existing } = await supabase.from('health_profiles').select('id').eq('relationship', 'self').eq('is_demo', false).maybeSingle()
+    const { data: existing } = await supabase.from('health_profiles').select('id').eq('owner_id', session.user.id).eq('relationship', 'self').eq('is_demo', false).maybeSingle()
     const { data, error: e2 } = existing
       ? await supabase.from('health_profiles').update(fields).eq('id', existing.id).select('id').single()
       : await supabase.from('health_profiles').insert({ owner_id: session.user.id, relationship: 'self', ...fields }).select('id').single()

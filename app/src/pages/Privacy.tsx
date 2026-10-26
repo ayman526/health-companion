@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Activity, BellOff, Download, History, LockKeyhole, LogOut, MapPin, ShieldCheck, Sparkles, Trash2, UserRound } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Activity, BellOff, Download, History, LockKeyhole, LogOut, MapPin, ShieldCheck, Sparkles, Trash2, UserRound, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { hasAiConsent } from '../lib/documents'
@@ -99,6 +100,9 @@ export function PrivacyPage() {
   return (
     <>
       <PageHeader title={t('privacy.title')} subtitle={t('privacy.subtitle')} />
+      <Link to="/sharing" className="mb-4 flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-sm font-medium">
+        <Users className="size-5 shrink-0 text-brand-700" aria-hidden /> <span className="flex-1">{t('sharing.givenTitle')}</span>
+      </Link>
       <div className="flex flex-col gap-4">
         <Section icon={ShieldCheck} title={t('privacy.facts.title')}>
           <ul className="flex flex-col gap-3">

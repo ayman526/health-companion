@@ -44,7 +44,9 @@ export interface ExportProgress { stage: 'records' | 'files' | 'zip'; done: numb
 export async function exportMyData(email: string | undefined, onProgress: (p: ExportProgress) => void): Promise<Blob> {
   if (!supabase) throw new Error('no_backend')
   const { zipSync, strToU8 } = await import('fflate')
-  const { data: people, error } = await supabase.from('health_profiles').select('*').order('created_at')
+  // Only records you own: records others shared with you are theirs to export.
+  const { data: auth } = await supabase.auth.getUser()
+  const { data: people, error } = await supabase.from('health_profiles').select('*').eq('owner_id', auth.user?.id ?? '').order('created_at')
   if (error) throw error
 
   const account: Record<string, unknown[]> = {}

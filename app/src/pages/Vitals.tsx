@@ -45,6 +45,7 @@ export function VitalsPage() {
   const { t, i18n } = useTranslation()
   const lang = i18n.language
   const { profile } = useAuth()
+  const canEdit = profile?.access !== 'view'
   const tz = profile?.time_zone ?? 'Africa/Cairo'
   const [params, setParams] = useSearchParams()
   const kind = (KINDS.find((k) => k.kind === params.get('kind'))?.kind ?? 'blood_pressure') as VitalKind
@@ -100,6 +101,7 @@ export function VitalsPage() {
   const latestAssessment = latest ? assessReading(latest, person) : null
 
   async function save() {
+    if (!canEdit) return
     if (!profile) return
     setError(false)
     const a = parseNumber(form.a)
@@ -158,6 +160,8 @@ export function VitalsPage() {
     <>
       <PageHeader title={t('vitals.title')} subtitle={t('vitals.subtitle')} />
 
+      {!canEdit && <p className="mb-3 rounded-xl bg-canvas px-4 py-3 text-sm text-muted">{t('sharing.viewOnlyAction')}</p>}
+      {canEdit && (<>
       {/* Read the numbers from a photo of the device's screen */}
       <label className={`mb-3 flex min-h-14 cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-brand-600 bg-brand-50 px-4 font-medium text-brand-700 ${photo.busy ? 'opacity-60' : ''}`}>
         {photo.busy ? <Loader2 className="size-5 animate-spin" aria-hidden /> : <Camera className="size-5" aria-hidden />}
@@ -169,6 +173,7 @@ export function VitalsPage() {
           onChange={(e) => { void fromPhoto(e.target.files?.[0]); e.target.value = '' }} />
       </label>
       <VoiceLog className="mb-3" />
+      </>)}
       {photo.error && <p role="alert" className="mb-3 rounded-xl bg-status-watch-bg px-4 py-3 text-sm text-status-watch">{t(`vitals.photo.errors.${photo.error}`, t('vitals.photo.errors.ai_unavailable'))}</p>}
 
       <div className="mb-4 grid grid-cols-3 gap-2" role="tablist">
@@ -181,6 +186,7 @@ export function VitalsPage() {
       </div>
 
       {/* Add a reading */}
+      {canEdit && (
       <section className="mb-4 rounded-2xl border border-line bg-surface p-4">
         <h2 className="mb-3 flex items-center gap-2 font-semibold"><Plus className="size-5 text-brand-700" aria-hidden /> {t('vitals.add')}</h2>
         <div className="grid grid-cols-2 gap-3">
@@ -262,6 +268,7 @@ export function VitalsPage() {
           {saving ? t('onboarding.saving') : t('vitals.save')}
         </button>
       </section>
+      )}
 
       {/* Latest reading and what it means */}
       {latest && (

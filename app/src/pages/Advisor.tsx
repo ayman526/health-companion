@@ -122,6 +122,15 @@ export function AdvisorPage() {
     })
   }
 
+  if (profile && profile.access !== 'owner') {
+    return (
+      <>
+        <PageHeader title={t('advisor.shortTitle')} />
+        <p className="rounded-2xl border border-line bg-surface p-4 text-sm">{t('sharing.advisorOwnerOnly')}</p>
+      </>
+    )
+  }
+
   if (consent === false) {
     return (
       <>

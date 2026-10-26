@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Check, Plus, Trash2, UserRound, Users } from 'lucide-react'
+import { ArrowRightLeft, Check, Plus, Share2, Trash2, UserRound, Users } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { listFiles } from '../lib/privacy'
 import { useAuth, type Relationship } from '../auth/AuthProvider'
@@ -9,7 +9,7 @@ import { ageOn } from '../domain/profileOptions'
 import { PageHeader } from '../components/ui'
 import { fieldClass } from '../components/ProfileFields'
 
-const RELATIONSHIPS: Exclude<Relationship, 'self'>[] = ['parent', 'spouse', 'child', 'sibling', 'grandparent', 'other']
+const RELATIONSHIPS: Exclude<Relationship, 'self' | 'shared'>[] = ['parent', 'spouse', 'child', 'sibling', 'grandparent', 'other']
 
 /** Everyone this account keeps records for. Each person's records stay separate. */
 export function FamilyPage() {
@@ -17,7 +17,7 @@ export function FamilyPage() {
   const navigate = useNavigate()
   const { session, profile, self, profiles, switchProfile, refreshProfile } = useAuth()
   const [adding, setAdding] = useState(false)
-  const [form, setForm] = useState({ name: '', relationship: 'parent' as Exclude<Relationship, 'self'>, dob: '', sex: '' })
+  const [form, setForm] = useState({ name: '', relationship: 'parent' as Exclude<Relationship, 'self' | 'shared'>, dob: '', sex: '' })
   const [error, setError] = useState<string | null>(null)
   const [removing, setRemoving] = useState<string | null>(null)
   const [confirmName, setConfirmName] = useState('')
@@ -78,6 +78,9 @@ export function FamilyPage() {
   return (
     <>
       <PageHeader title={t('family.title')} subtitle={t('family.subtitle')} />
+      <Link to="/sharing" className="mb-4 flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 text-sm font-medium">
+        <ArrowRightLeft className="size-5 shrink-0 text-brand-700" aria-hidden /> <span className="flex-1">{t('sharing.familyLink')}</span>
+      </Link>
       <ul className="flex flex-col gap-2">
         {profiles.map((p) => {
           const age = ageOn(p.date_of_birth, today)
@@ -89,7 +92,7 @@ export function FamilyPage() {
                 <span className="min-w-0 flex-1">
                   <span className="block font-medium">{nameOf(p)}</span>
                   <span className="block text-xs text-muted">
-                    {t(`family.relationships.${p.relationship}`)}{age != null ? ` · ${t('family.age', { age })}` : ''}
+                    {p.access === 'owner' ? t(`family.relationships.${p.relationship}`) : `${t('sharing.sharedBadge')} · ${t(`sharing.access.${p.access}`)}`}{age != null ? ` · ${t('family.age', { age })}` : ''}
                   </span>
                 </span>
                 {active ? (
@@ -98,7 +101,10 @@ export function FamilyPage() {
                   <button type="button" onClick={() => open(p.id)} className="min-h-11 rounded-xl bg-brand-700 px-4 text-sm font-medium text-white">{t('family.view')}</button>
                 )}
               </div>
-              {p.relationship !== 'self' && (
+              {p.access === 'owner' && (
+                <Link to={`/sharing?profile=${p.id}`} className="mt-2 me-4 inline-flex min-h-11 items-center gap-1 text-sm font-medium text-brand-700"><Share2 className="size-4" aria-hidden /> {t('sharing.actions.share')}</Link>
+              )}
+              {p.access === 'owner' && p.relationship !== 'self' && (
                 removing === p.id ? (
                   <div className="mt-3 rounded-xl bg-status-urgent-bg p-3 text-sm text-status-urgent">
                     <p>{t('family.removeWarning', { name: nameOf(p) })}</p>

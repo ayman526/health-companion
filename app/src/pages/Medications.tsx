@@ -10,10 +10,12 @@ import { currentSchedule, loadMedications, type MedicationRow } from '../lib/med
 import { useScheduleText } from '../components/ScheduleSummary'
 import { EmptyState, PageHeader } from '../components/ui'
 import { PushPrompt } from '../components/PushPrompt'
+import { useAuth } from '../auth/AuthProvider'
 
 export function MedicationsPage() {
   const { t, i18n } = useTranslation()
   const describe = useScheduleText()
+  const readOnly = useAuth().profile?.access === 'view'
   const [loading, setLoading] = useState(true)
   const [meds, setMeds] = useState<MedicationRow[]>([])
   const [photos, setPhotos] = useState<Record<string, string>>({})
@@ -44,6 +46,7 @@ export function MedicationsPage() {
     <>
       <PageHeader title={t('medications.title')} />
       <PushPrompt className="mb-4" />
+      {readOnly ? <p className="mb-4 rounded-xl bg-canvas px-4 py-3 text-sm text-muted">{t('sharing.viewOnlyAction')}</p> : (
       <div className="mb-4 grid gap-3 sm:grid-cols-2">
         <Link to="/medications/new" className="flex min-h-14 items-center gap-3 rounded-2xl bg-brand-700 px-4 font-medium text-white">
           <Plus className="size-5" aria-hidden /> {t('actions.addMedication')}
@@ -52,6 +55,7 @@ export function MedicationsPage() {
           <FileText className="size-5 text-brand-700" aria-hidden /> {t('meds.scanPrescription')}
         </Link>
       </div>
+      )}
 
       {prescriptions.length > 0 && (
         <section className="mb-4">

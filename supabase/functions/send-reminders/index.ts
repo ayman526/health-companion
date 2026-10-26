@@ -38,6 +38,7 @@ const TEXT = {
     title: 'Health Journal', dose: 'It\'s time for your medicine. Open the app to log it.', reminder: 'You have a reminder. Open the app to see it.',
     familyDose: 'Medicine time for someone you care for. Open the app to log it.', vital: 'Time to log today\'s reading.', summary: 'Your weekly summary is ready.',
     visitPrep: 'You have a doctor visit tomorrow. Prepare your visit summary.', visitFollowup: 'How did your visit go? Update what the doctor changed.',
+    helperAlert: 'Someone you care for hasn\'t logged a medicine dose yet.',
     followup: 'Did you take your medicine? Tap to log it.', familyFollowup: 'Was the medicine taken for someone you care for? Tap to log it.',
     taken: 'Taken', snooze: 'In 30 min', loggedTaken: 'Logged as taken ✓', loggedSnoozed: 'We\'ll remind you again in 30 minutes.',
     test: 'Notifications are working. Your reminders will appear like this.',
@@ -46,6 +47,7 @@ const TEXT = {
     title: 'سجلك الصحي', dose: 'حان موعد دوائك. افتح التطبيق لتسجيله.', reminder: 'لديك تذكير. افتح التطبيق لمعرفته.',
     familyDose: 'حان موعد دواء لشخص ترعاه. افتح التطبيق لتسجيله.', vital: 'حان وقت تسجيل قراءتك اليوم.', summary: 'ملخصك الأسبوعي جاهز.',
     visitPrep: 'لديك زيارة للطبيب غدًا. جهّز ملخص الزيارة.', visitFollowup: 'كيف كانت زيارتك؟ سجّل ما غيّره الطبيب.',
+    helperAlert: 'شخص ترعاه لم يسجّل جرعة دواء بعد.',
     followup: 'هل أخذت دواءك؟ اضغط لتسجيله.', familyFollowup: 'هل أُخذ الدواء لمن ترعاه؟ اضغط لتسجيله.',
     taken: 'أخذته', snooze: 'بعد 30 دقيقة', loggedTaken: 'تم التسجيل ✓', loggedSnoozed: 'سنذكّرك مرة أخرى بعد 30 دقيقة.',
     test: 'الإشعارات تعمل. ستصلك التذكيرات بهذا الشكل.',
@@ -240,6 +242,27 @@ async function sendFollowups(admin: SupabaseClient) {
   return sent
 }
 
+/** Missed-dose alerts for helpers who asked for them (records shared with alerts on). */
+async function sendHelperAlerts(admin: SupabaseClient) {
+  const { data } = await admin.rpc('due_helper_alerts', { p_limit: 200 })
+  let sent = 0
+  const claimed = new Set<string>()
+  for (const d of (data ?? []) as { item_id: string; profile_id: string; helper_id: string }[]) {
+    // One alert per dose, however many helpers: mark it first so a slow run never repeats it.
+    if (!claimed.has(d.item_id)) {
+      const { data: ok } = await admin.from('medication_dose_logs').update({ helper_alerted_at: new Date().toISOString() })
+        .eq('id', d.item_id).is('helper_alerted_at', null).select('id')
+      if (!ok?.length) continue
+      claimed.add(d.item_id)
+    }
+    const { data: helper } = await admin.from('health_profiles').select('ui_language').eq('owner_id', d.helper_id).eq('relationship', 'self').eq('is_demo', false).maybeSingle()
+    const lang: 'en' | 'ar' = helper?.ui_language === 'ar' ? 'ar' : 'en'
+    const o = await sendPush(admin, d.helper_id, { title: TEXT[lang].title, body: TEXT[lang].helperAlert, tag: `alert-${d.item_id}`, url: '/family' })
+    if (o?.status === 'sent') sent++
+  }
+  return sent
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
   if (req.method === 'GET') return json(200, channels())
@@ -260,6 +283,7 @@ Deno.serve(async (req) => {
   }
   const sent = await deliver(admin, (data ?? []) as Due[])
   const followups = channels().push ? await sendFollowups(admin) : 0
-  console.log(JSON.stringify({ event: 'reminders_run', due: (data ?? []).length, sent, followups }))
-  return json(200, { due: (data ?? []).length, sent, followups })
+  const helperAlerts = channels().push ? await sendHelperAlerts(admin) : 0
+  console.log(JSON.stringify({ event: 'reminders_run', due: (data ?? []).length, sent, followups, helperAlerts }))
+  return json(200, { due: (data ?? []).length, sent, followups, helperAlerts })
 })

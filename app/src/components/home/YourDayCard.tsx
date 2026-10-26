@@ -8,6 +8,7 @@ import { findRepeatingReminder, loadCheckIns, loadVitals, type CheckIn } from '.
 import { formatDose } from '../../domain/medications'
 import { CheckInRow } from '../CheckInCard'
 import { Sheet } from '../Sheet'
+import { useAuth } from '../../auth/AuthProvider'
 
 /**
  * Today's checklist, showing only what's left: medicines due, today's
@@ -22,6 +23,8 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
   const [menu, setMenu] = useState<string | null>(null)
   const [showDone, setShowDone] = useState(false)
   const [checkInOpen, setCheckInOpen] = useState(false)
+  // Records shared with you as "view only": the list shows, nothing can be ticked.
+  const readOnly = useAuth().profile?.access === 'view'
 
   const load = useCallback(async () => {
     if (!supabase) return
@@ -42,6 +45,7 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
 
   async function act(id: string, status: 'taken' | 'skipped' | 'snoozed' | 'pending') {
     setMenu(null)
+    if (readOnly) return
     if (await logDose(id, status, status === 'snoozed' ? 30 : undefined)) await load()
   }
 
@@ -69,7 +73,7 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
         {pending.map((d) => (
           <li key={d.id} className="border-b border-line py-2">
             <div className="flex items-center gap-3">
-              <button type="button" aria-label={t('meds.taken')} onClick={() => void act(d.id, 'taken')}
+              <button type="button" aria-label={t('meds.taken')} disabled={readOnly} onClick={() => void act(d.id, 'taken')}
                 className="grid size-6 shrink-0 place-items-center rounded-full border-2 border-brand-700" />
               <Link to={`/medications/${d.medication_schedules.medication_id}`} className="min-w-0 flex-1">
                 <span dir="auto" className="sensitive block truncate text-start text-sm font-medium">{name(d)}</span>
@@ -88,7 +92,7 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
           </li>
         ))}
 
-        {!checkedIn && (
+        {!readOnly && !checkedIn && (
           <li className="border-b border-line py-2">
             <button type="button" onClick={() => setCheckInOpen(true)} className="flex min-h-8 w-full items-center gap-3 text-start">
               <span className="size-6 shrink-0 rounded-full border-2 border-brand-700" aria-hidden />
@@ -126,7 +130,7 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
       </ul>
 
       {/* Logging a reading is an action, not a tick-box: its own row with a "+". */}
-      {reading.show && !reading.done && (
+      {!readOnly && reading.show && !reading.done && (
         <Link to="/vitals" className="mt-3 flex min-h-12 items-center gap-3 rounded-xl bg-brand-50 px-3 text-brand-700">
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-700 text-white"><Plus className="size-4" aria-hidden /></span>
           <span className="flex-1 text-sm font-semibold">{t('home.logReading')}</span>
