@@ -73,7 +73,8 @@ export interface AboutValue {
   weight_kg: string
 }
 
-export function AboutFields({ value, onChange }: { value: AboutValue; onChange: (v: AboutValue) => void }) {
+/** `compact` (sign-up): name, date of birth and sex only; country is detected and the rest waits for the profile. */
+export function AboutFields({ value, onChange, compact = false }: { value: AboutValue; onChange: (v: AboutValue) => void; compact?: boolean }) {
   const { t } = useTranslation()
   const set = (patch: Partial<AboutValue>) => onChange({ ...value, ...patch })
   return (
@@ -96,6 +97,7 @@ export function AboutFields({ value, onChange }: { value: AboutValue; onChange: 
         </div>
         <p className="mt-1 text-xs text-muted">{t('profileFields.sexWhy')}</p>
       </fieldset>
+      {!compact && <>
       <label className="flex flex-col gap-2 text-sm font-medium">
         {t('onboarding.country')}
         <select className={fieldClass} value={value.country} onChange={(e) => set({ country: e.target.value as 'EG' | 'US' })}>
@@ -115,6 +117,7 @@ export function AboutFields({ value, onChange }: { value: AboutValue; onChange: 
         </label>
       </div>
       <p className="-mt-2 text-xs text-muted">{t('profileFields.bodyWhy')}</p>
+      </>}
     </div>
   )
 }

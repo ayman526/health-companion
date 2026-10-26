@@ -15,6 +15,7 @@ import type { TestHistory } from '../domain/labs/history'
 import { useScheduleText } from '../components/ScheduleSummary'
 import { PageHeader } from '../components/ui'
 import { track } from '../lib/usage'
+import { ProfileAsk } from '../components/ProfileAsk'
 
 interface Data {
   details: ProfileDetails | null
@@ -120,6 +121,7 @@ export function SummaryPage() {
           </button>
         </div>
         <p className="mb-4 text-xs text-muted">{t('summary.shareNote')}</p>
+        <ProfileAsk topic="doctor" className="mb-4" />
       </div>
 
       <article className="rounded-2xl border border-line bg-surface p-5 text-sm print:border-0 print:p-0">

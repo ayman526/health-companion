@@ -198,12 +198,12 @@
   "auth": {
     "tagline": "Your health history, organized and understood.",
     "email": "Email address",
-    "sendLink": "Email me a sign-in link",
+    "sendLink": "Email me a sign-in code",
     "sending": "Sending…",
-    "checkEmail": "Check your email",
-    "sentTo": "We sent a sign-in link to",
+    "checkEmail": "Enter the code from your email",
+    "sentTo": "We sent a sign-in code to",
     "useDifferentEmail": "Use a different email",
-    "error": "We couldn't send the link. Please try again.",
+    "error": "We couldn't send the code. Please try again.",
     "notConfigured": "Sign-in isn't available yet: the app isn't connected to its secure backend.",
     "privacyNote": "Your health records are private to your account. We never sell your data or use it for advertising.",
     "signOut": "Sign out",
@@ -214,7 +214,14 @@
       "delete": "Delete anytime"
     },
     "howWeProtect": "How we protect your records",
-    "rateLimited": "Too many sign-in emails were sent in the last hour. Please try again later."
+    "rateLimited": "Too many sign-in emails were sent in the last hour. Please try again later.",
+    "code": "Sign-in code",
+    "verify": "Sign in",
+    "verifying": "Checking…",
+    "badCode": "That code didn't work. Check it, or send a new one.",
+    "resend": "Send a new code",
+    "resendIn": "Send a new code in {{s}}s",
+    "codeHint": "It can take a minute to arrive. Check your spam folder too."
   },
   "onboarding": {
     "step": "Step {{n}} of {{total}}",
@@ -278,15 +285,15 @@
     "doctorPlaceholder": "Doctor's name",
     "alertsTitle": "Reminders",
     "alertsIntro": "Turn on notifications so we can remind you to take your medicines.",
-    "startTitle": "You're all set",
-    "startIntro": "What would you like to do first?",
+    "startTitle": "Let's start with one thing",
+    "startIntro": "Pick what you have to hand. It takes about a minute.",
     "startScanReport": "Scan a lab report",
     "startScanReportHint": "Photo or PDF of your test results",
     "startAddMedicine": "Add a medicine",
     "startAddMedicineHint": "Set reminders for a medicine you take",
     "startScanPrescription": "Scan a prescription",
     "startScanPrescriptionHint": "We'll read the medicines for you",
-    "startLater": "I'll explore first",
+    "startLater": "I'll look around first",
     "summary": {
       "lock": {
         "title": "Private to you",
@@ -303,7 +310,26 @@
     },
     "readFull": "Read the details",
     "chooseTitle": "Choose what you agree to",
-    "required": "Required"
+    "required": "Required",
+    "aboutIntro": "Three quick facts so results are read correctly for you. You can skip and add them later.",
+    "first": {
+      "report": {
+        "title": "Scan a lab report",
+        "hint": "Photo or PDF. We explain each result."
+      },
+      "prescription": {
+        "title": "Scan a prescription or medicine box",
+        "hint": "We read the medicines for you."
+      },
+      "medicine": {
+        "title": "Add a medicine",
+        "hint": "Type it in and get reminders."
+      },
+      "reading": {
+        "title": "Log a reading",
+        "hint": "Blood pressure, sugar or weight. Type it or snap the monitor."
+      }
+    }
   },
   "scan": {
     "title": "Scan a report",
@@ -1628,5 +1654,24 @@
     "body": "Turn on notifications so medicine times reach you even when the app is closed. They never show medicine names.",
     "enable": "Turn on",
     "notNow": "Not now"
+  },
+  "profileAsk": {
+    "notNow": "Not now",
+    "home": {
+      "title": "Complete your profile ({{pct}}%)",
+      "body": "Health background, allergies and goals help tailor ranges and suggestions."
+    },
+    "pregnancy": {
+      "title": "Pregnant or breastfeeding?",
+      "body": "Some lab ranges differ. Tell us in your profile."
+    },
+    "family": {
+      "title": "Add your family history",
+      "body": "Conditions in parents, brothers or sisters change which checkups we suggest."
+    },
+    "doctor": {
+      "title": "Add your doctor's name",
+      "body": "It will appear on this summary."
+    }
   }
 }

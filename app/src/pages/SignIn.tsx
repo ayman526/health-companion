@@ -1,25 +1,62 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { KeyRound, LockKeyhole, MailCheck, MapPin, ShieldCheck, Trash2 } from 'lucide-react'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { setLanguage } from '../i18n'
+import { toWesternDigits } from '../domain/numbers'
 
 type State = { kind: 'idle' } | { kind: 'sending' } | { kind: 'sent'; email: string } | { kind: 'error'; message: string }
+const RESEND_AFTER_S = 60
 
+/**
+ * Sign in with a code sent by email (typed into the app). A code works in the
+ * Home Screen app on iPhone, where an email link would open Safari instead.
+ * The email also keeps a link, so either works.
+ */
 export function SignInPage() {
   const { t, i18n } = useTranslation()
   const [email, setEmail] = useState('')
   const [state, setState] = useState<State>({ kind: 'idle' })
+  const [code, setCode] = useState('')
+  const [verifying, setVerifying] = useState(false)
+  const [badCode, setBadCode] = useState(false)
+  const [wait, setWait] = useState(0)
 
-  async function submit(e: FormEvent) {
-    e.preventDefault()
+  useEffect(() => {
+    if (wait <= 0) return
+    const id = setTimeout(() => setWait((w) => w - 1), 1000)
+    return () => clearTimeout(id)
+  }, [wait])
+
+  async function send(address: string) {
     if (!supabase) return
     setState({ kind: 'sending' })
     const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
+      email: address,
       options: { emailRedirectTo: window.location.origin, shouldCreateUser: true },
     })
-    setState(error ? { kind: 'error', message: error.message } : { kind: 'sent', email: email.trim() })
+    setState(error ? { kind: 'error', message: error.message } : { kind: 'sent', email: address })
+    if (!error) {
+      setCode('')
+      setBadCode(false)
+      setWait(RESEND_AFTER_S)
+    }
+  }
+
+  async function submit(e: FormEvent) {
+    e.preventDefault()
+    await send(email.trim())
+  }
+
+  async function verify(e: FormEvent) {
+    e.preventDefault()
+    if (!supabase || state.kind !== 'sent') return
+    setVerifying(true)
+    setBadCode(false)
+    // On success the auth listener signs the person in and the app moves on.
+    const { error } = await supabase.auth.verifyOtp({ email: state.email, token: code, type: 'email' })
+    setVerifying(false)
+    if (error) setBadCode(true)
   }
 
   return (
@@ -45,16 +82,39 @@ export function SignInPage() {
         )}
 
         {state.kind === 'sent' ? (
-          <div role="status" className="mt-8 rounded-2xl border border-line bg-surface p-5">
+          <form onSubmit={verify} className="mt-8 rounded-2xl border border-line bg-surface p-5">
             <MailCheck className="mb-3 size-8 text-brand-700" aria-hidden />
-            <p className="font-medium">{t('auth.checkEmail')}</p>
+            <p role="status" className="font-medium">{t('auth.checkEmail')}</p>
             <p className="mt-1 text-sm text-muted">
               {t('auth.sentTo')} <span className="ltr-value font-medium text-ink">{state.email}</span>
             </p>
-            <button type="button" onClick={() => setState({ kind: 'idle' })} className="mt-4 min-h-11 text-sm font-medium text-brand-700">
-              {t('auth.useDifferentEmail')}
+            <label htmlFor="code" className="sr-only">{t('auth.code')}</label>
+            <input
+              id="code"
+              required
+              autoFocus
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              dir="ltr"
+              placeholder="••••••"
+              value={code}
+              onChange={(e) => setCode(toWesternDigits(e.target.value).replace(/\D/g, '').slice(0, 8))}
+              className="mt-4 min-h-14 w-full rounded-xl border border-line bg-canvas px-4 text-center text-2xl font-semibold tracking-[0.4em] outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+            />
+            {badCode && <p role="alert" className="mt-2 text-sm text-status-urgent">{t('auth.badCode')}</p>}
+            <button type="submit" disabled={verifying || code.length < 6} className="mt-3 min-h-12 w-full rounded-xl bg-brand-700 font-medium text-white disabled:opacity-60">
+              {verifying ? t('auth.verifying') : t('auth.verify')}
             </button>
-          </div>
+            <p className="mt-3 text-xs text-muted">{t('auth.codeHint')}</p>
+            <div className="mt-2 flex flex-wrap justify-between gap-2">
+              <button type="button" disabled={wait > 0} onClick={() => void send(state.email)} className="min-h-11 text-sm font-medium text-brand-700 disabled:text-muted">
+                {wait > 0 ? t('auth.resendIn', { s: wait }) : t('auth.resend')}
+              </button>
+              <button type="button" onClick={() => setState({ kind: 'idle' })} className="min-h-11 text-sm font-medium text-muted">
+                {t('auth.useDifferentEmail')}
+              </button>
+            </div>
+          </form>
         ) : (
           <form onSubmit={submit} className="mt-8 flex flex-col gap-3">
             <label htmlFor="email" className="text-sm font-medium">

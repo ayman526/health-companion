@@ -10,6 +10,8 @@ export type UsageEvent =
   | 'summary_printed' | 'summary_shared' | 'checkup_accepted' | 'checkup_done'
   | 'reading_logged' | 'reading_photo_used' | 'checkin_saved' | 'advisor_asked' | 'report_scanned'
   | 'push_prompt_shown' | 'push_prompt_enabled' | 'push_prompt_dismissed' | 'push_test_sent'
+  | 'onboarding_done' | 'first_action_report' | 'first_action_prescription' | 'first_action_medicine' | 'first_action_reading' | 'first_action_explore'
+  | 'profile_nudge_shown' | 'profile_nudge_opened' | 'profile_nudge_dismissed'
 
 export function track(event: UsageEvent) {
   // Fire and forget: counting must never slow down or break the app.

@@ -15,6 +15,7 @@ import { PushPrompt } from '../components/PushPrompt'
 import { ContextCard } from '../components/ContextCard'
 import { Sheet } from '../components/Sheet'
 import { loadUserTopics } from '../lib/userTopics'
+import { ProfileAsk } from '../components/ProfileAsk'
 
 interface Notice { key: string; to: string; text: string; icon: typeof FileText; urgent?: boolean; info?: boolean }
 
@@ -97,6 +98,8 @@ export function HomePage() {
       <YourDayCard timeZone={profile.time_zone} />
 
       <WeekTiles profileId={profile.id} max={2} />
+
+      {!forFamily && <ProfileAsk topic="home" />}
 
       {topics && <ContextCard topics={topics} allowGeneral heading={t('library.forYou')} teaser />}
 

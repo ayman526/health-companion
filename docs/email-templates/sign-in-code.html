@@ -1,0 +1,11 @@
+<!-- Paste into Supabase → Authentication → Emails → "Magic Link" AND "Confirm signup".
+     Subject for both: Your Health Journal code: {{ .Token }} | رمز الدخول -->
+<div style="font-family:system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;max-width:480px;margin:auto;padding:24px;color:#1f2a2a">
+  <h2 style="margin:0 0 12px;color:#1d5c55">Health Journal · سجلك الصحي</h2>
+  <p style="margin:0 0 8px">Your sign-in code:</p>
+  <p dir="rtl" style="margin:0 0 16px">رمز الدخول الخاص بك:</p>
+  <p style="font-size:32px;font-weight:700;letter-spacing:8px;margin:0 0 16px;direction:ltr">{{ .Token }}</p>
+  <p style="margin:0 0 8px;font-size:14px;color:#5b6b6b">Type it in the app. It expires in 1 hour. If you didn't ask for it, ignore this email.</p>
+  <p dir="rtl" style="margin:0 0 16px;font-size:14px;color:#5b6b6b">اكتبه في التطبيق. تنتهي صلاحيته خلال ساعة. إن لم تطلبه، تجاهل هذه الرسالة.</p>
+  <p style="font-size:13px;color:#5b6b6b">Or open: <a href="{{ .ConfirmationURL }}">sign in · دخول</a></p>
+</div>

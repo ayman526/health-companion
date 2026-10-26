@@ -5,6 +5,7 @@ import { formatDate } from '../lib/format'
 import { acceptSuggestion, dismissSuggestion, loadSuggestions, markSuggestionDone } from '../lib/suggestions'
 import { EvidenceChips } from './TrustChips'
 import { SCREENING_VARIANTS, type CheckupSuggestion, type ScreeningRule } from '../domain/testSuggestions'
+import { ProfileAsk } from './ProfileAsk'
 
 // Months until the next one, by interval, when the person marks a checkup as already done.
 const USUAL_MONTHS: Record<string, number> = {
@@ -43,6 +44,7 @@ export function SuggestedCheckups({ profileId, timeZone, today, onAccepted }: { 
     <section className="mb-6">
       <h2 className="mb-1 flex items-center gap-2 text-sm font-semibold text-brand-700"><Sparkles className="size-4" aria-hidden /> {t('suggestions.title')}</h2>
       <p className="mb-3 text-xs text-muted">{t('suggestions.intro')}</p>
+      <ProfileAsk topic="family" className="mb-2" />
       <ul className="flex flex-col gap-2">
         {items.map((s) => (
           <li key={s.key} className="rounded-2xl border border-brand-100 bg-brand-50 p-4">

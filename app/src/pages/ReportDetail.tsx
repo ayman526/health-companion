@@ -16,6 +16,7 @@ import { TestInfoPanel } from '../components/TestInfoPanel'
 import { ContextCard } from '../components/ContextCard'
 import { labTags } from '../domain/libraryTags'
 import { normalizeNumberInput, parseNumber } from '../domain/numbers'
+import { ProfileAsk } from '../components/ProfileAsk'
 
 /** Qualitative results such as "Positive" / "Reactive" / "إيجابي". */
 const isPositiveText = (s: string | null) => !!s && /positive|reactive|detected|إيجابي|ايجابي/i.test(s) && !/non[- ]?reactive|not detected|negative|سلبي/i.test(s)
@@ -194,6 +195,7 @@ export function ReportDetailPage() {
   return (
     <>
       <PageHeader title={report.lab_name || t('records.labReport')} subtitle={t('report.collectedOn', { date: formatDate(report.collected_at, lang) })} />
+      <ProfileAsk topic="pregnancy" className="mb-4" />
       <div className="mb-4 flex flex-wrap items-center gap-4">
         {report.document_id
           ? <SourceChip kind="document" detail={docUrl ? t('review.openOriginal') : undefined} href={docUrl ?? undefined} />

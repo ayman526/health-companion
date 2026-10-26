@@ -1,26 +1,35 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Bell, Camera, Check, ChevronDown, FileText, LockKeyhole, MapPin, Pill, Sparkles } from 'lucide-react'
+import { Camera, ChevronDown, HeartPulse, LockKeyhole, MapPin, Pill, Plus, Sparkles } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { setLanguage } from '../i18n'
 import { CONSENT_VERSION } from '../lib/consent'
 import { setActiveProfileId } from '../lib/activeProfile'
-import { loadProfileDetails, saveAllergies, saveConditions, saveFamilyHistory, saveProfileFields } from '../lib/profile'
-import { enablePush, pushState, type PushState } from '../lib/push'
+import { loadProfileDetails, saveProfileFields } from '../lib/profile'
 import { todayIn } from '../lib/medications'
-import { ALLERGY_OPTIONS, CONDITION_OPTIONS, FAMILY_OPTIONS, ageOn, askPregnancy } from '../domain/profileOptions'
-import { parseNumber } from '../domain/numbers'
-import { AboutFields, ChipGroup, GoalsField, PregnancyField, SmokingField, fieldClass, type AboutValue } from '../components/ProfileFields'
+import { track, type UsageEvent } from '../lib/usage'
+import { ageOn } from '../domain/profileOptions'
+import { AboutFields, type AboutValue } from '../components/ProfileFields'
 
 type ConsentKey = 'terms' | 'privacy' | 'health_data_processing' | 'ai_processing'
 const REQUIRED: ConsentKey[] = ['terms', 'privacy', 'health_data_processing']
 const ALL: ConsentKey[] = [...REQUIRED, 'ai_processing']
-const STEPS = ['language', 'consent', 'about', 'pregnancy', 'health', 'family', 'goals', 'doctor', 'alerts', 'start'] as const
+// Short on purpose: privacy, a few facts that change how results are read, then
+// straight into a first action. Health background, family history, goals,
+// pregnancy and the doctor's name are asked later, where they matter.
+const STEPS = ['consent', 'about', 'start'] as const
 type Step = (typeof STEPS)[number]
 
 const detectCountry = (): 'EG' | 'US' => (Intl.DateTimeFormat().resolvedOptions().timeZone.startsWith('America') ? 'US' : 'EG')
+
+const FIRST_ACTIONS = [
+  { key: 'report', to: '/records/scan', icon: Camera },
+  { key: 'prescription', to: '/records/scan', icon: Pill },
+  { key: 'medicine', to: '/medications/new', icon: Plus },
+  { key: 'reading', to: '/vitals', icon: HeartPulse },
+] as const
 
 export function OnboardingPage() {
   const { t, i18n } = useTranslation()
@@ -29,63 +38,32 @@ export function OnboardingPage() {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
   const today = todayIn(timeZone)
 
-  const [stepIndex, setStepIndex] = useState(profile ? Math.max(2, profile.onboarding_step) : 0)
+  // Resuming: with a profile, consent is done. (Earlier, longer versions saved
+  // higher step numbers; anything past "about" resumes at the first action.)
+  const [stepIndex, setStepIndex] = useState(profile ? (profile.onboarding_step >= 3 ? 2 : 1) : 0)
   const [profileId, setProfileId] = useState<string | null>(profile?.id ?? null)
   const [consents, setConsents] = useState<Record<ConsentKey, boolean>>({ terms: false, privacy: false, health_data_processing: false, ai_processing: false })
   const [individually, setIndividually] = useState(false)
   const [adult, setAdult] = useState(false)
   const [about, setAbout] = useState<AboutValue>({ display_name: '', date_of_birth: '', sex: '', country: detectCountry(), height_cm: '', weight_kg: '' })
-  const [pregnancy, setPregnancy] = useState('')
-  const [conditions, setConditions] = useState<string[]>([])
-  const [noConditions, setNoConditions] = useState(false)
-  const [allergies, setAllergies] = useState<string[]>([])
-  const [noAllergies, setNoAllergies] = useState(false)
-  const [smoking, setSmoking] = useState('')
-  const [family, setFamily] = useState<string[]>([])
-  const [goals, setGoals] = useState<string[]>([])
-  const [doctor, setDoctor] = useState('')
-  const [push, setPush] = useState<PushState | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Resuming: load what was already saved.
   useEffect(() => {
     if (!profile) return
-    void loadProfileDetails().then(({ profile: p, lists }) => {
+    void loadProfileDetails().then(({ profile: p }) => {
       if (!p) return
-      setAbout({
-        display_name: p.display_name ?? '', date_of_birth: p.date_of_birth ?? '', sex: p.sex ?? '', country: p.country,
-        height_cm: p.height_cm ? String(p.height_cm) : '', weight_kg: p.weight_kg ? String(p.weight_kg) : '',
-      })
-      setPregnancy(p.pregnancy_status ?? '')
-      setSmoking(p.smoking_status ?? '')
-      setNoConditions(p.no_known_conditions)
-      setNoAllergies(p.no_known_allergies)
-      setGoals(p.health_goals ?? [])
-      setDoctor(p.physician_name ?? '')
-      setConditions(lists.conditions)
-      setAllergies(lists.allergies)
-      setFamily(lists.family)
+      setAbout((a) => ({ ...a, display_name: p.display_name ?? '', date_of_birth: p.date_of_birth ?? '', sex: p.sex ?? '', country: p.country }))
     })
   }, [profile])
 
-  useEffect(() => {
-    void pushState().then(setPush)
-  }, [])
-
-  const visibleSteps = useMemo(
-    () => STEPS.filter((s) => s !== 'pregnancy' || askPregnancy(about.sex || null, about.date_of_birth || null, today)),
-    [about.sex, about.date_of_birth, today],
-  )
   const step: Step = STEPS[stepIndex]
-  const position = visibleSteps.indexOf(step)
 
   function go(delta: 1 | -1) {
-    let i = stepIndex + delta
-    while (STEPS[i] && !visibleSteps.includes(STEPS[i])) i += delta
+    const i = Math.max(0, Math.min(STEPS.length - 1, stepIndex + delta))
     setError(null)
-    setStepIndex(Math.max(0, Math.min(STEPS.length - 1, i)))
-    if (profileId && delta === 1) void saveProfileFields(profileId, { onboarding_step: i })
+    setStepIndex(i)
+    if (profileId && delta === 1) void saveProfileFields(profileId, { onboarding_step: i === 2 ? 3 : i })
   }
 
   async function run(save: () => Promise<boolean | string>) {
@@ -109,8 +87,8 @@ export function OnboardingPage() {
     )
     if (e1) return false
     const lang = i18n.language === 'ar' ? 'ar' : 'en'
-    const fields = { country: about.country, ui_language: lang, explanation_language: lang, time_zone: timeZone, onboarding_step: 2 }
-    // Your own profile: reuse it if consent is given again (e.g. after going back), otherwise create it.
+    const fields = { country: about.country, ui_language: lang, explanation_language: lang, time_zone: timeZone, onboarding_step: 1 }
+    // Your own profile: reuse it if consent is given again, otherwise create it.
     const { data: existing } = await supabase.from('health_profiles').select('id').eq('relationship', 'self').eq('is_demo', false).maybeSingle()
     const { data, error: e2 } = existing
       ? await supabase.from('health_profiles').update(fields).eq('id', existing.id).select('id').single()
@@ -129,36 +107,19 @@ export function OnboardingPage() {
     }
     return saveProfileFields(profileId, {
       display_name: about.display_name.trim() || null, date_of_birth: about.date_of_birth || null, sex: about.sex || null,
-      country: about.country, height_cm: parseNumber(about.height_cm), weight_kg: parseNumber(about.weight_kg),
     })
   }
 
-  async function saveHealth(): Promise<boolean> {
-    if (!profileId) return false
-    const ok = await saveConditions(profileId, noConditions ? [] : conditions) && await saveAllergies(profileId, noAllergies ? [] : allergies)
-    return ok && saveProfileFields(profileId, { no_known_conditions: noConditions, no_known_allergies: noAllergies, smoking_status: smoking || null })
-  }
-
-  async function finish(next: string) {
+  async function finish(next: string, event: UsageEvent) {
     if (!profileId) return
     setSaving(true)
-    await saveProfileFields(profileId, { onboarding_step: STEPS.length - 1, onboarding_completed_at: new Date().toISOString() })
+    track('onboarding_done')
+    track(event)
+    await saveProfileFields(profileId, { onboarding_step: 3, onboarding_completed_at: new Date().toISOString() })
     navigate(next, { replace: true })
     await refreshProfile()
   }
 
-  // ---------------------------------------------------------------- layout
-  const footer = (onNext: () => void, opts: { skippable?: boolean; nextLabel?: string } = {}) => (
-    <div className="mt-8 flex flex-wrap items-center gap-3">
-      {position > 0 && step !== 'about' && (
-        <button type="button" onClick={() => go(-1)} className="min-h-12 rounded-xl border border-line bg-surface px-4 font-medium">{t('onboarding.back')}</button>
-      )}
-      <button type="button" disabled={saving} onClick={onNext} className="min-h-12 flex-1 rounded-xl bg-brand-700 px-4 font-medium text-white disabled:opacity-60">
-        {saving ? t('onboarding.saving') : opts.nextLabel ?? t('onboarding.continue')}
-      </button>
-      {opts.skippable && <button type="button" onClick={() => go(1)} className="min-h-12 px-3 font-medium text-muted">{t('onboarding.skip')}</button>}
-    </div>
-  )
   const header = (title: string, intro?: string) => (
     <>
       <h1 className="text-2xl font-semibold">{title}</h1>
@@ -169,27 +130,15 @@ export function OnboardingPage() {
   return (
     <div className="min-h-dvh bg-canvas px-4 py-6">
       <main className="mx-auto w-full max-w-lg">
-        <div className="mb-6" aria-hidden>
-          <div className="h-1.5 overflow-hidden rounded-full bg-line">
-            <div className="h-full rounded-full bg-brand-600 transition-all" style={{ width: `${((position + 1) / visibleSteps.length) * 100}%` }} />
+        <div className="mb-6 flex items-center gap-3">
+          <div className="flex flex-1 gap-1.5" aria-hidden>
+            {STEPS.map((s, i) => <span key={s} className={`h-1.5 flex-1 rounded-full ${i <= stepIndex ? 'bg-brand-600' : 'bg-line'}`} />)}
           </div>
+          <span className="sr-only">{t('onboarding.step', { n: stepIndex + 1, total: STEPS.length })}</span>
+          <button type="button" onClick={() => setLanguage(i18n.language === 'ar' ? 'en' : 'ar')} className="min-h-10 rounded-full border border-line bg-surface px-3 text-xs font-medium">
+            {t('actions.switchLanguage')}
+          </button>
         </div>
-        <p className="mb-2 text-xs font-medium text-brand-700">{t('onboarding.step', { n: position + 1, total: visibleSteps.length })}</p>
-
-        {step === 'language' && (
-          <>
-            {header(t('onboarding.languageTitle'), 'Choose your language · اختر لغتك')}
-            <div className="mt-6 grid gap-3">
-              {(['en', 'ar'] as const).map((l) => (
-                <button key={l} type="button" onClick={() => { setLanguage(l); go(1) }}
-                  className={`flex min-h-16 items-center justify-between rounded-2xl border px-5 text-lg font-medium ${i18n.language === l ? 'border-brand-700 bg-brand-50' : 'border-line bg-surface'}`}>
-                  {l === 'en' ? 'English' : 'العربية'}
-                  {i18n.language === l && <Check className="size-5 text-brand-700" aria-hidden />}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
 
         {step === 'consent' && (
           <>
@@ -238,8 +187,7 @@ export function OnboardingPage() {
                   <button type="button" disabled={saving || !adult} onClick={() => void run(() => saveConsent(true))} className="min-h-14 w-full rounded-xl bg-brand-700 font-semibold text-white disabled:opacity-50">
                     {saving ? t('onboarding.saving') : t('onboarding.agreeAll')}
                   </button>
-                  <div className="mt-1 flex justify-between">
-                    <button type="button" onClick={() => go(-1)} className="min-h-11 text-sm text-muted">{t('onboarding.back')}</button>
+                  <div className="mt-1 flex justify-end">
                     <button type="button" onClick={() => setIndividually(true)} className="min-h-11 text-sm font-medium text-muted underline">{t('onboarding.chooseIndividually')}</button>
                   </div>
                 </>
@@ -257,90 +205,34 @@ export function OnboardingPage() {
 
         {step === 'about' && (
           <>
-            {header(t('onboarding.profileTitle'), t('onboarding.profileIntro'))}
-            <div className="mt-6"><AboutFields value={about} onChange={setAbout} /></div>
+            {header(t('onboarding.profileTitle'), t('onboarding.aboutIntro'))}
+            <div className="mt-6"><AboutFields value={about} onChange={setAbout} compact /></div>
             {error && <p role="alert" className="mt-3 text-sm text-status-urgent">{error}</p>}
-            {footer(() => void run(saveAbout), { skippable: true })}
-          </>
-        )}
-
-        {step === 'pregnancy' && (
-          <>
-            {header(t('onboarding.pregnancyTitle'), t('onboarding.pregnancyIntro'))}
-            <div className="mt-6"><PregnancyField value={pregnancy} onChange={setPregnancy} /></div>
-            {footer(() => void run(() => saveProfileFields(profileId!, { pregnancy_status: pregnancy || null })), { skippable: true })}
-          </>
-        )}
-
-        {step === 'health' && (
-          <>
-            {header(t('onboarding.healthTitle'), t('onboarding.healthIntro'))}
-            <h2 className="mb-2 mt-6 text-sm font-semibold">{t('profileFields.conditionsLabel')}</h2>
-            <ChipGroup options={CONDITION_OPTIONS} i18nPrefix="profileFields.conditions" value={conditions} onChange={setConditions} none={noConditions} onNone={setNoConditions} />
-            <h2 className="mb-2 mt-6 text-sm font-semibold">{t('profileFields.allergiesLabel')}</h2>
-            <ChipGroup options={ALLERGY_OPTIONS} i18nPrefix="profileFields.allergies" value={allergies} onChange={setAllergies} none={noAllergies} onNone={setNoAllergies} />
-            <h2 className="mb-2 mt-6 text-sm font-semibold">{t('profileFields.smokingLabel')}</h2>
-            <SmokingField value={smoking} onChange={setSmoking} />
-            {error && <p role="alert" className="mt-3 text-sm text-status-urgent">{error}</p>}
-            {footer(() => void run(saveHealth), { skippable: true })}
-          </>
-        )}
-
-        {step === 'family' && (
-          <>
-            {header(t('onboarding.familyTitle'), t('onboarding.familyIntro'))}
-            <div className="mt-6"><ChipGroup options={FAMILY_OPTIONS} i18nPrefix="profileFields.family" value={family} onChange={setFamily} /></div>
-            {footer(() => void run(() => saveFamilyHistory(profileId!, family)), { skippable: true })}
-          </>
-        )}
-
-        {step === 'goals' && (
-          <>
-            {header(t('onboarding.goalsTitle'), t('onboarding.goalsIntro'))}
-            <div className="mt-6"><GoalsField value={goals} onChange={setGoals} /></div>
-            {footer(() => void run(() => saveProfileFields(profileId!, { health_goals: goals })), { skippable: true })}
-          </>
-        )}
-
-        {step === 'doctor' && (
-          <>
-            {header(t('onboarding.doctorTitle'), t('onboarding.doctorIntro'))}
-            <input className={`${fieldClass} mt-6`} value={doctor} maxLength={120} placeholder={t('onboarding.doctorPlaceholder')} onChange={(e) => setDoctor(e.target.value)} />
-            {footer(() => void run(() => saveProfileFields(profileId!, { physician_name: doctor.trim() || null })), { skippable: true })}
-          </>
-        )}
-
-        {step === 'alerts' && (
-          <>
-            {header(t('onboarding.alertsTitle'), t('onboarding.alertsIntro'))}
-            <div className="mt-6 rounded-2xl border border-line bg-surface p-4 text-sm">
-              <p className="flex items-center gap-2 font-medium"><Bell className="size-5 text-brand-700" aria-hidden /> {t('settings.push')}</p>
-              <p className="mt-1 text-muted">{push ? t(`settings.pushState.${push}`) : t('auth.loading')}</p>
-              {push === 'off' && session && (
-                <button type="button" onClick={async () => setPush(await enablePush(session.user.id))} className="mt-3 min-h-11 rounded-xl bg-brand-700 px-4 font-medium text-white">{t('settings.enablePush')}</button>
-              )}
+            <div className="mt-8 flex items-center gap-3">
+              <button type="button" disabled={saving} onClick={() => void run(saveAbout)} className="min-h-12 flex-1 rounded-xl bg-brand-700 px-4 font-medium text-white disabled:opacity-60">
+                {saving ? t('onboarding.saving') : t('onboarding.continue')}
+              </button>
+              <button type="button" onClick={() => go(1)} className="min-h-12 px-3 font-medium text-muted">{t('onboarding.skip')}</button>
             </div>
-            {footer(() => go(1), { skippable: push !== 'on' })}
           </>
         )}
 
         {step === 'start' && (
           <>
             {header(t('onboarding.startTitle'), t('onboarding.startIntro'))}
-            <div className="mt-6 grid gap-3">
-              {[
-                { to: '/records/scan', icon: Camera, label: t('onboarding.startScanReport'), hint: t('onboarding.startScanReportHint') },
-                { to: '/medications/new', icon: Pill, label: t('onboarding.startAddMedicine'), hint: t('onboarding.startAddMedicineHint') },
-                { to: '/records/scan', icon: FileText, label: t('onboarding.startScanPrescription'), hint: t('onboarding.startScanPrescriptionHint') },
-              ].map((a) => (
-                <button key={a.label} type="button" disabled={saving} onClick={() => void finish(a.to)}
-                  className="flex min-h-16 items-center gap-4 rounded-2xl border border-line bg-surface px-4 py-3 text-start disabled:opacity-60">
-                  <a.icon className="size-6 shrink-0 text-brand-700" aria-hidden />
-                  <span><span className="block font-medium">{a.label}</span><span className="block text-xs text-muted">{a.hint}</span></span>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {FIRST_ACTIONS.map((a) => (
+                <button key={a.key} type="button" disabled={saving} onClick={() => void finish(a.to, `first_action_${a.key}`)}
+                  className="flex min-h-36 flex-col items-start gap-3 rounded-2xl border border-line bg-surface p-4 text-start disabled:opacity-60">
+                  <span className="grid size-11 place-items-center rounded-xl bg-brand-50 text-brand-700"><a.icon className="size-6" aria-hidden /></span>
+                  <span>
+                    <span className="block font-semibold leading-snug">{t(`onboarding.first.${a.key}.title`)}</span>
+                    <span className="mt-1 block text-xs text-muted">{t(`onboarding.first.${a.key}.hint`)}</span>
+                  </span>
                 </button>
               ))}
             </div>
-            <button type="button" disabled={saving} onClick={() => void finish('/')} className="mt-4 min-h-12 w-full rounded-xl px-4 font-medium text-muted">{t('onboarding.startLater')}</button>
+            <button type="button" disabled={saving} onClick={() => void finish('/', 'first_action_explore')} className="mt-4 min-h-12 w-full rounded-xl px-4 font-medium text-muted">{t('onboarding.startLater')}</button>
           </>
         )}
       </main>

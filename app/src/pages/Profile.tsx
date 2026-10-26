@@ -8,9 +8,9 @@ import { parseNumber } from '../domain/numbers'
 import { AboutFields, ChipGroup, GoalsField, PregnancyField, SmokingField, fieldClass, type AboutValue } from '../components/ProfileFields'
 import { PageHeader } from '../components/ui'
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+function Section({ id, title, hint, children }: { id?: string; title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-line bg-surface p-4">
+    <section id={id} className="scroll-mt-20 rounded-2xl border border-line bg-surface p-4">
       <h2 className="font-semibold">{title}</h2>
       {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
       <div className="mt-3">{children}</div>
@@ -53,6 +53,9 @@ export function ProfilePage() {
       setAllergies(lists.allergies)
       setFamily(lists.family)
       setLoaded(true)
+      // Arriving from a "tell us…" card (e.g. /profile#family): go to that question.
+      const target = location.hash.slice(1)
+      if (target) requestAnimationFrame(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
     })
   }, [])
 
@@ -87,11 +90,11 @@ export function ProfilePage() {
           {index != null && <p className="mt-3 text-sm">{t('profile.bmi')}: <span className="ltr-value sensitive font-semibold">{index}</span></p>}
         </Section>
         {askPregnancy(about.sex || null, about.date_of_birth || null, today) && (
-          <Section title={t('onboarding.pregnancyTitle')} hint={t('onboarding.pregnancyIntro')}>
+          <Section id="pregnancy" title={t('onboarding.pregnancyTitle')} hint={t('onboarding.pregnancyIntro')}>
             <PregnancyField value={pregnancy} onChange={setPregnancy} />
           </Section>
         )}
-        <Section title={t('profileFields.conditionsLabel')}>
+        <Section id="health" title={t('profileFields.conditionsLabel')}>
           <ChipGroup options={CONDITION_OPTIONS} i18nPrefix="profileFields.conditions" value={conditions} onChange={setConditions} none={noConditions} onNone={setNoConditions} />
         </Section>
         <Section title={t('profileFields.allergiesLabel')}>
@@ -100,13 +103,13 @@ export function ProfilePage() {
         <Section title={t('profileFields.smokingLabel')}>
           <SmokingField value={smoking} onChange={setSmoking} />
         </Section>
-        <Section title={t('onboarding.familyTitle')} hint={t('onboarding.familyIntro')}>
+        <Section id="family" title={t('onboarding.familyTitle')} hint={t('onboarding.familyIntro')}>
           <ChipGroup options={FAMILY_OPTIONS} i18nPrefix="profileFields.family" value={family} onChange={setFamily} />
         </Section>
         <Section title={t('onboarding.goalsTitle')}>
           <GoalsField value={goals} onChange={setGoals} />
         </Section>
-        <Section title={t('onboarding.doctorTitle')}>
+        <Section id="doctor" title={t('onboarding.doctorTitle')}>
           <input className={fieldClass} value={doctor} maxLength={120} placeholder={t('onboarding.doctorPlaceholder')} onChange={(e) => setDoctor(e.target.value)} />
         </Section>
         <p className="text-xs text-muted">{t('profile.fromDocuments')}</p>
