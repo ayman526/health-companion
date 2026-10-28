@@ -74,22 +74,29 @@ export function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-dvh flex-col bg-canvas px-4 py-6">
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => setLanguage(i18n.language === 'ar' ? 'en' : 'ar')}
-          className="min-h-11 rounded-full border border-line bg-surface px-4 text-sm font-medium"
-        >
-          {t('actions.switchLanguage')}
-        </button>
-      </div>
+    <div className="flex min-h-dvh flex-col bg-canvas pb-6">
+      {/* Berry header with a curved bottom; the cards below overlap it. */}
+      <header className="rounded-b-[2.5rem] bg-hero px-4 pb-16 pt-6 text-on-hero">
+        <div className="mx-auto flex w-full max-w-sm items-center justify-between">
+          <p className="flex items-center gap-2 text-lg font-semibold">
+            <img src="/favicon.svg" alt="" className="size-8 rounded-lg ring-2 ring-on-hero/40" /> {t('app.name')}
+          </p>
+          <button
+            type="button"
+            onClick={() => setLanguage(i18n.language === 'ar' ? 'en' : 'ar')}
+            className="min-h-11 rounded-full border border-on-hero/50 px-4 text-sm font-medium"
+          >
+            {t('actions.switchLanguage')}
+          </button>
+        </div>
+        <div className="mx-auto mt-6 w-full max-w-sm">
+          <h1 className="text-3xl font-bold leading-snug tracking-tight">{t('auth.promise')}</h1>
+          <p className="mt-2 opacity-90">{t('auth.promiseLine')}</p>
+        </div>
+      </header>
 
-      <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center">
-        <p className="text-lg font-semibold text-brand-700">{t('app.name')}</p>
+      <main className="mx-auto -mt-10 flex w-full max-w-sm flex-1 flex-col px-4">
         {state.kind !== 'sent' && <PromiseCard />}
-        <h1 className="mt-5 text-2xl font-semibold leading-snug tracking-tight">{t('auth.promise')}</h1>
-        <p className="mt-1 text-muted">{t('auth.promiseLine')}</p>
 
         {!isSupabaseConfigured && (
           <p role="status" className="mt-8 rounded-xl bg-status-watch-bg px-4 py-3 text-sm text-status-watch">
@@ -98,7 +105,7 @@ export function SignInPage() {
         )}
 
         {state.kind === 'sent' ? (
-          <form onSubmit={verify} className="mt-8 rounded-2xl border border-line bg-surface p-5">
+          <form onSubmit={verify} className="rounded-2xl border border-line bg-surface p-5 shadow-sm">
             <MailCheck className="mb-3 size-8 text-brand-700" aria-hidden />
             <p role="status" className="font-medium">{t('auth.checkEmail')}</p>
             <p className="mt-1 text-sm text-muted">
@@ -132,7 +139,7 @@ export function SignInPage() {
             </div>
           </form>
         ) : (
-          <form onSubmit={submit} className="mt-8 flex flex-col gap-3">
+          <form onSubmit={submit} className="mt-6 flex flex-col gap-3">
             <label htmlFor="email" className="text-sm font-medium">
               {t('auth.email')}
             </label>
@@ -178,7 +185,7 @@ export function SignInPage() {
 function PromiseCard() {
   const { t } = useTranslation()
   return (
-    <div className="mt-4 rounded-2xl border border-line bg-surface p-4" aria-hidden>
+    <div className="rounded-2xl border border-line bg-surface p-4 shadow-sm" aria-hidden>
       <div className="flex items-baseline justify-between">
         <span className="font-semibold">{t('auth.cardTitle')}</span>
         <span className="font-semibold text-status-ok">6.4</span>
@@ -186,8 +193,8 @@ function PromiseCard() {
       <svg viewBox="0 0 200 86" className="mt-1 h-24 w-full">
         <line x1="0" y1="54" x2="200" y2="54" stroke="var(--color-line)" strokeDasharray="3 3" />
         <line x1="55" y1="4" x2="55" y2="66" stroke="var(--color-status-watch)" strokeWidth="1" />
-        <polyline points="10,12 55,16 100,34 145,46 190,60" fill="none" stroke="var(--color-brand-700)" strokeWidth="2" />
-        {[[10, 12], [55, 16], [100, 34], [145, 46], [190, 60]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3" fill="var(--color-brand-700)" />)}
+        <polyline points="10,12 55,16 100,34 145,46 190,60" fill="none" stroke="var(--color-plum-700)" strokeWidth="2.5" />
+        {[[10, 12], [55, 16], [100, 34], [145, 46], [190, 60]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="3.5" fill={x === 190 ? 'var(--color-sun-500)' : 'var(--color-plum-700)'} />)}
       </svg>
       {/* Under the marker line (x = 55 of 200); the years read left to right, like the chart. */}
       <div dir="ltr" className="relative h-6">

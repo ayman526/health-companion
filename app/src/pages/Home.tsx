@@ -69,12 +69,13 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      <header className="flex items-center justify-between gap-3">
+      {/* Berry greeting block, full-bleed on phones. */}
+      <header className="-mx-4 -mt-5 flex items-center justify-between gap-3 rounded-b-[2rem] bg-hero px-5 pb-7 pt-6 text-on-hero md:mx-0 md:mt-0 md:rounded-3xl">
         <div className="min-w-0">
-          <p className="text-xs text-muted">{new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())}</p>
-          <h1 className="truncate text-xl font-semibold tracking-tight">{greeting}</h1>
+          <p className="text-xs opacity-90">{new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())}</p>
+          <h1 className="truncate text-2xl font-bold tracking-tight">{greeting}</h1>
         </div>
-        <Link to="/family" aria-label={t('family.switchPerson')} className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-50 text-sm font-semibold text-brand-700">
+        <Link to="/family" aria-label={t('family.switchPerson')} className="grid size-11 shrink-0 place-items-center rounded-full bg-on-hero/20 text-sm font-semibold ring-2 ring-on-hero/40">
           {forFamily ? personName.slice(0, 1) : <UserRound className="size-5" aria-hidden />}
         </Link>
       </header>

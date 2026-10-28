@@ -60,11 +60,11 @@ export function TestHistoryPage() {
 
       {latest ? (
         <>
-          <section className="mb-4 rounded-2xl border border-line bg-surface p-4">
-            <div className="flex items-start justify-between gap-3">
+          <section className="mb-4 rounded-3xl border border-line bg-surface p-4">
+            <div className="-m-4 mb-0 flex items-start justify-between gap-3 rounded-t-3xl bg-plum-50 p-4">
               <div>
                 <p className="text-xs text-muted">{t('history.latest', { date: formatDate(latest.collectedAt, lang) })}</p>
-                <p className="text-2xl font-semibold"><span className="ltr-value sensitive">{formatNumber(latest.value, lang)} {latest.unit}</span></p>
+                <p className="text-3xl font-bold text-plum-700"><span className="ltr-value sensitive">{formatNumber(latest.value, lang)} {latest.unit}</span></p>
               </div>
               <StatusBadge status={measurementStatus(test, latest)} />
             </div>

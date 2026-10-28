@@ -136,7 +136,7 @@ export function YourDayCard({ timeZone }: { timeZone: string }) {
       {/* Logging a reading is an action, not a tick-box: its own row with a "+". */}
       {!readOnly && reading.show && !reading.done && (
         <Link to="/vitals" className="mt-3 flex min-h-12 items-center gap-3 rounded-xl bg-brand-50 px-3 text-brand-700">
-          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-700 text-white"><Plus className="size-4" aria-hidden /></span>
+          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-sun-500 text-white"><Plus className="size-4" aria-hidden /></span>
           <span className="flex-1 text-sm font-semibold">{t('home.logReading')}</span>
           <HeartPulse className="size-4" aria-hidden />
         </Link>

@@ -7,7 +7,7 @@ import { useSyncExternalStore } from 'react'
 export type ThemePref = 'system' | 'light' | 'dark'
 
 const STORAGE_KEY = 'hc.theme'
-const BAR_COLOR = { light: '#0b4f5c', dark: '#0f1416' }
+const BAR_COLOR = { light: '#b0175f', dark: '#140f13' }
 const media = window.matchMedia('(prefers-color-scheme: dark)')
 const listeners = new Set<() => void>()
 

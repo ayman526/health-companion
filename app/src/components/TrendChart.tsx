@@ -28,8 +28,8 @@ const M = { top: 20, right: 20, bottom: 30, left: 44 }
 // Marks: one series, so no legend box (the page title names it). Abnormal points
 // use the reserved status colors and are always paired with a text label in the tooltip and list.
 const POINT_FILL: Record<MeasurementStatus, string> = {
-  within_range: 'var(--color-brand-700)',
-  no_range: 'var(--color-brand-700)',
+  within_range: 'var(--color-plum-700)',
+  no_range: 'var(--color-plum-700)',
   high: 'var(--color-status-watch)',
   low: 'var(--color-status-watch)',
   urgent: 'var(--color-status-urgent)',
@@ -112,7 +112,7 @@ export function TrendChart({ points, unit, refLow, refHigh, onSelect, statusLabe
         )}
         {/* Crosshair */}
         {tip && <line x1={tip.cx} x2={tip.cx} y1={M.top} y2={HEIGHT - M.bottom} stroke="var(--color-muted)" strokeWidth={1} strokeDasharray="3 3" />}
-        <path d={path} fill="none" stroke="var(--color-brand-600)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+        <path d={path} fill="none" stroke="var(--color-plum-700)" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {xy.map((p, i) => (
           <g key={p.id}>
             <circle cx={p.cx} cy={p.cy} r={active === i ? 7 : 5} fill={POINT_FILL[p.status]} stroke="var(--color-surface)" strokeWidth={2} />

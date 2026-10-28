@@ -5,18 +5,31 @@
 @theme {
   --font-sans: "Inter", "IBM Plex Sans Arabic", system-ui, sans-serif;
 
-  /* Deep ink-teal, matching the app icon: closer to a medical record than a wellness app. */
-  --color-brand-50: #eff7f5;
-  --color-brand-100: #d3ece6;
-  --color-brand-500: #2a8c8c;
-  --color-brand-600: #126470;
-  --color-brand-700: #0b4f5c;
+  /* Berry: warm and personal (users found the old teal too formal).
+     brand-700 is the main colour for text and filled buttons (AA on white). */
+  --color-brand-50: #fdeff5;
+  --color-brand-100: #f9d3e4;
+  --color-brand-500: #e0559a;
+  --color-brand-600: #c42a73;
+  --color-brand-700: #b0175f;
+
+  /* Plum: second colour for test pages and charts. Sun: warm accent for
+     quick actions (fills and icons only; too light for text on white). */
+  --color-plum-50: #f3ecfc;
+  --color-plum-700: #6d28b8;
+
+  /* Big colour blocks (sign-in, Home greeting): deep berry with white text in both modes. */
+  --color-hero: #b0175f;
+  --color-on-hero: #ffffff;
+  --color-sun-50: #fff1ea;
+  --color-sun-500: #ff8a5b;
+  --color-sun-700: #b1461d;
 
   --color-surface: #ffffff;
-  --color-canvas: #fafaf7;
-  --color-ink: #14201e;
-  --color-muted: #5d6a67;
-  --color-line: #e7e5df;
+  --color-canvas: #fbf8f9;
+  --color-ink: #1f1420;
+  --color-muted: #6b5f68;
+  --color-line: #ede5ea;
 
   --color-status-ok: #15803d;
   --color-status-ok-bg: #ecfdf3;
@@ -29,25 +42,32 @@
 }
 
 /* Dark mode: chosen in Settings (System / Light / Dark); lib/theme.ts sets
-   data-theme on <html>. Filled buttons become light teal or light red with
+   data-theme on <html>. Filled buttons become light pink or light red with
    dark text (--color-white is the "text on a filled colour" token). All
    text/background pairs here are at least WCAG AA (4.5:1). Printouts always
    use the light colours. */
 @media screen {
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --color-brand-50: #16302f;
-    --color-brand-100: #1f403e;
-    --color-brand-500: #4fb3ac;
-    --color-brand-600: #6cc3bb;
-    --color-brand-700: #8ad3ca;
+    --color-brand-50: #2b1520;
+    --color-brand-100: #4a1f33;
+    --color-brand-500: #d9558f;
+    --color-brand-600: #ec79a9;
+    --color-brand-700: #f48fb8;
 
-    --color-surface: #172024;
-    --color-canvas: #0f1416;
-    --color-ink: #e6ecea;
-    --color-muted: #a3b0ad;
-    --color-line: #2a3539;
-    --color-white: #0f1416;
+    --color-hero: #7d1046;
+    --color-plum-50: #261a38;
+    --color-plum-700: #c4a5f5;
+    --color-sun-50: #3a2018;
+    --color-sun-500: #ff9f7a;
+    --color-sun-700: #ffb394;
+
+    --color-surface: #1e161b;
+    --color-canvas: #140f13;
+    --color-ink: #f1e8ed;
+    --color-muted: #b6a6b0;
+    --color-line: #3a2d35;
+    --color-white: #140f13;
 
     --color-status-ok: #7dd69a;
     --color-status-ok-bg: #13281b;
