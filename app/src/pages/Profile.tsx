@@ -7,6 +7,9 @@ import { ALLERGY_OPTIONS, CONDITION_OPTIONS, FAMILY_OPTIONS, ageOn, askPregnancy
 import { parseNumber } from '../domain/numbers'
 import { AboutFields, ChipGroup, GoalsField, PregnancyField, SmokingField, fieldClass, type AboutValue } from '../components/ProfileFields'
 import { PageHeader } from '../components/ui'
+import { PregnancyCelebration } from '../components/PregnancyCelebration'
+import { dueMonthOptions } from '../domain/pregnancy'
+import { formatMonth } from '../lib/format'
 
 function Section({ id, title, hint, children }: { id?: string; title: string; hint?: string; children: React.ReactNode }) {
   return (
@@ -19,12 +22,16 @@ function Section({ id, title, hint, children }: { id?: string; title: string; hi
 }
 
 export function ProfilePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { profile, refreshProfile } = useAuth()
   const today = todayIn(profile?.time_zone ?? 'Africa/Cairo')
   const [loaded, setLoaded] = useState(false)
   const [about, setAbout] = useState<AboutValue>({ display_name: '', date_of_birth: '', sex: '', country: 'EG', height_cm: '', weight_kg: '' })
   const [pregnancy, setPregnancy] = useState('')
+  const [dueMonth, setDueMonth] = useState('')
+  // What's saved, so the celebration only plays when it changes to pregnant.
+  const [savedPregnancy, setSavedPregnancy] = useState('')
+  const [celebrating, setCelebrating] = useState(false)
   const [conditions, setConditions] = useState<string[]>([])
   const [noConditions, setNoConditions] = useState(false)
   const [allergies, setAllergies] = useState<string[]>([])
@@ -43,6 +50,8 @@ export function ProfilePage() {
           height_cm: p.height_cm ? String(p.height_cm) : '', weight_kg: p.weight_kg ? String(p.weight_kg) : '',
         })
         setPregnancy(p.pregnancy_status ?? '')
+        setSavedPregnancy(p.pregnancy_status ?? '')
+        setDueMonth(p.due_month ?? '')
         setSmoking(p.smoking_status ?? '')
         setNoConditions(p.no_known_conditions)
         setNoAllergies(p.no_known_allergies)
@@ -68,15 +77,38 @@ export function ProfilePage() {
     const ok = (await saveProfileFields(profile.id, {
       display_name: about.display_name.trim() || null, date_of_birth: about.date_of_birth || null, sex: about.sex || null,
       country: about.country, height_cm: parseNumber(about.height_cm), weight_kg: parseNumber(about.weight_kg),
-      pregnancy_status: showPregnancy ? pregnancy || null : null, smoking_status: smoking || null,
+      pregnancy_status: showPregnancy ? pregnancy || null : null,
+      due_month: showPregnancy && pregnancy === 'pregnant' ? dueMonth || null : null, smoking_status: smoking || null,
       no_known_conditions: noConditions, no_known_allergies: noAllergies, health_goals: goals, physician_name: doctor.trim() || null,
     }))
       && (await saveConditions(profile.id, noConditions ? [] : conditions))
       && (await saveAllergies(profile.id, noAllergies ? [] : allergies))
       && (await saveFamilyHistory(profile.id, family))
     setStatus(ok ? 'saved' : 'error')
-    if (ok) await refreshProfile()
+    if (ok) {
+      setSavedPregnancy(showPregnancy ? pregnancy : '')
+      await refreshProfile()
+    }
   }
+
+  function changePregnancy(value: string) {
+    setPregnancy(value)
+    if (value === 'pregnant' && savedPregnancy !== 'pregnant') setCelebrating(true)
+  }
+
+  // The celebration saves right away, so the due month isn't lost if the page is left.
+  async function finishCelebration(due: string | null) {
+    if (!profile) return false
+    const ok = await saveProfileFields(profile.id, { pregnancy_status: 'pregnant', due_month: due })
+    if (!ok) return false
+    setSavedPregnancy('pregnant')
+    setDueMonth(due ?? '')
+    setCelebrating(false)
+    return true
+  }
+
+  const dueOptions = dueMonthOptions(today)
+  if (dueMonth && !dueOptions.includes(dueMonth)) dueOptions.unshift(dueMonth)
 
   const index = bmi(parseNumber(about.height_cm), parseNumber(about.weight_kg))
 
@@ -91,7 +123,16 @@ export function ProfilePage() {
         </Section>
         {askPregnancy(about.sex || null, about.date_of_birth || null, today) && (
           <Section id="pregnancy" title={t('onboarding.pregnancyTitle')} hint={t('onboarding.pregnancyIntro')}>
-            <PregnancyField value={pregnancy} onChange={setPregnancy} />
+            <PregnancyField value={pregnancy} onChange={changePregnancy} />
+            {pregnancy === 'pregnant' && (
+              <label className="mt-4 flex flex-col gap-2 text-sm font-medium">
+                {t('pregnancy.dueMonth')}
+                <select className={fieldClass} value={dueMonth} onChange={(e) => setDueMonth(e.target.value)}>
+                  <option value="">{t('pregnancy.dueNotSure')}</option>
+                  {dueOptions.map((m) => <option key={m} value={m}>{formatMonth(m, i18n.language)}</option>)}
+                </select>
+              </label>
+            )}
           </Section>
         )}
         <Section id="health" title={t('profileFields.conditionsLabel')}>
@@ -122,6 +163,13 @@ export function ProfilePage() {
           {status === 'underage' && <p role="alert" className="text-center text-sm text-status-urgent">{t('onboarding.mustBeAdult')}</p>}
         </div>
       </div>
+      {celebrating && (
+        <PregnancyCelebration
+          today={today}
+          name={profile && profile.relationship !== 'self' ? profile.display_name ?? undefined : undefined}
+          onDone={finishCelebration}
+        />
+      )}
     </>
   )
 }

@@ -1917,5 +1917,131 @@
     "medsNote": "Dose changes are kept too, so you and your doctor can see your full treatment history.",
     "remindersNote": "Reminders work for family members you look after, too.",
     "bandNote": "Shaded: the normal range printed on the report."
+  },
+  "pregnancy": {
+    "celebrate": {
+      "title": "Congratulations",
+      "titleFor": "Congratulations to {{name}}",
+      "body": "A new chapter is on its way. We'll be with you, month by month.",
+      "dueTitle": "When is the baby due?",
+      "dueHint": "The month is enough. We'll use it to show tips for each month.",
+      "save": "Save",
+      "notNow": "Not now",
+      "pickFirst": "Pick a month first",
+      "saveError": "Couldn't save. Try again."
+    },
+    "dueMonth": "Due month",
+    "dueNotSure": "Not sure yet",
+    "card": {
+      "title": "Month {{month}} of your pregnancy",
+      "titleFor": "Month {{month}} of {{name}}'s pregnancy",
+      "sub": "About week {{week}} · due {{due}}",
+      "anyDay": "Any day now · due {{due}}",
+      "week": "week",
+      "forThisMonth": "For this month",
+      "addDueTitle": "Add the due month",
+      "addDueBody": "We'll show tips for each month of the pregnancy.",
+      "arrivedTitle": "Has the baby arrived?",
+      "arrivedBody": "The due month has passed.",
+      "arrivedYes": "Yes, the baby's here",
+      "arrivedNotYet": "Not yet",
+      "arrivedDone": "Congratulations on the baby. If you're breastfeeding, add it to the profile, since some ranges change."
+    },
+    "labs": {
+      "title": "Your results, in context",
+      "body": "Some lab ranges, like hemoglobin and thyroid, are different in pregnancy. Ask your doctor about yours."
+    },
+    "tips": {
+      "m1": {
+        "a": {
+          "title": "Folic acid matters early",
+          "body": "It helps the baby's spine form in the first weeks. Ask your doctor which supplement fits you."
+        },
+        "b": {
+          "title": "Your first visit",
+          "body": "First visits often include a blood count, blood group and a few other tests. Add the report here when you get it."
+        }
+      },
+      "m2": {
+        "a": {
+          "title": "The first scan",
+          "body": "A first ultrasound often happens between weeks 11 and 14."
+        },
+        "b": {
+          "title": "Keep it all together",
+          "body": "Add your pregnancy reports as they come, so every result is in one place."
+        }
+      },
+      "m3": {
+        "a": {
+          "title": "Feeling a bit better",
+          "body": "Many people feel less tired and less sick around now."
+        },
+        "b": {
+          "title": "Coming up: the detailed scan",
+          "body": "It often happens between weeks 18 and 22. Ask your doctor when yours is."
+        }
+      },
+      "m4": {
+        "a": {
+          "title": "First kicks",
+          "body": "Many feel the baby move for the first time between weeks 16 and 22."
+        },
+        "b": {
+          "title": "Blood count",
+          "body": "Blood count is often repeated during pregnancy. Add each result to see your trend."
+        }
+      },
+      "m5": {
+        "a": {
+          "title": "The detailed scan",
+          "body": "It often happens between weeks 18 and 22. Ask your doctor when yours is."
+        },
+        "b": {
+          "title": "Coming up: the sugar test",
+          "body": "Guidelines often check blood sugar between weeks 24 and 28. Ask your doctor about it."
+        }
+      },
+      "m6": {
+        "a": {
+          "title": "Sugar test time",
+          "body": "Guidelines often check blood sugar between weeks 24 and 28."
+        },
+        "b": {
+          "title": "Blood count again",
+          "body": "Many doctors repeat the blood count around now. Add it to see how it compares."
+        }
+      },
+      "m7": {
+        "a": {
+          "title": "Third trimester",
+          "body": "Visits often get closer together from here."
+        },
+        "b": {
+          "title": "The baby's moves",
+          "body": "Ask your doctor how to keep track of the baby's moves."
+        }
+      },
+      "m8": {
+        "a": {
+          "title": "Getting ready",
+          "body": "A good month to pack the hospital bag and save your doctor's number."
+        },
+        "b": {
+          "title": "Your records, ready",
+          "body": "Your health summary can go with you on delivery day."
+        }
+      },
+      "m9": {
+        "a": {
+          "title": "Almost there",
+          "body": "Visits are often every week now."
+        },
+        "b": {
+          "title": "Know when to call",
+          "body": "Ask your doctor which signs mean you should call or go in."
+        }
+      }
+    }
   }
 }

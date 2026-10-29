@@ -9,6 +9,7 @@ import { loadSuggestions } from '../lib/suggestions'
 import { todayIn } from '../lib/medications'
 import { YourDayCard } from '../components/home/YourDayCard'
 import { WeekTiles } from '../components/home/WeekTiles'
+import { PregnancyCard } from '../components/home/PregnancyCard'
 import { AddButton } from '../components/home/AddButton'
 import { InstallPrompt } from '../components/InstallPrompt'
 import { PushPrompt } from '../components/PushPrompt'
@@ -99,6 +100,8 @@ export function HomePage() {
 
       <PushPrompt />
       <InstallPrompt />
+
+      <PregnancyCard today={todayIn(profile.time_zone)} />
 
       <YourDayCard timeZone={profile.time_zone} />
 

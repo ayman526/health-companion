@@ -11,6 +11,8 @@ export interface ProfileDetails {
   height_cm: number | null
   weight_kg: number | null
   pregnancy_status: string | null
+  /** First day of the due month, only while pregnant. */
+  due_month: string | null
   smoking_status: string | null
   no_known_conditions: boolean
   no_known_allergies: boolean
@@ -25,7 +27,7 @@ export interface HealthLists {
   family: string[]
 }
 
-const PROFILE_SELECT = 'id, display_name, date_of_birth, sex, country, time_zone, height_cm, weight_kg, pregnancy_status, smoking_status, no_known_conditions, no_known_allergies, health_goals, physician_name, onboarding_step'
+const PROFILE_SELECT = 'id, display_name, date_of_birth, sex, country, time_zone, height_cm, weight_kg, pregnancy_status, due_month, smoking_status, no_known_conditions, no_known_allergies, health_goals, physician_name, onboarding_step'
 
 export async function loadProfileDetails(): Promise<{ profile: ProfileDetails | null; lists: HealthLists }> {
   const empty = { conditions: [], allergies: [], family: [] }
