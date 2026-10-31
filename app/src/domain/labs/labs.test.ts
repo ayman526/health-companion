@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LAB_TESTS, getTest, learnedKey, matchTest, nameKeys, nameOnlyTest, normalizeUnit, toCanonical } from './catalog'
+import { LAB_TESTS, getTest, learnedKey, fitsSection, matchTest, nameKeys, sectionsInContext, nameOnlyTest, normalizeUnit, toCanonical } from './catalog'
 import { buildSeries, compareLatest, referenceChangeValue, type LabResultInput } from './compare'
 import { draftStatus, guidelineFindings, liverElevationGrade, measurementStatus } from './rules'
 
@@ -358,5 +358,106 @@ describe('section headings', () => {
     expect(matchTest('RBCs', null, undefined, { section: 'Complete Blood Count' })?.code).toBe('rbc')
     expect(matchTest('pH', null, undefined, { section: 'تحليل البول' })?.code).toBe('urine_ph')
     expect(matchTest('Pus cells', null, undefined, { section: 'Urine Analysis' })?.code).toBe('urine_pus')
+  })
+})
+
+describe('stool analysis', () => {
+  // The report from the screenshot: main heading, then sub-headings.
+  const REPORT: [string, string][] = [
+    ['Colour', 'MACROSCOPIC EXAMINATION'], ['Odour', 'MACROSCOPIC EXAMINATION'], ['Consistency', 'MACROSCOPIC EXAMINATION'],
+    ['Mucus', 'MACROSCOPIC EXAMINATION'], ['Blood', 'MACROSCOPIC EXAMINATION'], ['pH', 'MACROSCOPIC EXAMINATION'],
+    ['Worms', 'MACROSCOPIC EXAMINATION'], ['Undigested Food', 'MACROSCOPIC EXAMINATION'],
+    ['Vegetable Cells', '1. Digestion'], ['Starch', '1. Digestion'], ['Muscle Fibers', '1. Digestion'], ['Fat', '1. Digestion'],
+    ['Pus Cells', '2. Cytology'], ['RBCs', '2. Cytology'], ['Epithelial Cells', '2. Cytology'], ['Yeast Cells', '2. Cytology'],
+    ['Protozoa', '3. Parasites'],
+  ]
+  const EXPECTED = [
+    'stool_colour', 'stool_odour', 'stool_consistency', 'stool_mucus', 'stool_blood', 'stool_ph', 'stool_ova', 'stool_undigested_food',
+    'stool_vegetable_cells', 'stool_starch', 'stool_muscle_fibers', 'stool_fat',
+    'stool_pus', 'stool_rbc', 'stool_epithelial', 'stool_yeast', 'stool_protozoa',
+  ]
+  const codes = (rows: [string, string][]) => {
+    const sections = sectionsInContext(rows.map(([name, section]) => ({ name, section })))
+    return rows.map(([name], i) => matchTest(name, null, undefined, { section: sections[i] })?.code ?? null)
+  }
+
+  it('reads every row when only the sub-headings were kept', () => {
+    expect(codes(REPORT)).toEqual(EXPECTED)
+  })
+
+  it('reads every row under the main heading and its sub-headings', () => {
+    expect(codes(REPORT.map(([n, s]) => [n, `Stool Analysis > ${s}`]))).toEqual(EXPECTED)
+    expect(codes([['Stool Analysis', 'x'], ...REPORT].slice(1).map(([n, s], i) => [n, i < 3 ? 'Stool Analysis' : s]))).toEqual(EXPECTED)
+  })
+
+  it('keeps blood count and urine rows as they are', () => {
+    expect(codes([['RBCs', 'Complete Blood Count'], ['Fat', 'MICROSCOPIC EXAMINATION'], ['Starch', 'MICROSCOPIC EXAMINATION']]))
+      .toEqual(['rbc', 'stool_fat', 'stool_starch'])
+    expect(codes([['Colour', 'Urine Analysis'], ['Specific gravity', 'Urine Analysis'], ['Pus cells', 'Microscopic examination'], ['RBCs', 'Microscopic examination']]))
+      .toEqual(['urine_colour', 'urine_sg', 'urine_pus', 'urine_rbc'])
+  })
+
+  it('does not guess a sample for plain sub-headings with nothing to go on', () => {
+    expect(codes([['Colour', 'MACROSCOPIC EXAMINATION'], ['Pus cells', 'MICROSCOPIC EXAMINATION']])).toEqual([null, 'urine_pus'])
+  })
+
+  it('recognizes stool-only names anywhere', () => {
+    expect(matchTest('Occult blood')?.code).toBe('stool_occult_blood')
+    expect(matchTest('Muscle fibres')?.code).toBe('stool_muscle_fibers')
+  })
+})
+
+describe('the sample decides the test, for any report', () => {
+  const codes = (rows: [string, string][]) => {
+    const sections = sectionsInContext(rows.map(([name, section]) => ({ name, section })))
+    return rows.map(([name], i) => matchTest(name, null, undefined, { section: sections[i] })?.code ?? null)
+  }
+
+  it('reads a full urine analysis with sub-headings', () => {
+    expect(codes([
+      ['Colour', 'Urine Analysis > Physical Examination'], ['Appearance', 'Urine Analysis > Physical Examination'],
+      ['Specific Gravity', 'Urine Analysis > Physical Examination'], ['pH', 'Urine Analysis > Chemical Examination'],
+      ['Glucose', 'Urine Analysis > Chemical Examination'], ['Protein', 'Urine Analysis > Chemical Examination'],
+      ['Ketones', 'Urine Analysis > Chemical Examination'], ['Bilirubin', 'Urine Analysis > Chemical Examination'],
+      ['Blood', 'Urine Analysis > Chemical Examination'], ['Nitrite', 'Urine Analysis > Chemical Examination'],
+      ['Pus Cells', 'Urine Analysis > Microscopic Examination'], ['RBCs', 'Urine Analysis > Microscopic Examination'],
+      ['Epithelial Cells', 'Urine Analysis > Microscopic Examination'], ['Crystals', 'Urine Analysis > Microscopic Examination'],
+      ['Casts', 'Urine Analysis > Microscopic Examination'],
+    ])).toEqual([
+      'urine_colour', 'urine_appearance', 'urine_sg', 'urine_ph', 'urine_glucose', 'urine_protein', 'urine_ketones', 'urine_bilirubin',
+      'urine_blood', 'urine_nitrite', 'urine_pus', 'urine_rbc', 'urine_epithelial', 'urine_crystals', 'urine_casts',
+    ])
+  })
+
+  it('takes the sample from the heading printed above the sub-headings', () => {
+    expect(codes([
+      ['Colour', 'Urine Analysis'], ['Glucose', 'CHEMICAL EXAMINATION'], ['Protein', 'CHEMICAL EXAMINATION'], ['Pus cells', 'MICROSCOPIC EXAMINATION'],
+    ])).toEqual(['urine_colour', 'urine_glucose', 'urine_protein', 'urine_pus'])
+    // No heading names the sample, but ketones and nitrite only exist in urine.
+    expect(codes([['Glucose', 'Chemical examination'], ['Ketones', 'Chemical examination'], ['Nitrite', 'Chemical examination']]))
+      .toEqual(['urine_glucose', 'urine_ketones', 'urine_nitrite'])
+  })
+
+  it('never puts a result from another sample on a blood test', () => {
+    // Semen and body fluids: no tests for them yet, so they're left for the person to pick.
+    expect(codes([['pH', 'Semen Analysis'], ['Glucose', 'Semen Analysis'], ['WBCs', 'Semen Analysis > Microscopic']])).toEqual([null, null, null])
+    expect(codes([['Protein', 'Pleural Fluid Analysis'], ['Glucose', 'Pleural Fluid'], ['LDH', 'Ascitic fluid']])).toEqual([null, null, null])
+    expect(codes([['Creatinine', '24 Hour Urine'], ['Glucose', 'تحليل البول']])).toEqual([null, 'urine_glucose'])
+  })
+
+  it('keeps blood results as blood, in a mixed report', () => {
+    expect(codes([
+      ['Glucose', 'Blood Chemistry'], ['Bilirubin', 'Liver Function Tests'], ['RBCs', 'Complete Blood Count'], ['Hb', 'Complete Blood Count'],
+      ['Glucose', 'Urine Analysis'], ['RBCs', 'Urine Analysis > Microscopic'],
+      ['Colour', 'Stool Analysis'], ['RBCs', 'MICROSCOPIC EXAMINATION'],
+      ['Creatinine', 'Serum and Urine Chemistry'],
+    ])).toEqual(['glucose', 'bilirubin_total', 'rbc', 'hemoglobin', 'urine_glucose', 'urine_rbc', 'stool_colour', 'stool_rbc', 'creatinine'])
+  })
+
+  it('checks the reading service suggestion against the sample too', () => {
+    expect(fitsSection('glucose', 'Urine Analysis > Chemical')).toBe(false)
+    expect(fitsSection('urine_glucose', 'Urine Analysis > Chemical')).toBe(true)
+    expect(fitsSection('glucose', 'Lipid Profile')).toBe(true)
+    expect(fitsSection('glucose', null)).toBe(true)
   })
 })

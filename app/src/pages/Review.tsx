@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle, CheckCircle2, ChevronDown, ExternalLink, Plus, Trash2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { LAB_TESTS, getTest, learnedKey, matchTest, unitFits, type MatchSource } from '../domain/labs/catalog'
+import { LAB_TESTS, getTest, learnedKey, fitsSection, matchTest, sectionsInContext, unitFits, type MatchSource } from '../domain/labs/catalog'
 import { draftStatus } from '../domain/labs/rules'
 import { StatusBadge } from '../components/LabStatus'
 import { PageHeader } from '../components/ui'
@@ -30,6 +30,8 @@ interface DraftResult {
   /** AI suggestion rejected because its unit doesn't fit that test. */
   rejectedSuggestion: string | null
   reported_name: string
+  /** The heading it's printed under, with its sample (see sectionsInContext). */
+  section: string | null
   value: string
   value_comparator: string
   value_text: string
@@ -50,7 +52,7 @@ const newKey = () => `row-${++keySeq}`
 
 function emptyRow(): DraftResult {
   return {
-    key: newKey(), id: null, test_code: '', source: null, rejectedSuggestion: null, reported_name: '', value: '',
+    key: newKey(), id: null, test_code: '', source: null, rejectedSuggestion: null, reported_name: '', section: null, value: '',
     value_comparator: '', value_text: '', unit: '', ref_low: '', ref_high: '', ref_text: '', lab_flag: '',
     needs_confirmation: [], checked: true, expanded: true,
   }
@@ -123,11 +125,13 @@ export function ReviewPage() {
       const shared = new Map((sharedRows ?? []).map((a) => [a.alias_key, a.test_code]))
       names.current = { learned, shared }
 
-      const loaded = (res ?? []).map((r): DraftResult => {
+      // Sub-headings ("Microscopic examination") take their sample (stool, urine) from the heading above.
+      const sections = sectionsInContext((res ?? []).map((r) => ({ name: r.reported_name, section: r.note })))
+      const loaded = (res ?? []).map((r, i): DraftResult => {
         // Deterministic match first (learned names, catalog); then the AI suggestion if its unit fits.
-        const det = matchTest(r.reported_name, null, learned, { shared, unit: r.unit, numeric: r.value_numeric != null, section: r.note })
+        const det = matchTest(r.reported_name, null, learned, { shared, unit: r.unit, numeric: r.value_numeric != null, section: sections[i] })
         const suggested = r.test_code ? getTest(r.test_code) : undefined
-        const suggestionFits = !!suggested && (r.value_numeric == null || unitFits(suggested, r.unit))
+        const suggestionFits = !!suggested && fitsSection(suggested.code, sections[i]) && (r.value_numeric == null || unitFits(suggested, r.unit))
         const code = det?.code ?? (suggestionFits ? suggested.code : '')
         const row: DraftResult = {
           key: newKey(),
@@ -136,6 +140,7 @@ export function ReviewPage() {
           source: det?.source ?? (suggestionFits ? 'ai_suggested' : null),
           rejectedSuggestion: !det && suggested && !suggestionFits ? suggested.code : null,
           reported_name: r.reported_name,
+          section: sections[i],
           value: r.value_numeric == null ? '' : String(r.value_numeric),
           value_comparator: r.value_comparator ?? '',
           value_text: r.value_text ?? '',
@@ -295,7 +300,7 @@ export function ReviewPage() {
               className={field('reported_name')}
               value={r.reported_name}
               onChange={(e) => {
-                const det = r.source === 'manual' ? null : matchTest(e.target.value, null, names.current.learned, { shared: names.current.shared, unit: r.unit, numeric: r.value.trim() !== '' })
+                const det = r.source === 'manual' ? null : matchTest(e.target.value, null, names.current.learned, { shared: names.current.shared, unit: r.unit, numeric: r.value.trim() !== '', section: r.section })
                 update(r.key, det ? { reported_name: e.target.value, test_code: det.code, source: det.source } : { reported_name: e.target.value })
               }}
             />

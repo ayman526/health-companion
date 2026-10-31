@@ -664,4 +664,178 @@ export const TEST_INFO_EN: Record<string, TestInfo> = {
     low: 'More acidic urine can come from diet, dehydration or some conditions such as diabetes that isn’t well controlled.',
     helps: 'Diet affects urine pH a lot. Your doctor reads it with the rest of the urine test.',
   },
+  // ---------------------------------------------------------------- stool analysis
+  stool_colour: {
+    about: 'The lab notes the colour of the stool sample. Brown is the usual colour.',
+    positive: 'Colour changes often come from food, iron tablets or some medications. Black, red or very pale stool is worth showing your doctor.',
+    helps: 'Your doctor reads the colour with the rest of the stool test.',
+  },
+  stool_consistency: {
+    about: 'Consistency describes how firm or loose the stool sample is (formed, soft, loose, watery).',
+    positive: 'Loose or watery stool can come from food, infection or some medications. Hard stool is common with constipation.',
+    helps: 'Water, fiber and regular meals help keep stool soft and formed.',
+  },
+  stool_odour: {
+    about: 'The lab notes the smell of the sample. A usual stool smell is reported as faecal.',
+    positive: 'A very strong or unusual smell can come from diet, infection or problems digesting fat.',
+    helps: 'Your doctor reads it with the rest of the stool test.',
+  },
+  stool_mucus: {
+    about: 'This checks for mucus, a clear jelly-like substance, in the stool. Usually none is seen.',
+    positive: 'Mucus can appear with irritation or inflammation of the bowel, some infections or constipation.',
+    helps: 'If you also have pain, diarrhea or blood, tell your doctor.',
+  },
+  stool_blood: {
+    about: 'This checks for blood you can see in the stool sample. Usually none is seen.',
+    positive: 'Visible blood can come from piles (hemorrhoids), a small tear, infection or other bowel problems.',
+    helps: 'Show this result to your doctor, especially if it happens again.',
+  },
+  stool_occult_blood: {
+    about: 'This test looks for small amounts of blood in stool that you can’t see. It is used in bowel cancer screening.',
+    positive: 'A positive result means blood was found. It has many possible causes, such as piles or ulcers. Doctors usually follow it up with a colonoscopy.',
+    helps: 'If positive, ask your doctor about the next step. Don’t skip the follow-up.',
+  },
+  stool_ph: {
+    about: 'Stool pH shows whether the stool is acidic or alkaline.',
+    positive: 'Acidic stool can come with diarrhea or trouble digesting sugars. Alkaline stool is often normal.',
+    helps: 'Diet changes stool pH. Your doctor reads it with the rest of the test.',
+  },
+  stool_undigested_food: {
+    about: 'This checks for pieces of food that passed without being digested.',
+    positive: 'Some undigested food is common, especially with fast eating or high-fiber food. A lot of it can come with fast bowel movement or digestion problems.',
+    helps: 'Chewing well and eating slowly help digestion.',
+  },
+  stool_vegetable_cells: {
+    about: 'Vegetable cells are plant fibers from food seen under the microscope.',
+    positive: 'A few vegetable cells are normal after eating vegetables and fruit.',
+    helps: 'Usually no action is needed. Your doctor reads it with the rest of the test.',
+  },
+  stool_starch: {
+    about: 'This looks for starch (from bread, rice, potatoes) left undigested in the stool.',
+    positive: 'Some starch is common. A lot can come with diarrhea or problems digesting carbohydrates.',
+    helps: 'Your doctor reads it with your symptoms and the rest of the test.',
+  },
+  stool_muscle_fibers: {
+    about: 'This looks for undigested meat fibers in the stool. Usually few or none are seen.',
+    positive: 'More muscle fibers can come with fast bowel movement or problems digesting protein, for example from the pancreas.',
+    helps: 'If you have ongoing diarrhea or weight loss, tell your doctor.',
+  },
+  stool_fat: {
+    about: 'This looks for fat droplets in the stool under the microscope.',
+    positive: 'More fat can come from a very fatty meal or from problems absorbing fat, for example from the pancreas, liver or gut.',
+    helps: 'Pale, oily or floating stool is worth mentioning to your doctor.',
+  },
+  stool_pus: {
+    about: 'Pus cells are white blood cells seen in stool under the microscope.',
+    high: 'More pus cells can be a sign of a bowel infection or inflammation.',
+    low: 'None or very few is normal.',
+    helps: 'Drink plenty of fluids if you have diarrhea. Your doctor decides if treatment is needed.',
+  },
+  stool_rbc: {
+    about: 'This counts red blood cells seen in stool under the microscope.',
+    high: 'Red cells in stool can come from piles, a small tear, infection or inflammation of the bowel.',
+    low: 'None is normal.',
+    helps: 'Show this result to your doctor, especially with pain, diarrhea or visible blood.',
+  },
+  stool_epithelial: {
+    about: 'Epithelial cells line the gut. The lab notes if they are seen in the stool.',
+    positive: 'A few can be normal. Many can come with irritation of the bowel lining.',
+    helps: 'Your doctor reads it with the rest of the stool test.',
+  },
+  stool_yeast: {
+    about: 'This checks for yeast cells in the stool.',
+    positive: 'Small amounts of yeast are common. More can be seen after antibiotics or with a weak immune system.',
+    helps: 'Your doctor decides if it matters, together with your symptoms.',
+  },
+  stool_protozoa: {
+    about: 'This looks for tiny parasites such as Entamoeba (amoeba) or Giardia in the stool.',
+    positive: 'Finding them can explain diarrhea, cramps or bloating. They are treatable with medication your doctor prescribes.',
+    helps: 'Wash hands well and drink safe water. Your doctor decides on treatment.',
+  },
+  stool_ova: {
+    about: 'This looks for worms or their eggs (ova) in the stool.',
+    positive: 'Worms are common and treatable with medication your doctor prescribes. Family members may need checking too.',
+    helps: 'Wash hands before eating and after the toilet, and wash fruit and vegetables well.',
+  },
+  // ---------------------------------------------------------------- urine (by eye, dipstick, microscopy)
+  urine_colour: {
+    about: 'The lab notes the colour of the urine sample. Pale to dark yellow is usual.',
+    positive: 'Colour changes often come from how much you drink, food or some medications. Red, brown or very dark urine is worth showing your doctor.',
+    helps: 'Darker urine often means you need more water.',
+  },
+  urine_appearance: {
+    about: 'Appearance describes whether the urine is clear or cloudy.',
+    positive: 'Cloudy urine can come from crystals, mucus, cells or an infection.',
+    helps: 'Your doctor reads it with the rest of the urine test.',
+  },
+  urine_protein: {
+    about: 'This checks for protein in urine. Usually there is none or only a trace.',
+    positive: 'Protein can appear after exercise, fever or dehydration. If it stays, it can be a sign the kidneys need a closer look.',
+    helps: 'Doctors often repeat the test or ask for a urine albumin (ACR) test.',
+  },
+  urine_glucose: {
+    about: 'This checks for sugar in urine. Usually there is none.',
+    positive: 'Sugar in urine usually means blood sugar has been high. Some medications for diabetes also cause it.',
+    helps: 'Your doctor may check your blood sugar or HbA1c.',
+  },
+  urine_ketones: {
+    about: 'Ketones are made when the body burns fat for energy. Usually none are found in urine.',
+    positive: 'Ketones can appear with fasting, low-carb diets, vomiting or uncontrolled diabetes.',
+    helps: 'If you have diabetes and ketones with feeling unwell, contact your doctor.',
+  },
+  urine_bilirubin: {
+    about: 'This checks for bilirubin, a yellow substance from the liver, in urine. Usually there is none.',
+    positive: 'Bilirubin in urine can be a sign the liver or bile ducts need a closer look.',
+    helps: 'Your doctor may ask for liver blood tests.',
+  },
+  urine_urobilinogen: {
+    about: 'Urobilinogen is made from bilirubin in the gut. A small amount in urine is normal.',
+    positive: 'Higher levels can come with liver conditions or faster breakdown of red blood cells.',
+    helps: 'Your doctor reads it with your liver tests and blood count.',
+  },
+  urine_nitrite: {
+    about: 'Some bacteria change nitrate in urine into nitrite. Usually the test is negative.',
+    positive: 'A positive nitrite often points to a urinary tract infection.',
+    helps: 'Your doctor may ask for a urine culture before treatment.',
+  },
+  urine_leukocyte_esterase: {
+    about: 'This dipstick test finds white blood cells in urine. Usually it is negative.',
+    positive: 'A positive result can be a sign of a urinary tract infection or inflammation.',
+    helps: 'Your doctor reads it with the pus cells count and your symptoms.',
+  },
+  urine_blood: {
+    about: 'This dipstick test looks for blood in urine. Usually it is negative.',
+    positive: 'Blood in urine can come from exercise, a period, infection, stones or other kidney or bladder conditions.',
+    helps: 'Doctors usually repeat it. Tell your doctor if it stays positive.',
+  },
+  urine_epithelial: {
+    about: 'Epithelial cells line the urinary tract. A few are often seen.',
+    positive: 'Many cells often mean the sample picked up cells from the skin. A clean-catch sample helps.',
+    helps: 'Your doctor may ask for a new sample if needed.',
+  },
+  urine_casts: {
+    about: 'Casts are tiny tube-shaped particles formed in the kidneys.',
+    positive: 'A few clear (hyaline) casts can be normal. Other types can be a sign the kidneys need a closer look.',
+    helps: 'Your doctor reads them with the rest of the urine test and kidney blood tests.',
+  },
+  urine_crystals: {
+    about: 'Crystals form from minerals in urine, such as calcium oxalate or urates.',
+    positive: 'Some crystals are common, especially in concentrated urine. Many of them can be linked to kidney stones.',
+    helps: 'Drinking enough water helps prevent crystals.',
+  },
+  urine_bacteria: {
+    about: 'This notes bacteria seen in the urine sample.',
+    positive: 'Bacteria can mean an infection, but often come from the skin during sampling.',
+    helps: 'Your doctor reads it with your symptoms and may ask for a urine culture.',
+  },
+  urine_mucus: {
+    about: 'Mucus threads are often seen in urine and come from the urinary tract lining.',
+    positive: 'A lot of mucus can come with irritation or infection, but is often harmless.',
+    helps: 'Your doctor reads it with the rest of the urine test.',
+  },
+  urine_yeast: {
+    about: 'This checks for yeast cells in urine.',
+    positive: 'Yeast can come from the skin or a yeast infection, more often with diabetes or after antibiotics.',
+    helps: 'Your doctor decides if it matters, together with your symptoms.',
+  },
 }

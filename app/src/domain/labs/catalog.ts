@@ -3,7 +3,7 @@ import type { SourceId } from './sources'
 export type Direction = 'lower_better' | 'higher_better' | 'in_range'
 export type Category =
   | 'lipids' | 'glucose' | 'liver' | 'kidney' | 'electrolytes' | 'minerals' | 'iron' | 'cbc' | 'thyroid' | 'vitamins'
-  | 'inflammation' | 'coagulation' | 'hormones' | 'pancreas' | 'muscle' | 'infection' | 'urine' | 'other'
+  | 'inflammation' | 'coagulation' | 'hormones' | 'pancreas' | 'muscle' | 'infection' | 'urine' | 'stool' | 'other'
 
 /** value_in_canonical = value * scale + offset */
 export interface UnitConversion {
@@ -799,6 +799,213 @@ export const LAB_TESTS: LabTest[] = [
     aliases: ['urine ph', 'ph urine', 'reaction ph', 'حموضة البول'],
     canonicalUnit: '', units: { '': same }, direction: 'in_range',
   },
+  {
+    code: 'urine_colour', loinc: [], category: 'urine',
+    name: { en: 'Urine colour', ar: 'لون البول' },
+    aliases: ['urine colour', 'urine color', 'colour of urine', 'color of urine'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_appearance', loinc: [], category: 'urine',
+    name: { en: 'Urine appearance', ar: 'شكل البول' },
+    aliases: ['urine appearance', 'urine aspect', 'urine clarity', 'urine turbidity'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_protein', loinc: ['5804-0'], category: 'urine',
+    name: { en: 'Protein in urine', ar: 'بروتين في البول' },
+    aliases: ['urine protein', 'protein in urine', 'proteinuria', 'urine albumin dipstick', 'زلال في البول', 'البروتين في البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_glucose', loinc: ['5792-7'], category: 'urine',
+    name: { en: 'Sugar in urine', ar: 'سكر في البول' },
+    aliases: ['urine glucose', 'urine sugar', 'glucose in urine', 'sugar in urine', 'glycosuria', 'السكر في البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_ketones', loinc: ['5797-6'], category: 'urine',
+    name: { en: 'Ketones in urine', ar: 'كيتونات في البول' },
+    aliases: ['ketones', 'ketone', 'ketone bodies', 'acetone', 'urine ketones', 'كيتون', 'الكيتونات', 'اسيتون'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_bilirubin', loinc: ['5770-3'], category: 'urine',
+    name: { en: 'Bilirubin in urine', ar: 'بيليروبين في البول' },
+    aliases: ['urine bilirubin', 'bilirubin in urine', 'بيليروبين في البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_urobilinogen', loinc: ['5818-0'], category: 'urine',
+    name: { en: 'Urobilinogen', ar: 'يوروبيلينوجين' },
+    aliases: ['urobilinogen', 'urine urobilinogen'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_nitrite', loinc: ['5802-4'], category: 'urine',
+    name: { en: 'Nitrite in urine', ar: 'نيتريت في البول' },
+    aliases: ['nitrite', 'nitrites', 'urine nitrite', 'نيتريت'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_leukocyte_esterase', loinc: ['5799-2'], category: 'urine',
+    name: { en: 'Leukocyte esterase', ar: 'إستريز كرات الدم البيضاء' },
+    aliases: ['leukocyte esterase', 'leucocyte esterase', 'leukocytes esterase', 'urine leukocytes dipstick'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_blood', loinc: ['5794-3'], category: 'urine',
+    name: { en: 'Blood in urine (dipstick)', ar: 'دم في البول' },
+    aliases: ['urine blood', 'blood in urine', 'urine hemoglobin', 'hemoglobin in urine', 'دم في البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_epithelial', loinc: [], category: 'urine',
+    name: { en: 'Epithelial cells in urine', ar: 'خلايا طلائية في البول' },
+    aliases: ['epithelial cells', 'epithelial', 'squamous epithelial cells', 'urine epithelial cells', 'خلايا طلائية'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_casts', loinc: [], category: 'urine',
+    name: { en: 'Casts in urine', ar: 'أسطوانات في البول' },
+    aliases: ['casts', 'cast', 'hyaline casts', 'granular casts', 'urine casts', 'اسطوانات'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_crystals', loinc: [], category: 'urine',
+    name: { en: 'Crystals in urine', ar: 'بلورات في البول' },
+    aliases: ['crystals', 'crystal', 'calcium oxalate', 'calcium oxalate crystals', 'amorphous urates', 'amorphous phosphates', 'uric acid crystals', 'triple phosphate', 'urine crystals', 'بلورات', 'املاح'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_bacteria', loinc: [], category: 'urine',
+    name: { en: 'Bacteria in urine', ar: 'بكتيريا في البول' },
+    aliases: ['bacteria', 'bacteriuria', 'urine bacteria', 'بكتيريا'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_mucus', loinc: [], category: 'urine',
+    name: { en: 'Mucus in urine', ar: 'مخاط في البول' },
+    aliases: ['mucus', 'mucus threads', 'mucous threads', 'urine mucus', 'مخاط'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_yeast', loinc: [], category: 'urine',
+    name: { en: 'Yeast cells in urine', ar: 'خلايا الخميرة في البول' },
+    aliases: ['yeast', 'yeast cells', 'budding yeast', 'urine yeast', 'خميرة'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  // ---------------------------------------------------------------- stool analysis
+  // Short printed names ("Colour", "Fat", "Pus cells") only mean these under a
+  // stool heading (see PANELS); the aliases here are stool-only names.
+  {
+    code: 'stool_colour', loinc: [], category: 'stool',
+    name: { en: 'Stool colour', ar: 'لون البراز' },
+    aliases: ['stool colour', 'stool color', 'colour of stool', 'color of stool'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_consistency', loinc: [], category: 'stool',
+    name: { en: 'Stool consistency', ar: 'قوام البراز' },
+    aliases: ['stool consistency'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_odour', loinc: [], category: 'stool',
+    name: { en: 'Stool odour', ar: 'رائحة البراز' },
+    aliases: ['stool odour', 'stool odor'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_mucus', loinc: [], category: 'stool',
+    name: { en: 'Mucus in stool', ar: 'مخاط في البراز' },
+    aliases: ['stool mucus', 'mucus in stool'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_blood', loinc: [], category: 'stool',
+    name: { en: 'Visible blood in stool', ar: 'دم ظاهر في البراز' },
+    aliases: ['stool blood', 'blood in stool', 'gross blood stool'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_occult_blood', loinc: ['2335-8'], category: 'stool',
+    name: { en: 'Occult blood in stool', ar: 'دم خفي في البراز' },
+    aliases: ['occult blood', 'stool occult blood', 'fecal occult blood', 'faecal occult blood', 'fobt', 'fit test', 'دم خفي'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_ph', loinc: [], category: 'stool',
+    name: { en: 'Stool pH', ar: 'حموضة البراز' },
+    aliases: ['stool ph', 'stool reaction'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_undigested_food', loinc: [], category: 'stool',
+    name: { en: 'Undigested food in stool', ar: 'طعام غير مهضوم في البراز' },
+    aliases: ['undigested food', 'undigested food particles', 'طعام غير مهضوم', 'بقايا طعام غير مهضوم'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_vegetable_cells', loinc: [], category: 'stool',
+    name: { en: 'Vegetable cells in stool', ar: 'خلايا نباتية في البراز' },
+    aliases: ['vegetable cells', 'vegetable fibers', 'vegetable fibres', 'خلايا نباتية'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_starch', loinc: [], category: 'stool',
+    name: { en: 'Starch in stool', ar: 'نشا في البراز' },
+    aliases: ['starch', 'starch granules', 'نشا', 'النشا'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_muscle_fibers', loinc: [], category: 'stool',
+    name: { en: 'Muscle fibers in stool', ar: 'ألياف عضلية في البراز' },
+    aliases: ['muscle fibers', 'muscle fibres', 'meat fibers', 'meat fibres', 'ألياف عضلية'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_fat', loinc: [], category: 'stool',
+    name: { en: 'Fat in stool', ar: 'دهون في البراز' },
+    aliases: ['stool fat', 'fat globules', 'fat droplets', 'fecal fat', 'faecal fat', 'neutral fat', 'كرات دهنية'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_pus', loinc: [], category: 'stool',
+    name: { en: 'Stool pus cells', ar: 'خلايا الصديد في البراز' },
+    aliases: ['stool pus cells', 'stool wbc', 'fecal leukocytes', 'faecal leucocytes'],
+    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+  },
+  {
+    code: 'stool_rbc', loinc: [], category: 'stool',
+    name: { en: 'Stool red blood cells', ar: 'كرات الدم الحمراء في البراز' },
+    aliases: ['stool rbcs', 'stool rbc'],
+    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+  },
+  {
+    code: 'stool_epithelial', loinc: [], category: 'stool',
+    name: { en: 'Epithelial cells in stool', ar: 'خلايا طلائية في البراز' },
+    aliases: ['stool epithelial cells'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_yeast', loinc: [], category: 'stool',
+    name: { en: 'Yeast cells in stool', ar: 'خلايا الخميرة في البراز' },
+    aliases: ['stool yeast', 'stool yeast cells'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_protozoa', loinc: [], category: 'stool',
+    name: { en: 'Protozoa in stool', ar: 'طفيليات أولية في البراز' },
+    aliases: ['protozoa', 'stool protozoa', 'entamoeba', 'e histolytica', 'giardia', 'giardia lamblia', 'amoeba', 'طفيليات أولية', 'أميبا', 'جيارديا'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_ova', loinc: [], category: 'stool',
+    name: { en: 'Worm eggs (ova) in stool', ar: 'بويضات الديدان في البراز' },
+    aliases: ['helminths', 'helminth ova', 'ova', 'ova and cysts', 'ova cysts', 'ova & parasites', 'o&p', 'worms', 'stool worms', 'ديدان', 'بويضات'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
 ]
 
 const BY_CODE = new Map(LAB_TESTS.map((t) => [t.code, t]))
@@ -916,18 +1123,133 @@ export function matchTest(
   opts: { shared?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean; section?: string | null } = {},
 ): { code: string; source: MatchSource } | null {
   const found = matchByName(reportedName, loinc, learned, opts)
-  // Under a urine heading, "RBCs", "WBCs" and "pH" are the urine values, not the blood count.
-  if (opts.section && URINE_SECTION.test(normalizeName(opts.section))) {
+  const specimen = opts.section ? specimenOf(opts.section) : null
+  if (!specimen) return found
+  // Under a urine or stool heading, short names ("RBCs", "pH", "Colour", "Glucose") are that sample's values.
+  const panel = PANELS[specimen]
+  if (panel) {
     const keys = nameKeys(reportedName)
-    const urine = (found && IN_URINE[found.code]) ?? keys.map((k) => IN_URINE_BY_NAME[k]).find(Boolean)
-    if (urine) return { code: urine, source: found?.source ?? 'catalog' }
+    const code = (found && panel.byCode[found.code]) ?? keys.map((k) => panel.byName[k]).find(Boolean)
+    if (code) return { code, source: found?.source ?? 'catalog' }
   }
-  return found
+  // Never a test from another sample: "Glucose" in urine or semen is not blood glucose.
+  return found && specimenOfTest(found.code) === specimen ? found : null
 }
 
-const URINE_SECTION = /urine|urinalysis|بول/
-const IN_URINE: Record<string, string> = { rbc: 'urine_rbc', wbc: 'urine_pus' }
-const IN_URINE_BY_NAME: Record<string, string> = { ph: 'urine_ph', 'reaction': 'urine_ph', sg: 'urine_sg' }
+/** What a result was measured in, when it isn't blood. */
+export type Specimen = 'urine' | 'stool' | 'semen' | 'csf' | 'fluid'
+
+const SPECIMEN_WORDS: [Specimen, RegExp][] = [
+  ['stool', /stool|faeces|feces|faecal|fecal|براز/],
+  ['semen', /semen|seminal|sperm|منوي/],
+  ['csf', /\bcsf\b|cerebrospinal|نخاعي/],
+  ['fluid', /pleural|ascitic|ascites|peritoneal|synovial|pericardial|body fluid|بلوري|استسقاء|بريتوني|مفصلي/],
+  ['urine', /urine|urinalysis|urinary|بول/],
+]
+// A heading naming both (e.g. "Serum and urine chemistry") doesn't decide the sample.
+const BLOOD_WORDS = /\b(serum|plasma)\b|مصل|بلازما/
+
+/** The sample a heading (or heading path) names, if it names one. */
+export function specimenOf(section: string): Specimen | null {
+  const s = normalizeName(section)
+  if (BLOOD_WORDS.test(s)) return null
+  return SPECIMEN_WORDS.find(([, re]) => re.test(s))?.[0] ?? null
+}
+
+/** The sample a catalog test is measured in; null means blood. */
+export function specimenOfTest(code: string): Specimen | null {
+  const c = BY_CODE.get(code)?.category
+  return c === 'urine' ? 'urine' : c === 'stool' ? 'stool' : null
+}
+
+/** Whether a test can be the one printed under this heading (used for the reading service's suggestion too). */
+export function fitsSection(code: string, section: string | null | undefined): boolean {
+  const specimen = section ? specimenOf(section) : null
+  return !specimen || specimenOfTest(code) === specimen
+}
+
+// Short names that mean a different test in each sample. byCode: what the name matched on its
+// own (usually a blood test) → that sample's test. byName: names with no match of their own.
+const PANELS: Partial<Record<Specimen, { byCode: Record<string, string>; byName: Record<string, string> }>> = {
+  stool: {
+    byCode: { rbc: 'stool_rbc', wbc: 'stool_pus', urine_pus: 'stool_pus', urine_rbc: 'stool_rbc', urine_ph: 'stool_ph', hemoglobin: 'stool_blood', urine_mucus: 'stool_mucus', urine_epithelial: 'stool_epithelial', urine_yeast: 'stool_yeast' },
+    byName: {
+      colour: 'stool_colour', color: 'stool_colour', لون: 'stool_colour', اللون: 'stool_colour',
+      consistency: 'stool_consistency', قوام: 'stool_consistency', القوام: 'stool_consistency',
+      odour: 'stool_odour', odor: 'stool_odour', smell: 'stool_odour', رائحه: 'stool_odour', الرائحه: 'stool_odour', رايحه: 'stool_odour',
+      mucus: 'stool_mucus', mucous: 'stool_mucus', مخاط: 'stool_mucus', المخاط: 'stool_mucus',
+      blood: 'stool_blood', 'gross blood': 'stool_blood', دم: 'stool_blood', الدم: 'stool_blood',
+      ph: 'stool_ph', reaction: 'stool_ph', 'reaction ph': 'stool_ph',
+      fat: 'stool_fat', fats: 'stool_fat', دهون: 'stool_fat',
+      'pus cells': 'stool_pus', pus: 'stool_pus', 'epithelial cells': 'stool_epithelial', epithelial: 'stool_epithelial',
+      'yeast cells': 'stool_yeast', yeast: 'stool_yeast', cysts: 'stool_protozoa',
+    },
+  },
+  urine: {
+    byCode: { rbc: 'urine_rbc', wbc: 'urine_pus', glucose: 'urine_glucose', total_protein: 'urine_protein', albumin: 'urine_protein', bilirubin_total: 'urine_bilirubin', hemoglobin: 'urine_blood' },
+    byName: {
+      ph: 'urine_ph', reaction: 'urine_ph', sg: 'urine_sg',
+      colour: 'urine_colour', color: 'urine_colour', لون: 'urine_colour', اللون: 'urine_colour',
+      appearance: 'urine_appearance', aspect: 'urine_appearance', clarity: 'urine_appearance', turbidity: 'urine_appearance', الشكل: 'urine_appearance', المظهر: 'urine_appearance', العكاره: 'urine_appearance',
+      protein: 'urine_protein', proteins: 'urine_protein', بروتين: 'urine_protein', زلال: 'urine_protein',
+      sugar: 'urine_glucose', سكر: 'urine_glucose', السكر: 'urine_glucose', جلوكوز: 'urine_glucose',
+      blood: 'urine_blood', دم: 'urine_blood', الدم: 'urine_blood',
+      'pus cells': 'urine_pus', pus: 'urine_pus',
+    },
+  },
+}
+
+// Sub-headings that don't say which sample they belong to.
+const GENERIC_HEADING_WORDS = new Set([
+  'macroscopic', 'microscopic', 'macroscopical', 'microscopical', 'examination', 'exam', 'physical', 'chemical', 'general',
+  'digestion', 'cytology', 'parasites', 'parasitology', 'parasitic', 'findings', 'others', 'other', 'and', 'dipstick', 'sediment', 'properties',
+  'فحص', 'الفحص', 'عياني', 'العياني', 'مجهري', 'المجهري', 'ميكروسكوبي', 'الميكروسكوبي', 'كيميائي', 'الكيميائي', 'طبيعي', 'الطبيعي', 'طفيليات', 'الطفيليات',
+])
+function isGenericHeading(section: string): boolean {
+  return normalizeName(section).split(' ').every((w) => !w || /^\d+$/.test(w) || GENERIC_HEADING_WORDS.has(w))
+}
+
+// Names only one sample has ("Starch", "Specific gravity") point a heading-less group to it.
+// Names both urine and stool tests use (pus cells, epithelial cells, mucus…) don't count.
+const SHARED_NAMES = new Set(['urine_pus', 'urine_rbc', 'urine_epithelial', 'urine_mucus', 'urine_yeast'])
+
+/**
+ * The heading to match each result under, for a whole report in printed
+ * order. Sub-headings like "Microscopic examination" or "1. Digestion" take
+ * the sample from the heading above them ("Stool Analysis"); if no heading
+ * names it, names only one sample has decide it for that group of rows.
+ */
+export function sectionsInContext(rows: { name: string; section: string | null | undefined }[]): (string | null)[] {
+  const out: (string | null)[] = rows.map((r) => r.section || null)
+  const WORD: Record<Specimen, string> = { urine: 'Urine', stool: 'Stool', semen: 'Semen', csf: 'CSF', fluid: 'Body fluid' }
+  let i = 0
+  let lastNamed: Specimen | null = null
+  while (i < rows.length) {
+    const section = rows[i].section ?? ''
+    if (!isGenericHeading(section)) {
+      // A named heading: its rows keep it as printed; remember its sample for the sub-headings below it.
+      lastNamed = specimenOf(section)
+      while (i < rows.length && (rows[i].section ?? '') === section) i++
+      continue
+    }
+    // A run of rows under sub-headings (or none): one group.
+    const start = i
+    while (i < rows.length && isGenericHeading(rows[i].section ?? '')) i++
+    let specimen = lastNamed
+    if (!specimen) {
+      const votes = new Map<Specimen, number>()
+      for (const r of rows.slice(start, i)) {
+        const code = matchByName(r.name, null, undefined, {})?.code
+        const s = code && !SHARED_NAMES.has(code) ? specimenOfTest(code) : null
+        if (s) votes.set(s, (votes.get(s) ?? 0) + 1)
+      }
+      const ranked = [...votes].sort((a, b) => b[1] - a[1])
+      specimen = ranked.length && (ranked.length === 1 || ranked[0][1] > ranked[1][1]) ? ranked[0][0] : null
+    }
+    if (specimen) for (let j = start; j < i; j++) out[j] = [WORD[specimen], rows[j].section].filter(Boolean).join(' > ')
+  }
+  return out
+}
 
 function matchByName(
   reportedName: string,

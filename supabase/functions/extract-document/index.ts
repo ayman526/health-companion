@@ -151,6 +151,40 @@ const CATALOG: [string, string][] = [
   ['urine_rbc', 'Urine red blood cells per HPF (urine microscopy)'],
   ['urine_sg', 'Urine specific gravity'],
   ['urine_ph', 'Urine pH'],
+  ['urine_colour', 'Urine colour'],
+  ['urine_appearance', 'Urine appearance / clarity'],
+  ['urine_protein', 'Protein in urine (dipstick)'],
+  ['urine_glucose', 'Sugar / glucose in urine (dipstick)'],
+  ['urine_ketones', 'Ketones in urine'],
+  ['urine_bilirubin', 'Bilirubin in urine'],
+  ['urine_urobilinogen', 'Urobilinogen in urine'],
+  ['urine_nitrite', 'Nitrite in urine'],
+  ['urine_leukocyte_esterase', 'Leukocyte esterase in urine'],
+  ['urine_blood', 'Blood / hemoglobin in urine (dipstick)'],
+  ['urine_epithelial', 'Epithelial cells in urine'],
+  ['urine_casts', 'Casts in urine'],
+  ['urine_crystals', 'Crystals in urine (oxalate, urates, phosphates)'],
+  ['urine_bacteria', 'Bacteria in urine'],
+  ['urine_mucus', 'Mucus threads in urine'],
+  ['urine_yeast', 'Yeast cells in urine'],
+  ['stool_colour', 'Stool colour (stool analysis)'],
+  ['stool_consistency', 'Stool consistency'],
+  ['stool_odour', 'Stool odour'],
+  ['stool_mucus', 'Mucus in stool'],
+  ['stool_blood', 'Visible blood in stool (macroscopic)'],
+  ['stool_occult_blood', 'Occult blood in stool (FOBT / FIT)'],
+  ['stool_ph', 'Stool pH / reaction'],
+  ['stool_undigested_food', 'Undigested food in stool'],
+  ['stool_vegetable_cells', 'Vegetable cells in stool'],
+  ['stool_starch', 'Starch in stool'],
+  ['stool_muscle_fibers', 'Muscle fibers in stool'],
+  ['stool_fat', 'Fat in stool'],
+  ['stool_pus', 'Stool pus cells per HPF (stool microscopy)'],
+  ['stool_rbc', 'Stool red blood cells per HPF (stool microscopy)'],
+  ['stool_epithelial', 'Epithelial cells in stool'],
+  ['stool_yeast', 'Yeast cells in stool'],
+  ['stool_protozoa', 'Protozoa in stool (e.g. Entamoeba, Giardia)'],
+  ['stool_ova', 'Worms / helminth ova in stool'],
 ]
 const CATALOG_CODES = [...CATALOG.map(([code]) => code), 'unknown']
 
@@ -272,8 +306,8 @@ Rules:
 - Use an empty string "" for any text or number field that is not on the document. Use "none" for value_comparator and lab_flag when they don't apply.
 - value_as_printed is the result exactly as shown, including symbols. value_number is the same number written with digits 0-9, "." as the decimal point and no thousands separators (e.g. "4.5", "1250"), or "" for non-numeric results such as "Negative". For "<5" use value_number "5" and value_comparator "<".
 - A reference range printed as "3.5 - 5.1" gives ref_low "3.5" and ref_high "5.1"; "< 200" gives ref_high "200" and ref_low "". Same number format as value_number. Put the range exactly as printed in ref_text.
-- section: the heading the result is printed under, exactly as printed (for example "Lipid Profile", "Complete Blood Count", "Urine Analysis", "وظائف الكبد"), or "".
-- Use the section to read short or ambiguous names: "TG" under a lipid heading is triglycerides; "RBCs", "WBCs"/"Pus cells" or "pH" under a urine heading are urine microscopy/urine values, not the blood count; "HB" under a blood count is hemoglobin.
+- section: the heading the result is printed under, exactly as printed (for example "Lipid Profile", "Complete Blood Count", "Urine Analysis", "وظائف الكبد"), or "". When there are sub-headings, give the main heading first, then the sub-headings, joined with " > " (for example "Stool Analysis > Microscopic Examination > Digestion"). If the results are not from blood and no printed heading names the sample, start the path with the sample yourself: "Urine", "Stool", "Semen", "CSF" or the body fluid's name (for example "Urine > Chemical Examination").
+- Use the section to read short or ambiguous names: "TG" under a lipid heading is triglycerides; "RBCs", "WBCs"/"Pus cells" or "pH" under a urine heading are urine microscopy/urine values, not the blood count; "Colour", "Consistency", "Mucus", "Blood", "Fat", "Pus cells" or "RBCs" under a stool heading are stool analysis values; a result from urine, stool, semen, CSF or another body fluid never gets a blood test's catalog_code (urine "Glucose" is urine_glucose, semen "pH" is "unknown"); "HB" under a blood count is hemoglobin.
 - catalog_code: the code from the catalog below that is the same test (same analyte AND same kind of measurement), or "unknown". Do not pick a code for a related but different test: fasting vs random glucose, direct vs total bilirubin, free vs total T4, a ratio vs its components, urine vs blood. When unsure, use "unknown".
 - Reference ranges printed in several levels (for example lipids: "Desirable < 200, Borderline 200-239, High >= 240"): use the desirable/normal level for ref_low and ref_high, put the full printed text in ref_text, and add "ref_low" and "ref_high" to uncertain_fields if it is not clear which level is the normal one. Ranges given only for another sex or age group than stated on the report: leave ref_low/ref_high empty and keep ref_text.
 - lab_flag only when the document marks the result (H, L, *, "High", "Critical", bold or coloured flags). Do not set flags yourself by comparing with the range.
