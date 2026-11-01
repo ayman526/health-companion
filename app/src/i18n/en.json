@@ -435,6 +435,7 @@
     },
     "rangeAsPrinted": "Range as printed",
     "unitNotComparable": "This unit can't convert to {{unit}}, so it won't be compared with your other results for this test.",
+    "rangeHint": "Its unit and range match:",
     "unmatchedHint": "Not in our list yet. We'll still track it by its printed name and unit. Pick the test if you know it and we'll remember next time.",
     "checkedAgainstDoc": "I've checked the highlighted fields against the document",
     "removeRow": "Remove this result",
@@ -468,7 +469,8 @@
       "ai_suggested": "suggested by AI",
       "manual": "chosen by you",
       "shared": "known name, confirmed by other users",
-      "close": "close spelling, check it"
+      "close": "close spelling, check it",
+      "lab": "known name at this lab, confirmed by other users"
     },
     "labMarked": "Lab marked: {{flag}}",
     "aiMatchUnit": "Looks like {{test}}, but the unit doesn't fit. Pick the test if you're sure.",

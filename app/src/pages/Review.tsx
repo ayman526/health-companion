@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle, CheckCircle2, ChevronDown, ExternalLink, Plus, Trash2 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
-import { LAB_TESTS, getTest, learnedKey, fitsSection, matchTest, sectionsInContext, unitFits, type MatchSource } from '../domain/labs/catalog'
+import { LAB_TESTS, getTest, labNameKey, learnedKey, fitsSection, matchTest, sectionsInContext, specimenOf, unitFits, type MatchSource, type Specimen } from '../domain/labs/catalog'
+import { suggestByRange } from '../domain/labs/rangeHints'
 import { draftStatus } from '../domain/labs/rules'
 import { StatusBadge } from '../components/LabStatus'
 import { PageHeader } from '../components/ui'
@@ -75,6 +76,26 @@ function isClear(r: DraftResult) {
   )
 }
 
+/** For a row we couldn't match: tests its unit and printed range point to, to pick with one tap. */
+function RangeHints({ r, onPick }: { r: DraftResult; onPick: (code: string) => void }) {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language === 'ar' ? 'ar' : 'en'
+  const codes = suggestByRange({ unit: r.unit, refLow: num(r.ref_low), refHigh: num(r.ref_high), section: r.section })
+  if (codes.length === 0) return null
+  return (
+    <div className="mt-3">
+      <p className="text-xs text-muted">{t('review.rangeHint')}</p>
+      <div className="mt-1 flex flex-wrap gap-2">
+        {codes.map((code) => (
+          <button key={code} type="button" onClick={() => onPick(code)} className="min-h-9 rounded-full border border-brand-100 bg-brand-50 px-3 text-sm text-brand-700">
+            {getTest(code)?.name[lang]}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const inputBase = 'min-h-11 w-full rounded-lg border bg-surface px-3 text-sm outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100'
 
 export function ReviewPage() {
@@ -85,7 +106,7 @@ export function ReviewPage() {
 
   const [loading, setLoading] = useState(true)
   // Names known for matching while the person edits: their own and the shared list.
-  const names = useRef<{ learned: ReadonlyMap<string, string>; shared: ReadonlyMap<string, string> }>({ learned: new Map(), shared: new Map() })
+  const names = useRef<{ learned: ReadonlyMap<string, string>; shared: ReadonlyMap<string, string>; lab: ReadonlyMap<string, string> }>({ learned: new Map(), shared: new Map(), lab: new Map() })
   const [report, setReport] = useState<ReportRow | null>(null)
   const [docUrl, setDocUrl] = useState<{ url: string; isImage: boolean } | null>(null)
   const [labName, setLabName] = useState('')
@@ -120,16 +141,21 @@ export function ReviewPage() {
           .order('created_at'),
         supabase.from('test_aliases').select('alias_key, test_code'),
       ])
-      const { data: sharedRows } = await supabase.from('global_test_aliases').select('alias_key, test_code')
+      const [{ data: sharedRows }, { data: labRows }] = await Promise.all([
+        supabase.from('global_test_aliases').select('alias_key, test_code'),
+        // Names other people confirmed for this same lab (by the lab name read from the report).
+        rep.lab_name ? supabase.rpc('lab_test_names_for', { p_lab_name: rep.lab_name }) : Promise.resolve({ data: [] }),
+      ])
       const learned = new Map((aliases ?? []).map((a) => [a.alias_key, a.test_code]))
       const shared = new Map((sharedRows ?? []).map((a) => [a.alias_key, a.test_code]))
-      names.current = { learned, shared }
+      const lab = new Map(((labRows ?? []) as { sample: string; alias_key: string; test_code: string }[]).map((a) => [labNameKey((a.sample || null) as Specimen | null, a.alias_key), a.test_code]))
+      names.current = { learned, shared, lab }
 
       // Sub-headings ("Microscopic examination") take their sample (stool, urine) from the heading above.
       const sections = sectionsInContext((res ?? []).map((r) => ({ name: r.reported_name, section: r.note })))
       const loaded = (res ?? []).map((r, i): DraftResult => {
         // Deterministic match first (learned names, catalog); then the AI suggestion if its unit fits.
-        const det = matchTest(r.reported_name, null, learned, { shared, unit: r.unit, numeric: r.value_numeric != null, section: sections[i] })
+        const det = matchTest(r.reported_name, null, learned, { shared, lab, unit: r.unit, numeric: r.value_numeric != null, section: sections[i] })
         const suggested = r.test_code ? getTest(r.test_code) : undefined
         const suggestionFits = !!suggested && fitsSection(suggested.code, sections[i]) && (r.value_numeric == null || unitFits(suggested, r.unit))
         const code = det?.code ?? (suggestionFits ? suggested.code : '')
@@ -233,6 +259,8 @@ export function ReviewPage() {
         lab_flag: r.lab_flag || null,
         // Remember matches the user made by hand, for their next reports.
         learn_alias: r.source === 'manual' && r.test_code ? learnedKey(r.reported_name) : null,
+        // The sample it was under (blood = ''), so a lab's names stay apart per sample.
+        sample: r.section ? specimenOf(r.section) ?? '' : '',
         // Unrecognized names are counted anonymously (name only) to grow the catalog.
         name_key: r.test_code ? null : learnedKey(r.reported_name),
       }
@@ -300,7 +328,7 @@ export function ReviewPage() {
               className={field('reported_name')}
               value={r.reported_name}
               onChange={(e) => {
-                const det = r.source === 'manual' ? null : matchTest(e.target.value, null, names.current.learned, { shared: names.current.shared, unit: r.unit, numeric: r.value.trim() !== '', section: r.section })
+                const det = r.source === 'manual' ? null : matchTest(e.target.value, null, names.current.learned, { shared: names.current.shared, lab: names.current.lab, unit: r.unit, numeric: r.value.trim() !== '', section: r.section })
                 update(r.key, det ? { reported_name: e.target.value, test_code: det.code, source: det.source } : { reported_name: e.target.value })
               }}
             />
@@ -354,6 +382,7 @@ export function ReviewPage() {
         </div>
         {unitProblem(r) && test && <p className="mt-2 text-xs text-status-watch">{t('review.unitNotComparable', { unit: test.canonicalUnit })}</p>}
         {r.rejectedSuggestion && <p className="mt-2 text-xs text-status-watch">{t('review.aiMatchUnit', { test: getTest(r.rejectedSuggestion)?.name[lang] ?? '' })}</p>}
+        {!r.test_code && <RangeHints r={r} onPick={(code) => update(r.key, { test_code: code, source: 'manual', rejectedSuggestion: null })} />}
         {!r.test_code && <p className="mt-2 text-xs text-muted">{t('review.unmatchedHint')}</p>}
 
         <div className="mt-3 flex items-center justify-between gap-3">

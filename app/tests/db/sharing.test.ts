@@ -188,3 +188,30 @@ describe('shared test names', () => {
     await q('delete from team_members')
   })
 })
+
+describe('names per lab', () => {
+  it('a lab’s name becomes known once 2 accounts match it the same way, for that lab and sample only', async () => {
+    const vote = (user: string, profile: string, lab: string, sample = 'urine') =>
+      as(user, profile, () => q(`select vote_lab_test_name($1, $2, $3, 'glucose', 'urine_glucose')`, [profile, lab, sample]))
+    const known = (lab: string) => as(OTHER, null, () => q('select sample, alias_key, test_code from lab_test_names_for($1)', [lab]))
+
+    await vote(MOM, MOM_P, 'Al-Borg Lab.')
+    expect(await known('Al-Borg Lab.')).toEqual([])
+    await vote(MOM, MOM_P, 'AL BORG LAB') // the same account again doesn't count twice
+    expect(await known('Al-Borg Lab.')).toEqual([])
+    await vote(SON, SON_P, 'al borg lab')
+    expect(await known('AL-BORG LAB')).toEqual([{ sample: 'urine', alias_key: 'glucose', test_code: 'urine_glucose' }])
+    expect(await known('Alfa Lab')).toEqual([])
+
+    // Arabic lab names work too.
+    await vote(MOM, MOM_P, 'معامل البرج', '')
+    await vote(SON, SON_P, 'معامل  البرج.', '')
+    expect(await known('معامل البرج')).toHaveLength(1)
+
+    // Only for your own profiles; nobody can see who voted.
+    await as(OTHER, null, () => q(`select vote_lab_test_name($1, 'Some Lab', '', 'glucose', 'glucose')`, [MOM_P]))
+    expect(await q(`select * from lab_test_name_votes where lab_key = 'some lab'`)).toEqual([])
+    await expect(as(SON, null, () => q('select * from lab_test_name_votes'))).rejects.toThrow(/permission denied/)
+    await expect(as(SON, null, () => q(`insert into lab_test_names (lab_key, alias_key, test_code) values ('x', 'y', 'alt')`))).rejects.toThrow(/permission denied/)
+  })
+})

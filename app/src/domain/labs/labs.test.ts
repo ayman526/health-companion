@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LAB_TESTS, getTest, learnedKey, fitsSection, matchTest, nameKeys, sectionsInContext, nameOnlyTest, normalizeUnit, toCanonical } from './catalog'
+import { LAB_TESTS, getTest, learnedKey, fitsSection, labNameKey, matchTest, nameKeys, sectionsInContext, nameOnlyTest, normalizeUnit, toCanonical } from './catalog'
 import { buildSeries, compareLatest, referenceChangeValue, type LabResultInput } from './compare'
 import { draftStatus, guidelineFindings, liverElevationGrade, measurementStatus } from './rules'
 
@@ -459,5 +459,29 @@ describe('the sample decides the test, for any report', () => {
     expect(fitsSection('urine_glucose', 'Urine Analysis > Chemical')).toBe(true)
     expect(fitsSection('glucose', 'Lipid Profile')).toBe(true)
     expect(fitsSection('glucose', null)).toBe(true)
+  })
+})
+
+describe('names known at a lab', () => {
+  const lab = new Map([
+    [labNameKey(null, 'glu f'), 'glucose_fasting'],
+    [labNameKey('urine', 'sug'), 'urine_glucose'],
+    [labNameKey(null, 'hb'), 'hba1c'], // this lab prints HbA1c as "HB"
+  ])
+
+  it('uses the lab’s own name before the general list', () => {
+    expect(matchTest('GLU-F', null, undefined, { lab })).toEqual({ code: 'glucose_fasting', source: 'lab' })
+    expect(matchTest('HB', null, undefined, { lab })).toEqual({ code: 'hba1c', source: 'lab' })
+    expect(matchTest('HB')?.code).toBe('hemoglobin') // other labs: unchanged
+  })
+
+  it('keeps each sample apart', () => {
+    expect(matchTest('SUG', null, undefined, { lab, section: 'Urine Analysis' })).toEqual({ code: 'urine_glucose', source: 'lab' })
+    expect(matchTest('SUG', null, undefined, { lab, section: 'Stool Analysis' })).toBeNull()
+    expect(matchTest('SUG', null, undefined, { lab })).toBeNull()
+  })
+
+  it('your own earlier choice still comes first', () => {
+    expect(matchTest('HB', null, new Map([['hb', 'hemoglobin']]), { lab })?.source).toBe('learned')
   })
 })

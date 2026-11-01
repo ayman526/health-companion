@@ -1078,10 +1078,10 @@ for (const t of LAB_TESTS) {
 const LOINC_INDEX = new Map<string, string>()
 for (const t of LAB_TESTS) for (const l of t.loinc) LOINC_INDEX.set(l, t.code)
 
-// learned: the person's own earlier matches · catalog: the built-in list · shared: a name
+// learned: the person's own earlier matches · lab: a name known at this lab (see labNameKey) · catalog: the built-in list · shared: a name
 // several people confirmed, or the team added · close: one letter off a known name (always
 // shown for a check) · ai_suggested: what the reading model proposed · manual: chosen by hand.
-export type MatchSource = 'learned' | 'catalog' | 'shared' | 'close' | 'ai_suggested'
+export type MatchSource = 'learned' | 'lab' | 'catalog' | 'shared' | 'close' | 'ai_suggested'
 
 /** Edit distance, stopping early once it's over `max`. */
 function withinEdits(a: string, b: string, max: number): boolean {
@@ -1120,10 +1120,10 @@ export function matchTest(
   reportedName: string,
   loinc?: string | null,
   learned?: ReadonlyMap<string, string>,
-  opts: { shared?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean; section?: string | null } = {},
+  opts: { shared?: ReadonlyMap<string, string>; lab?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean; section?: string | null } = {},
 ): { code: string; source: MatchSource } | null {
-  const found = matchByName(reportedName, loinc, learned, opts)
   const specimen = opts.section ? specimenOf(opts.section) : null
+  const found = matchByName(reportedName, loinc, learned, { ...opts, specimen })
   if (!specimen) return found
   // Under a urine or stool heading, short names ("RBCs", "pH", "Colour", "Glucose") are that sample's values.
   const panel = PANELS[specimen]
@@ -1255,11 +1255,17 @@ function matchByName(
   reportedName: string,
   loinc: string | null | undefined,
   learned: ReadonlyMap<string, string> | undefined,
-  opts: { shared?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean },
+  opts: { shared?: ReadonlyMap<string, string>; lab?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean; specimen?: Specimen | null },
 ): { code: string; source: MatchSource } | null {
   const keys = nameKeys(reportedName)
   if (learned) {
     for (const k of keys) if (learned.has(k)) return { code: learned.get(k)!, source: 'learned' }
+  }
+  if (opts.lab) {
+    for (const k of keys) {
+      const code = opts.lab.get(labNameKey(opts.specimen ?? null, k))
+      if (code && BY_CODE.has(code)) return { code, source: 'lab' }
+    }
   }
   if (loinc && LOINC_INDEX.has(loinc)) return { code: LOINC_INDEX.get(loinc)!, source: 'catalog' }
   for (const k of keys) if (ALIAS_INDEX.has(k)) return { code: ALIAS_INDEX.get(k)!, source: 'catalog' }
@@ -1273,6 +1279,11 @@ function matchByName(
     if (fits) return { code: close, source: 'close' }
   }
   return null
+}
+
+/** How a lab's known names are looked up: the sample ('' for blood) and the printed name. */
+export function labNameKey(specimen: Specimen | null, aliasKey: string): string {
+  return `${specimen ?? ''}|${aliasKey}`
 }
 
 /** The key under which a user's manual match is remembered. */
