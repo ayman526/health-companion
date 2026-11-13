@@ -4,7 +4,7 @@ import { TYPICAL_RANGES, suggestByRange } from './rangeHints'
 
 describe('suggestions from the printed unit and range', () => {
   it('has a typical range for every numeric test (viral loads have none)', () => {
-    const numeric = LAB_TESTS.filter((t) => !t.qualitative && !['hcv_rna', 'hbv_dna'].includes(t.code)).map((t) => t.code)
+    const numeric = LAB_TESTS.filter((t) => !t.qualitative && !['hcv_rna', 'hbv_dna', 'urine_volume'].includes(t.code)).map((t) => t.code)
     expect(numeric.filter((c) => !TYPICAL_RANGES[c])).toEqual([])
     expect(Object.keys(TYPICAL_RANGES).filter((c) => !LAB_TESTS.some((t) => t.code === c))).toEqual([])
     for (const [low, high] of Object.values(TYPICAL_RANGES)) expect(low).toBeLessThan(high)

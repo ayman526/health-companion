@@ -20,7 +20,7 @@ declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void }
 // values - typically handwriting), the document is read again by Opus.
 // The ai_settings table ('scan' row) can change both models and the limit.
 const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: 'claude-opus-5-5', monthlyLimit: 15, enabled: true }
-const PROMPT_VERSION = 'extract-2026-10-28.1'
+const PROMPT_VERSION = 'extract-2026-11-13.1'
 const MAX_PDF_PAGES = 20
 // The API accepts images up to 5 MB; the app uploads a downsized reading copy for larger photos.
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -167,6 +167,14 @@ const CATALOG: [string, string][] = [
   ['urine_bacteria', 'Bacteria in urine'],
   ['urine_mucus', 'Mucus threads in urine'],
   ['urine_yeast', 'Yeast cells in urine'],
+  ['urine_volume', 'Urine sample volume (mL)'],
+  ['urine_bile_salts', 'Bile salts in urine'],
+  ['urine_ova', 'Worm eggs / ova / bilharzia in urine'],
+  ['urine_trichomonas', 'Trichomonas vaginalis in urine'],
+  ['widal_typhi_o', 'Widal test: Salmonella Typhi "O" antibody'],
+  ['widal_typhi_h', 'Widal test: Salmonella Typhi "H" antibody'],
+  ['widal_paratyphi_a', 'Widal test: Salmonella Paratyphi "A" antibody'],
+  ['widal_paratyphi_b', 'Widal test: Salmonella Paratyphi "B" antibody'],
   ['stool_colour', 'Stool colour (stool analysis)'],
   ['stool_consistency', 'Stool consistency'],
   ['stool_odour', 'Stool odour'],
@@ -313,6 +321,7 @@ Rules:
 - lab_flag only when the document marks the result (H, L, *, "High", "Critical", bold or coloured flags). Do not set flags yourself by comparing with the range.
 - Add a field name to uncertain_fields whenever it is blurred, cut off, handwritten and ambiguous, or could be misread (for example a decimal point, 1 vs 7, 0 vs 6, mg vs mcg). When in doubt, mark it uncertain.
 - All dates as YYYY-MM-DD (document_date, collected_at = sample collection date, reported_at = report date). Interpret day/month order using the document's country and language; if the order is ambiguous, set date_uncertain true.
+- Pages of a lab report PDF that are not results (an invoice, receipt, price list, payment page, cover page or terms) are never results: do not transcribe test names with prices or amounts as results. A printed "Bile Pigments" under urine is bilirubin in urine; a Widal report gives one result per antigen (Typhi "O", Typhi "H", Paratyphi "A", Paratyphi "B"), with the titer or "Negative" as the value.
 - lab_report: fill it for laboratory reports; for other documents return empty strings and an empty results list.
 - Medications (prescriptions, discharge summaries, doctor reports), often handwritten:
   - name_as_written exactly as written (brand or generic, any language). active_ingredient only if it is written on the document; never look it up from the brand name.

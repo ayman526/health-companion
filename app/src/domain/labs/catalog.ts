@@ -41,7 +41,11 @@ const same: UnitConversion = { scale: 1 }
 // Molar ↔ mass factors are standard SI conversion factors.
 const CHOL_MMOL = { scale: 38.67 }
 const enzymeUnits = { 'u/l': same, 'iu/l': same }
-const COUNT = { '10^3/ul': same, '10^9/l': same, '10^3/mm3': same }
+// Thousands per microlitre; "cmm" and "mm3" are the same volume as a microlitre.
+const COUNT = { '10^3/ul': same, '10^9/l': same, '10^3/mm3': same, '10^3/cmm': same, 'thousands/cmm': same, 'thousand/cmm': same, 'thousands/mm3': same, 'thousand/mm3': same, 'k/ul': same }
+const MILLIONS = { '10^6/ul': same, '10^12/l': same, '10^6/mm3': same, '10^6/cmm': same, 'millions/cmm': same, 'million/cmm': same, 'millions/mm3': same, 'million/mm3': same }
+// Cells per high-power field, as labs print it (/HPF, /H.P.F., cells/hpf).
+const HPF = { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same, '/h.p.f': same, '/h.p.f.': same, 'h.p.f': same, 'h.p.f.': same, '/hpf.': same, 'cells/h.p.f': same }
 const PERCENT = { '%': same }
 const RATIO = { '': same, 'ratio': same }
 const SECONDS = { 's': same, 'sec': same, 'seconds': same }
@@ -187,14 +191,14 @@ export const LAB_TESTS: LabTest[] = [
     code: 'platelets', loinc: ['777-3'], category: 'cbc',
     name: { en: 'Platelets', ar: 'الصفائح الدموية' },
     aliases: ['platelets', 'platelet count', 'plt', 'plts', 'platelet', 'الصفائح الدموية', 'الصفائح'],
-    canonicalUnit: '10³/µL', units: { '10^3/ul': same, '10^9/l': same, '10^3/mm3': same },
+    canonicalUnit: '10³/µL', units: COUNT,
     direction: 'in_range', cvi: 7.3,
   },
   {
     code: 'wbc', loinc: ['6690-2'], category: 'cbc',
     name: { en: 'White blood cells', ar: 'كرات الدم البيضاء' },
     aliases: ['wbc', 'wbcs', 'white blood cells', 'white blood cell count', 'leukocytes', 'leucocytes', 'tlc', 'total leucocytic count', 'total leukocyte count', 'كرات الدم البيضاء'],
-    canonicalUnit: '10³/µL', units: { '10^3/ul': same, '10^9/l': same, '10^3/mm3': same },
+    canonicalUnit: '10³/µL', units: COUNT,
     direction: 'in_range', cvi: 11.1,
   },
   // ---------------------------------------------------------------- thyroid
@@ -417,8 +421,8 @@ export const LAB_TESTS: LabTest[] = [
   {
     code: 'rbc', loinc: ['789-8'], category: 'cbc',
     name: { en: 'Red blood cells', ar: 'كرات الدم الحمراء' },
-    aliases: ['rbc', 'rbcs', 'red blood cells', 'red blood cell count', 'red cell count', 'erythrocytes', 'erythrocyte count', 'كرات الدم الحمراء'],
-    canonicalUnit: '10⁶/µL', units: { '10^6/ul': same, '10^12/l': same, '10^6/mm3': same },
+    aliases: ['rbc', 'rbcs', 'rbc count', 'rbcs count', 'red blood cells', 'red blood cell count', 'red cell count', 'erythrocytes', 'erythrocyte count', 'كرات الدم الحمراء'],
+    canonicalUnit: '10⁶/µL', units: MILLIONS,
     direction: 'in_range', cvi: 2.8,
   },
   {
@@ -779,18 +783,18 @@ export const LAB_TESTS: LabTest[] = [
     code: 'urine_pus', loinc: ['5821-4'], category: 'urine',
     name: { en: 'Urine pus cells (WBC)', ar: 'خلايا الصديد في البول' },
     aliases: ['pus cells', 'pus', 'urine pus cells', 'urine wbc', 'leucocytes urine', 'wbcs urine', 'pus cells hpf', 'صديد', 'خلايا صديد', 'خلايا الصديد'],
-    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+    canonicalUnit: '/HPF', units: HPF, direction: 'lower_better',
   },
   {
     code: 'urine_rbc', loinc: ['13945-1'], category: 'urine',
     name: { en: 'Urine red blood cells', ar: 'كرات الدم الحمراء في البول' },
     aliases: ['urine rbcs', 'urine rbc', 'rbcs urine', 'red cells urine', 'كرات دم حمراء في البول'],
-    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+    canonicalUnit: '/HPF', units: HPF, direction: 'lower_better',
   },
   {
     code: 'urine_sg', loinc: ['5811-5'], category: 'urine',
     name: { en: 'Urine specific gravity', ar: 'كثافة البول' },
-    aliases: ['specific gravity', 'sp gravity', 'sp gr', 'urine specific gravity', 'الكثافة النوعية', 'كثافة البول'],
+    aliases: ['specific gravity', 'sp gravity', 'sp gr', 'urine specific gravity', 'specific gravity in urine', 'sp gravity in urine', 'الكثافة النوعية', 'كثافة البول'],
     canonicalUnit: '', units: { '': same }, direction: 'in_range',
   },
   {
@@ -832,7 +836,7 @@ export const LAB_TESTS: LabTest[] = [
   {
     code: 'urine_bilirubin', loinc: ['5770-3'], category: 'urine',
     name: { en: 'Bilirubin in urine', ar: 'بيليروبين في البول' },
-    aliases: ['urine bilirubin', 'bilirubin in urine', 'بيليروبين في البول'],
+    aliases: ['urine bilirubin', 'bilirubin in urine', 'urine bile pigments', 'bile pigments in urine', 'بيليروبين في البول'],
     canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
   },
   {
@@ -893,6 +897,55 @@ export const LAB_TESTS: LabTest[] = [
     code: 'urine_yeast', loinc: [], category: 'urine',
     name: { en: 'Yeast cells in urine', ar: 'خلايا الخميرة في البول' },
     aliases: ['yeast', 'yeast cells', 'budding yeast', 'urine yeast', 'خميرة'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_volume', loinc: ['3167-4'], category: 'urine',
+    name: { en: 'Urine sample volume', ar: 'حجم عينة البول' },
+    aliases: ['urine volume', 'volume of urine', 'urine sample volume', 'حجم البول'],
+    canonicalUnit: 'mL', units: { 'ml': same, 'cc': same }, direction: 'in_range',
+  },
+  {
+    code: 'urine_bile_salts', loinc: [], category: 'urine',
+    name: { en: 'Bile salts in urine', ar: 'أملاح الصفراء في البول' },
+    aliases: ['urine bile salts', 'bile salts in urine', 'أملاح الصفراء في البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_ova', loinc: [], category: 'urine',
+    name: { en: 'Worm eggs (ova) in urine', ar: 'بويضات الديدان في البول' },
+    aliases: ['urine ova', 'ova in urine', 'schistosoma ova', 'schistosoma haematobium', 'bilharzia', 'بلهارسيا', 'بويضات بلهارسيا'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'urine_trichomonas', loinc: [], category: 'urine',
+    name: { en: 'Trichomonas in urine', ar: 'التريكوموناس في البول' },
+    aliases: ['urine trichomonas', 'trichomonas in urine', 'تريكوموناس في البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  // ---------------------------------------------------------------- Widal test (typhoid and paratyphoid antibodies)
+  {
+    code: 'widal_typhi_o', loinc: [], category: 'infection',
+    name: { en: 'Widal: Salmonella Typhi "O"', ar: 'ويدال: سالمونيلا التيفود O' },
+    aliases: ['salmonella typhi o', 'typhi o', 'widal typhi o', 'widal o', 's typhi o', 'typhoid o', 'salmonella typhi o antigen', 'تيفود o'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'widal_typhi_h', loinc: [], category: 'infection',
+    name: { en: 'Widal: Salmonella Typhi "H"', ar: 'ويدال: سالمونيلا التيفود H' },
+    aliases: ['salmonella typhi h', 'typhi h', 'widal typhi h', 'widal h', 's typhi h', 'typhoid h', 'salmonella typhi h antigen', 'تيفود h'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'widal_paratyphi_a', loinc: [], category: 'infection',
+    name: { en: 'Widal: Salmonella Paratyphi "A"', ar: 'ويدال: سالمونيلا الباراتيفود A' },
+    aliases: ['salmonella paratyphi a', 'paratyphi a', 'widal paratyphi a', 's paratyphi a', 'paratyphoid a', 'باراتيفود a'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'widal_paratyphi_b', loinc: [], category: 'infection',
+    name: { en: 'Widal: Salmonella Paratyphi "B"', ar: 'ويدال: سالمونيلا الباراتيفود B' },
+    aliases: ['salmonella paratyphi b', 'paratyphi b', 'widal paratyphi b', 's paratyphi b', 'paratyphoid b', 'باراتيفود b'],
     canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
   },
   // ---------------------------------------------------------------- stool analysis
@@ -974,13 +1027,13 @@ export const LAB_TESTS: LabTest[] = [
     code: 'stool_pus', loinc: [], category: 'stool',
     name: { en: 'Stool pus cells', ar: 'خلايا الصديد في البراز' },
     aliases: ['stool pus cells', 'stool wbc', 'fecal leukocytes', 'faecal leucocytes'],
-    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+    canonicalUnit: '/HPF', units: HPF, direction: 'lower_better',
   },
   {
     code: 'stool_rbc', loinc: [], category: 'stool',
     name: { en: 'Stool red blood cells', ar: 'كرات الدم الحمراء في البراز' },
     aliases: ['stool rbcs', 'stool rbc'],
-    canonicalUnit: '/HPF', units: { '/hpf': same, 'cells/hpf': same, '/hp': same, 'hpf': same }, direction: 'lower_better',
+    canonicalUnit: '/HPF', units: HPF, direction: 'lower_better',
   },
   {
     code: 'stool_epithelial', loinc: [], category: 'stool',
@@ -1046,6 +1099,7 @@ export function normalizeName(name: string): string {
     .replace(/ى/g, 'ي')
     .replace(/^\s*(\d{1,2}\s*[-.)]|[•▪●◦*-])\s+/, '') // list numbering or bullets in front of the name
     .replace(/\./g, '')
+    .replace(/["“”″]/g, ' ') // quotes around a letter, as in Salmonella Typhi "O"
     .replace(/#/g, ' absolute ') // "Neutrophils #" is the absolute count, not the percentage
     .replace(/[-_/:,;*]+/g, ' ')
     .replace(/\s+/g, ' ')
@@ -1123,7 +1177,10 @@ export function matchTest(
   opts: { shared?: ReadonlyMap<string, string>; lab?: ReadonlyMap<string, string>; unit?: string | null; numeric?: boolean; section?: string | null } = {},
 ): { code: string; source: MatchSource } | null {
   const specimen = opts.section ? specimenOf(opts.section) : null
-  const found = matchByName(reportedName, loinc, learned, { ...opts, specimen })
+  let found = matchByName(reportedName, loinc, learned, { ...opts, specimen })
+  // "Neutrophils" is printed twice (percent and absolute): the unit tells which.
+  const sibling = found && opts.numeric !== false && opts.unit ? UNIT_SIBLINGS[found.code] : undefined
+  if (found && sibling && !unitFits(BY_CODE.get(found.code)!, opts.unit) && unitFits(BY_CODE.get(sibling)!, opts.unit)) found = { ...found, code: sibling }
   if (!specimen) return found
   // Under a urine or stool heading, short names ("RBCs", "pH", "Colour", "Glucose") are that sample's values.
   const panel = PANELS[specimen]
@@ -1135,6 +1192,10 @@ export function matchTest(
   // Never a test from another sample: "Glucose" in urine or semen is not blood glucose.
   return found && specimenOfTest(found.code) === specimen ? found : null
 }
+
+const UNIT_SIBLINGS: Record<string, string> = Object.fromEntries(
+  ['neutrophils', 'lymphocytes', 'monocytes', 'eosinophils', 'basophils'].flatMap((c) => [[`${c}_pct`, `${c}_abs`], [`${c}_abs`, `${c}_pct`]]),
+)
 
 /** What a result was measured in, when it isn't blood. */
 export type Specimen = 'urine' | 'stool' | 'semen' | 'csf' | 'fluid'
@@ -1186,7 +1247,7 @@ const PANELS: Partial<Record<Specimen, { byCode: Record<string, string>; byName:
     },
   },
   urine: {
-    byCode: { rbc: 'urine_rbc', wbc: 'urine_pus', glucose: 'urine_glucose', total_protein: 'urine_protein', albumin: 'urine_protein', bilirubin_total: 'urine_bilirubin', hemoglobin: 'urine_blood' },
+    byCode: { rbc: 'urine_rbc', wbc: 'urine_pus', glucose: 'urine_glucose', total_protein: 'urine_protein', albumin: 'urine_protein', bilirubin_total: 'urine_bilirubin', hemoglobin: 'urine_blood', stool_ova: 'urine_ova' },
     byName: {
       ph: 'urine_ph', reaction: 'urine_ph', sg: 'urine_sg',
       colour: 'urine_colour', color: 'urine_colour', لون: 'urine_colour', اللون: 'urine_colour',
@@ -1195,6 +1256,9 @@ const PANELS: Partial<Record<Specimen, { byCode: Record<string, string>; byName:
       sugar: 'urine_glucose', سكر: 'urine_glucose', السكر: 'urine_glucose', جلوكوز: 'urine_glucose',
       blood: 'urine_blood', دم: 'urine_blood', الدم: 'urine_blood',
       'pus cells': 'urine_pus', pus: 'urine_pus',
+      volume: 'urine_volume', 'bile salts': 'urine_bile_salts', 'bile salt': 'urine_bile_salts',
+      'bile pigments': 'urine_bilirubin', 'bile pigment': 'urine_bilirubin', bile: 'urine_bilirubin',
+      ova: 'urine_ova', trichomonas: 'urine_trichomonas', 'trichomonas vaginalis': 'urine_trichomonas', 't vaginalis': 'urine_trichomonas',
     },
   },
 }

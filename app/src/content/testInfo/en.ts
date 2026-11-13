@@ -838,4 +838,46 @@ export const TEST_INFO_EN: Record<string, TestInfo> = {
     positive: 'Yeast can come from the skin or a yeast infection, more often with diabetes or after antibiotics.',
     helps: 'Your doctor decides if it matters, together with your symptoms.',
   },
+  // ---------------------------------------------------------------- more urine tests and the Widal test
+  urine_volume: {
+    about: 'This is the amount of urine in the sample sent to the lab. It is not how much urine you pass in a day.',
+    high: 'A larger sample doesn’t point to a health problem. It only depends on how much was collected.',
+    low: 'A small sample is common and is usually enough for the test.',
+    helps: 'Nothing to do. Your doctor reads the other urine results instead.',
+  },
+  urine_bile_salts: {
+    about: 'Bile salts are made by the liver to help digest fat. Usually none is found in urine.',
+    positive: 'Bile salts in urine can come with liver or bile duct conditions. Doctors read them together with bilirubin and liver blood tests.',
+    helps: 'Your doctor may ask for liver blood tests.',
+  },
+  urine_ova: {
+    about: 'This looks for worm eggs in the urine under the microscope. In some countries, such as Egypt, it is mainly used to check for bilharzia (schistosomiasis).',
+    positive: 'Finding eggs means a worm infection that can be treated with medication your doctor prescribes. It often comes from contact with canal or river water.',
+    helps: 'Avoid swimming in canal or river water, and ask your doctor about treatment.',
+  },
+  urine_trichomonas: {
+    about: 'This looks for Trichomonas vaginalis, a tiny parasite, in the urine sample.',
+    positive: 'Finding it points to a trichomonas infection, which is treatable with medication. Sexual partners are usually treated too.',
+    helps: 'Your doctor decides on treatment.',
+  },
+  widal_typhi_o: {
+    about: 'The Widal test looks for antibodies to the Salmonella bacteria that cause typhoid fever. This one is for the “O” (body) antigen of Salmonella Typhi.',
+    positive: 'Raised antibodies can point to typhoid fever, but the test also reacts after a past infection or vaccination, so doctors read it with your symptoms and other tests such as a blood culture. Borderline results are usually repeated after 2 to 3 weeks.',
+    helps: 'Your doctor decides if more tests are needed. Drink safe water and wash your hands well.',
+  },
+  widal_typhi_h: {
+    about: 'The Widal test looks for antibodies to the Salmonella bacteria that cause typhoid fever. This one is for the “H” (flagellar) antigen of Salmonella Typhi.',
+    positive: 'Raised “H” antibodies can stay for months after an infection or vaccination, so doctors read them with your symptoms and other tests such as a blood culture. Borderline results are usually repeated after 2 to 3 weeks.',
+    helps: 'Your doctor decides if more tests are needed. Drink safe water and wash your hands well.',
+  },
+  widal_paratyphi_a: {
+    about: 'This Widal result looks for antibodies to Salmonella Paratyphi A, which causes paratyphoid fever, an illness similar to typhoid.',
+    positive: 'Raised antibodies can point to paratyphoid fever, but they can also be left over from a past infection, so doctors read them with your symptoms and other tests. Borderline results are usually repeated after 2 to 3 weeks.',
+    helps: 'Your doctor decides if more tests are needed. Drink safe water and wash your hands well.',
+  },
+  widal_paratyphi_b: {
+    about: 'This Widal result looks for antibodies to Salmonella Paratyphi B, which causes paratyphoid fever, an illness similar to typhoid.',
+    positive: 'Raised antibodies can point to paratyphoid fever, but they can also be left over from a past infection, so doctors read them with your symptoms and other tests. Borderline results are usually repeated after 2 to 3 weeks.',
+    helps: 'Your doctor decides if more tests are needed. Drink safe water and wash your hands well.',
+  },
 }
