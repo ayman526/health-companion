@@ -20,7 +20,7 @@ declare const EdgeRuntime: { waitUntil(p: Promise<unknown>): void }
 // values - typically handwriting), the document is read again by Opus.
 // The ai_settings table ('scan' row) can change both models and the limit.
 const DEFAULTS: AiSetting = { model: 'claude-sonnet-5-5', backupModel: 'claude-opus-5-5', monthlyLimit: 15, enabled: true }
-const PROMPT_VERSION = 'extract-2026-11-13.1'
+const PROMPT_VERSION = 'extract-2026-11-13.2'
 const MAX_PDF_PAGES = 20
 // The API accepts images up to 5 MB; the app uploads a downsized reading copy for larger photos.
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -175,6 +175,12 @@ const CATALOG: [string, string][] = [
   ['widal_typhi_h', 'Widal test: Salmonella Typhi "H" antibody'],
   ['widal_paratyphi_a', 'Widal test: Salmonella Paratyphi "A" antibody'],
   ['widal_paratyphi_b', 'Widal test: Salmonella Paratyphi "B" antibody'],
+  ['abo_group', 'ABO blood group (A, B, AB, O)'],
+  ['rh_factor', 'Rh factor / Rh grouping (positive or negative)'],
+  ['hcg', 'HCG / beta-HCG (pregnancy hormone), quantitative'],
+  ['urine_culture', 'Urine culture and sensitivity'],
+  ['stool_culture', 'Stool culture and sensitivity'],
+  ['blood_culture', 'Blood culture and sensitivity'],
   ['stool_colour', 'Stool colour (stool analysis)'],
   ['stool_consistency', 'Stool consistency'],
   ['stool_odour', 'Stool odour'],
@@ -317,11 +323,11 @@ Rules:
 - section: the heading the result is printed under, exactly as printed (for example "Lipid Profile", "Complete Blood Count", "Urine Analysis", "وظائف الكبد"), or "". When there are sub-headings, give the main heading first, then the sub-headings, joined with " > " (for example "Stool Analysis > Microscopic Examination > Digestion"). If the results are not from blood and no printed heading names the sample, start the path with the sample yourself: "Urine", "Stool", "Semen", "CSF" or the body fluid's name (for example "Urine > Chemical Examination").
 - Use the section to read short or ambiguous names: "TG" under a lipid heading is triglycerides; "RBCs", "WBCs"/"Pus cells" or "pH" under a urine heading are urine microscopy/urine values, not the blood count; "Colour", "Consistency", "Mucus", "Blood", "Fat", "Pus cells" or "RBCs" under a stool heading are stool analysis values; a result from urine, stool, semen, CSF or another body fluid never gets a blood test's catalog_code (urine "Glucose" is urine_glucose, semen "pH" is "unknown"); "HB" under a blood count is hemoglobin.
 - catalog_code: the code from the catalog below that is the same test (same analyte AND same kind of measurement), or "unknown". Do not pick a code for a related but different test: fasting vs random glucose, direct vs total bilirubin, free vs total T4, a ratio vs its components, urine vs blood. When unsure, use "unknown".
-- Reference ranges printed in several levels (for example lipids: "Desirable < 200, Borderline 200-239, High >= 240"): use the desirable/normal level for ref_low and ref_high, put the full printed text in ref_text, and add "ref_low" and "ref_high" to uncertain_fields if it is not clear which level is the normal one. Ranges given only for another sex or age group than stated on the report: leave ref_low/ref_high empty and keep ref_text.
+- Reference ranges printed in several levels (for example lipids: "Desirable < 200, Borderline 200-239, High >= 240"): use the desirable/normal level for ref_low and ref_high, put the full printed text in ref_text, and add "ref_low" and "ref_high" to uncertain_fields if it is not clear which level is the normal one. Ranges given only for another sex or age group than stated on the report, or ranges that depend on pregnancy or gestational week (for example HCG): leave ref_low/ref_high empty and keep ref_text.
 - lab_flag only when the document marks the result (H, L, *, "High", "Critical", bold or coloured flags). Do not set flags yourself by comparing with the range.
 - Add a field name to uncertain_fields whenever it is blurred, cut off, handwritten and ambiguous, or could be misread (for example a decimal point, 1 vs 7, 0 vs 6, mg vs mcg). When in doubt, mark it uncertain.
 - All dates as YYYY-MM-DD (document_date, collected_at = sample collection date, reported_at = report date). Interpret day/month order using the document's country and language; if the order is ambiguous, set date_uncertain true.
-- Pages of a lab report PDF that are not results (an invoice, receipt, price list, payment page, cover page or terms) are never results: do not transcribe test names with prices or amounts as results. A printed "Bile Pigments" under urine is bilirubin in urine; a Widal report gives one result per antigen (Typhi "O", Typhi "H", Paratyphi "A", Paratyphi "B"), with the titer or "Negative" as the value.
+- Pages of a lab report PDF that are not results (an invoice, receipt, price list, payment page, cover page or terms) are never results: do not transcribe test names with prices or amounts as results. A printed "Bile Pigments" under urine is bilirubin in urine; a "Culture" row under a urine, stool or blood culture heading is that culture's result (value_as_printed such as "No growth after 48 hrs incubation"); the ABO group (A, B, AB, O) and Rh grouping (Positive/Negative) are two separate results; a Widal report gives one result per antigen (Typhi "O", Typhi "H", Paratyphi "A", Paratyphi "B"), with the titer or "Negative" as the value.
 - lab_report: fill it for laboratory reports; for other documents return empty strings and an empty results list.
 - Medications (prescriptions, discharge summaries, doctor reports), often handwritten:
   - name_as_written exactly as written (brand or generic, any language). active_ingredient only if it is written on the document; never look it up from the brand name.

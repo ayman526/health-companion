@@ -51,13 +51,26 @@ const MIXED: Row[] = [
   ['Salmonella Paratyphi "A"', 'WIDAL TEST REPORT', '', 'widal_paratyphi_a'], ['Salmonella Paratyphi "B"', 'WIDAL TEST REPORT', '', 'widal_paratyphi_b'],
 ]
 
+// A third report: blood group, Rh, HCG and a urine culture.
+const THIRD: Row[] = [
+  ['ABO GROUP (EDTA Blood)', 'HEMATOLOGY REPORT > ABO & Rh Typing', '', 'abo_group'],
+  ['Rh Grouping (EDTA Blood)', 'HEMATOLOGY REPORT > ABO & Rh Typing', '', 'rh_factor'],
+  ['Human chorionic gonadotropin (HCG)', 'Fertility Profile', 'mIU/mL', 'hcg'],
+  ['Pus cells', 'MICROBIOLOGY REPORT > Urine Culture and Sensitivity', '', 'urine_pus'],
+  ['Culture', 'MICROBIOLOGY REPORT > Urine Culture and Sensitivity', '', 'urine_culture'],
+  ['Culture', 'Stool Culture and Sensitivity', '', 'stool_culture'],
+  ['Culture', 'Blood Culture and Sensitivity', '', 'blood_culture'],
+  ['Culture', 'Wound swab', '', ''],
+]
+
 describe('two real lab reports', () => {
-  for (const [title, rows] of [['chemistry and thyroid report', CHEMISTRY], ['stool, urine, blood count and Widal report', MIXED]] as const) {
+  for (const [title, rows] of [['chemistry and thyroid report', CHEMISTRY], ['stool, urine, blood count and Widal report', MIXED], ['blood group, HCG and culture report', THIRD]] as const) {
     it(`matches every row of the ${title}, with a unit that fits`, () => {
       const sections = sectionsInContext(rows.map(([name, section]) => ({ name, section })))
       const got = rows.map(([name, , unit], i) => matchTest(name, null, undefined, { section: sections[i], unit, numeric: unit !== '' })?.code ?? null)
-      expect(got).toEqual(rows.map((r) => r[3]))
+      expect(got).toEqual(rows.map((r) => r[3] || null))
       rows.forEach(([, , unit], i) => {
+        if (!got[i]) return
         const test = getTest(got[i]!)!
         if (unit && !test.qualitative) expect(unitFits(test, unit), `${got[i]} with "${unit}"`).toBe(true)
       })

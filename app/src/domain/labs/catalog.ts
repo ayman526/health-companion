@@ -948,6 +948,43 @@ export const LAB_TESTS: LabTest[] = [
     aliases: ['salmonella paratyphi b', 'paratyphi b', 'widal paratyphi b', 's paratyphi b', 'paratyphoid b', 'باراتيفود b'],
     canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
   },
+  // ---------------------------------------------------------------- blood group, pregnancy hormone, cultures
+  {
+    code: 'abo_group', loinc: ['883-9'], category: 'other',
+    name: { en: 'ABO blood group', ar: 'فصيلة الدم (ABO)' },
+    aliases: ['abo group', 'abo grouping', 'abo typing', 'abo blood group', 'blood group', 'blood group abo', 'blood grouping', 'abo', 'فصيلة الدم', 'فصيله الدم'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'rh_factor', loinc: ['10331-7'], category: 'other',
+    name: { en: 'Rh factor', ar: 'عامل ريزس (Rh)' },
+    aliases: ['rh', 'rh factor', 'rh grouping', 'rh group', 'rh typing', 'rh type', 'rh d', 'rhesus', 'rhesus factor', 'rh blood group', 'عامل ريزس', 'عامل ار اتش'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'hcg', loinc: ['21198-7'], category: 'hormones',
+    name: { en: 'HCG (pregnancy hormone)', ar: 'هرمون الحمل (HCG)' },
+    aliases: ['hcg', 'human chorionic gonadotropin', 'human chorionic gonadotrophin', 'beta hcg', 'b hcg', 'total hcg', 'quantitative hcg', 'hcg quantitative', 'serum hcg', 'هرمون الحمل', 'بيتا اتش سي جي'],
+    canonicalUnit: 'mIU/mL', units: { 'miu/ml': same, 'iu/l': same, 'u/l': same }, direction: 'in_range',
+  },
+  {
+    code: 'urine_culture', loinc: [], category: 'urine',
+    name: { en: 'Urine culture', ar: 'مزرعة البول' },
+    aliases: ['urine culture', 'urine culture and sensitivity', 'urine culture sensitivity', 'urine c s', 'culture and sensitivity urine', 'مزرعة بول', 'مزرعه البول', 'مزرعة البول'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'stool_culture', loinc: [], category: 'stool',
+    name: { en: 'Stool culture', ar: 'مزرعة البراز' },
+    aliases: ['stool culture', 'stool culture and sensitivity', 'stool c s', 'faecal culture', 'fecal culture', 'مزرعة براز', 'مزرعه البراز', 'مزرعة البراز'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
+  {
+    code: 'blood_culture', loinc: [], category: 'infection',
+    name: { en: 'Blood culture', ar: 'مزرعة الدم' },
+    aliases: ['blood culture', 'blood culture and sensitivity', 'blood c s', 'مزرعة دم', 'مزرعه الدم', 'مزرعة الدم'],
+    canonicalUnit: '', units: {}, direction: 'in_range', qualitative: true,
+  },
   // ---------------------------------------------------------------- stool analysis
   // Short printed names ("Colour", "Fat", "Pus cells") only mean these under a
   // stool heading (see PANELS); the aliases here are stool-only names.
@@ -1125,6 +1162,8 @@ for (const t of LAB_TESTS) {
     // Same cleaning as printed names (first key = full name, brackets removed), plus its noise-free form.
     const full = nameKeys(a)[0]
     for (const k of [full, full && stripNoise(full)]) {
+      // "Blood culture" without "blood" is just "culture": it says nothing about the sample.
+      if (k && k !== full && /^(culture\b.*|c s)$/.test(k)) continue
       if (k && !ALIAS_INDEX.has(k)) ALIAS_INDEX.set(k, t.code)
     }
   }
@@ -1181,7 +1220,11 @@ export function matchTest(
   // "Neutrophils" is printed twice (percent and absolute): the unit tells which.
   const sibling = found && opts.numeric !== false && opts.unit ? UNIT_SIBLINGS[found.code] : undefined
   if (found && sibling && !unitFits(BY_CODE.get(found.code)!, opts.unit) && unitFits(BY_CODE.get(sibling)!, opts.unit)) found = { ...found, code: sibling }
-  if (!specimen) return found
+  if (!specimen) {
+    // "Culture" under a blood culture heading (blood has no sample word of its own).
+    if (!found && opts.section && BLOOD_CULTURE_SECTION.test(normalizeName(opts.section)) && nameKeys(reportedName).some((k) => CULTURE_NAMES.has(k))) return { code: 'blood_culture', source: 'catalog' }
+    return found
+  }
   // Under a urine or stool heading, short names ("RBCs", "pH", "Colour", "Glucose") are that sample's values.
   const panel = PANELS[specimen]
   if (panel) {
@@ -1196,6 +1239,9 @@ export function matchTest(
 const UNIT_SIBLINGS: Record<string, string> = Object.fromEntries(
   ['neutrophils', 'lymphocytes', 'monocytes', 'eosinophils', 'basophils'].flatMap((c) => [[`${c}_pct`, `${c}_abs`], [`${c}_abs`, `${c}_pct`]]),
 )
+
+const BLOOD_CULTURE_SECTION = /blood culture|مزرعه الدم|مزرعه دم/
+const CULTURE_NAMES = new Set(['culture', 'culture result', 'culture and sensitivity', 'c s'])
 
 /** What a result was measured in, when it isn't blood. */
 export type Specimen = 'urine' | 'stool' | 'semen' | 'csf' | 'fluid'
@@ -1244,6 +1290,7 @@ const PANELS: Partial<Record<Specimen, { byCode: Record<string, string>; byName:
       fat: 'stool_fat', fats: 'stool_fat', دهون: 'stool_fat',
       'pus cells': 'stool_pus', pus: 'stool_pus', 'epithelial cells': 'stool_epithelial', epithelial: 'stool_epithelial',
       'yeast cells': 'stool_yeast', yeast: 'stool_yeast', cysts: 'stool_protozoa',
+      culture: 'stool_culture', 'culture result': 'stool_culture', 'culture and sensitivity': 'stool_culture', 'c s': 'stool_culture',
     },
   },
   urine: {
@@ -1258,6 +1305,7 @@ const PANELS: Partial<Record<Specimen, { byCode: Record<string, string>; byName:
       'pus cells': 'urine_pus', pus: 'urine_pus',
       volume: 'urine_volume', 'bile salts': 'urine_bile_salts', 'bile salt': 'urine_bile_salts',
       'bile pigments': 'urine_bilirubin', 'bile pigment': 'urine_bilirubin', bile: 'urine_bilirubin',
+      culture: 'urine_culture', 'culture result': 'urine_culture', 'culture and sensitivity': 'urine_culture', 'c s': 'urine_culture',
       ova: 'urine_ova', trichomonas: 'urine_trichomonas', 'trichomonas vaginalis': 'urine_trichomonas', 't vaginalis': 'urine_trichomonas',
     },
   },

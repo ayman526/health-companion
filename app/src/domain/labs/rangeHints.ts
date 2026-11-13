@@ -28,6 +28,7 @@ export const TYPICAL_RANGES: Record<string, [number, number]> = {
   fsh: [1.5, 12], lh: [1.5, 9], estradiol: [15, 350], progesterone: [0.2, 25], amh: [1, 10],
   amylase: [30, 110], lipase: [10, 60], ck: [30, 200], ldh: [140, 280], troponin_hs: [0, 14],
   afp: [0, 10], cea: [0, 5], ca125: [0, 35], ca199: [0, 37],
+  hcg: [0, 10],
   urine_pus: [0, 5], urine_rbc: [0, 3], urine_sg: [1.005, 1.03], urine_ph: [4.5, 8], stool_pus: [0, 5], stool_rbc: [0, 2],
 }
 

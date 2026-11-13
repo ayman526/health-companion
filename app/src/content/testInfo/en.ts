@@ -880,4 +880,36 @@ export const TEST_INFO_EN: Record<string, TestInfo> = {
     positive: 'Raised antibodies can point to paratyphoid fever, but they can also be left over from a past infection, so doctors read them with your symptoms and other tests. Borderline results are usually repeated after 2 to 3 weeks.',
     helps: 'Your doctor decides if more tests are needed. Drink safe water and wash your hands well.',
   },
+  // ---------------------------------------------------------------- blood group, pregnancy hormone, cultures
+  abo_group: {
+    about: 'Your ABO blood group (A, B, AB or O) depends on markers on the surface of your red blood cells. It never changes.',
+    positive: 'Your blood group matters for blood transfusions and in pregnancy.',
+    helps: 'Keep a note of your blood group. It is useful in an emergency.',
+  },
+  rh_factor: {
+    about: 'The Rh factor (Rh D) is a protein on red blood cells. You are Rh positive if you have it and Rh negative if you don’t. It never changes.',
+    positive: 'Rh positive is the most common and is normal. Rh status matters for blood transfusions and in pregnancy, when an Rh negative mother may need extra care.',
+    helps: 'If you are Rh negative and pregnant or planning a pregnancy, tell your doctor.',
+  },
+  hcg: {
+    about: 'HCG is a hormone made after an embryo implants in the womb. A blood test measures how much is in your blood, which helps show whether and how far along a pregnancy may be.',
+    high: 'Levels rise quickly in early pregnancy, and the expected range depends on the week. In someone who isn’t pregnant, a raised level can come from other causes that your doctor will look into.',
+    low: 'Below 10 mIU/mL usually means not pregnant. In pregnancy, a level that rises more slowly than expected is followed with repeat tests.',
+    helps: 'In early pregnancy, doctors often repeat the test after a couple of days and read it together with an ultrasound.',
+  },
+  urine_culture: {
+    about: 'A urine culture grows any bacteria in your urine in the lab, usually for 24 to 48 hours, to see if there is an infection and which medicines work against it.',
+    positive: 'Growth means bacteria were found. The report then lists which antibiotics they respond to, and your doctor decides if treatment is needed. “No growth” means no bacteria grew.',
+    helps: 'Take any treatment exactly as your doctor prescribes, and drink enough water.',
+  },
+  stool_culture: {
+    about: 'A stool culture grows bacteria from the stool sample in the lab to look for those that cause diarrhea and infection, such as Salmonella and Shigella.',
+    positive: 'Growth of a harmful bacteria points to an infection that your doctor may treat. Normal gut bacteria are not reported.',
+    helps: 'Drink plenty of fluids if you have diarrhea. Your doctor decides on treatment.',
+  },
+  blood_culture: {
+    about: 'A blood culture checks whether bacteria or yeast grow from a sample of your blood.',
+    positive: 'Growth means germs were found in the blood, which needs your doctor’s attention. The lab then tests which medicines work against them.',
+    helps: 'Your doctor decides on further tests and treatment.',
+  },
 }
